@@ -38,7 +38,7 @@ public class GameController {
     */
 
     @GetMapping("/games/{id}")
-    ResponseEntity getPlayer(@PathVariable("id") Long id, @RequestParam("fields") String fields) {
+    ResponseEntity getGame(@PathVariable("id") Long id, @RequestParam("fields") String fields) {
 
         // TODO: get game by id
 
@@ -46,7 +46,7 @@ public class GameController {
     }
 
     @PutMapping("/games/{id}")
-    ResponseEntity updatePlayer(@PathVariable Long id) {
+    ResponseEntity updateGame(@PathVariable Long id) {
 
         // TODO: update game by id
 
