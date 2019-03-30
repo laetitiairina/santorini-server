@@ -3,10 +3,9 @@ package ch.uzh.ifi.seal.soprafs19.controller;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class PlayerController {
@@ -27,5 +26,21 @@ public class PlayerController {
     @PostMapping("/players")
     Player createPlayer(@RequestBody Player newPlayer) {
         return this.service.createPlayer(newPlayer);
+    }
+
+    @GetMapping("/players/{id}")
+    ResponseEntity getPlayer(@PathVariable Long id, @RequestParam("fields") String fields) {
+
+        // TODO: get player by id
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/players/{id}")
+    ResponseEntity updatePlayer(@PathVariable Long id) {
+
+        // TODO: update player by id
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -4,10 +4,9 @@ import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.BoardService;
 import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class GameController {
@@ -37,4 +36,20 @@ public class GameController {
         return this.service.createUser(newGame);
     }
     */
+
+    @GetMapping("/games/{id}")
+    ResponseEntity getPlayer(@PathVariable("id") Long id, @RequestParam("fields") String fields) {
+
+        // TODO: get game by id
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/games/{id}")
+    ResponseEntity updatePlayer(@PathVariable Long id) {
+
+        // TODO: update game by id
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
