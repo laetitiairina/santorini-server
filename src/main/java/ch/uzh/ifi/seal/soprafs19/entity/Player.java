@@ -20,6 +20,9 @@ public class Player implements Serializable {
 	private Long userId;
 
 	private Long gameId;
+
+	@Column(nullable = false)
+	private Integer mode;
 	
 	private Integer card;
 
@@ -47,6 +50,14 @@ public class Player implements Serializable {
 
 	public void setGameId(Long gameId) {
 		this.gameId = gameId;
+	}
+
+	public Integer getMode() {
+		return mode;
+	}
+
+	public void setMode(Integer mode) {
+		this.mode = mode;
 	}
 
 	public Integer getCard() {
