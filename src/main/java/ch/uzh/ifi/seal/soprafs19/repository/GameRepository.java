@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository("gameRepository")
 public interface GameRepository extends CrudRepository<Game, Long> {
 	//Game findByName(String name);
+
+    // TODO ewa - Add methods
 }
