@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs19.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,11 +13,20 @@ public class Board implements Serializable {
 
 	@Id
 	@GeneratedValue
+	@Column(name = "board_id")
 	private Long id;
 
-	@OneToMany
+	@OneToMany(mappedBy = "board")
 	@Column(nullable = false)
 	private List<Field> fields;
+
+	@OneToMany(mappedBy = "board")
+	//@Column(nullable = false)
+	private List<Worker> workers;
+
+	@OneToOne
+	@JoinColumn(name = "game_id")
+	private Game game;
 
 
 	public Long getId() {
@@ -33,6 +43,30 @@ public class Board implements Serializable {
 
 	public void setFields(List<Field> fields) {
 		this.fields = fields;
+	}
+
+	public List<Worker> getWorkers() {
+		return workers;
+	}
+
+	public void setWorkers(List<Worker> workers) {
+		this.workers = workers;
+	}
+
+	public Board(Integer numberOfFields) {
+
+		this.fields = new ArrayList<Field>();
+
+		for (int i = 0; i < numberOfFields; i++) {
+			this.fields.add(new Field(i));
+		}
+
+		// TODO: Initialize workers
+		/*
+		for (int i = 0; i < numberOfWorkers; i++) {
+			this.workers.add(new Worker());
+		}
+		*/
 	}
 
 
