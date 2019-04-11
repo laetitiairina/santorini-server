@@ -2,26 +2,24 @@ package ch.uzh.ifi.seal.soprafs19.controller;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
-import ch.uzh.ifi.seal.soprafs19.service.BoardService;
-import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class GameController {
 
-    private final GameService gameService;
+    @Autowired
+    private GameService service;
 
-    private final BoardService boardService;
-
-    private final PlayerService playerService;
-
-    GameController(GameService gameService, BoardService boardService, PlayerService playerService) {
-        this.gameService = gameService;
-        this.boardService = boardService;
-        this.playerService = playerService;
+    /*
+    GameController(GameService gameService) {
+        this.service = gameService;
     }
+    */
 
     /*
     @GetMapping("/games")
@@ -38,7 +36,7 @@ public class GameController {
     */
 
     @GetMapping("/games/{id}")
-    ResponseEntity getGame(@PathVariable("id") Long id, @RequestParam("fields") String fields) {
+    ResponseEntity getGame(@PathVariable("id") Long id, @RequestParam(required = false) List<String> fields) {
 
         // TODO: get game by id
 
