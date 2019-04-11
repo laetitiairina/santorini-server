@@ -2,11 +2,9 @@ package ch.uzh.ifi.seal.soprafs19.entity;
 
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 public class Game implements Serializable {
@@ -16,22 +14,19 @@ public class Game implements Serializable {
 
 	@Id
 	@GeneratedValue
+	@Column(name = "game_id")
 	private Long id;
-	
-	@Column(nullable = false) 
+
+	@OneToOne(mappedBy = "game", cascade = CascadeType.ALL)
+	//@Column(nullable = false)
 	private Board board;
-	
-	@Column(nullable = false)
-	private Player player1;
 
+	@OneToMany(mappedBy = "game")
 	@Column(nullable = false)
-	private Player player2;
+	private List<Player> players;
 
-	@Column(nullable = false)
-	private Integer card1;
-
-	@Column(nullable = false)
-	private Integer card2;
+	@OneToMany(mappedBy = "game")
+	private List<Card> cards;
 	
 	@Column(nullable = false)
 	private Boolean isGodMode;
@@ -39,11 +34,14 @@ public class Game implements Serializable {
 	@Column(nullable = false)
 	private GameStatus status;
 
-	@Column(nullable = false)
-	private Long currentPlayerId;
+	// TODO: Fix currentPlayer or include isCurrentPlayer in player entity
+	/*
+	@OneToOne(mappedBy = "game")
+	//@Column(nullable = false)
+	private Player currentPlayer;
+	*/
 
-	@Column(nullable = false)
-	private Integer currentWorker;
+	private Worker currentWorker;
 
 	public Long getId() {
 		return id;
@@ -61,36 +59,20 @@ public class Game implements Serializable {
 		this.board = board;
 	}
 
-	public Player getPlayer1() {
-		return player1;
+	public List<Player> getPlayers() {
+		return players;
 	}
 
-	public void setPlayer1(Player player1) {
-		this.player1 = player1;
+	public void setPlayers(List<Player> players) {
+		this.players = players;
 	}
 
-	public Player getPlayer2() {
-		return player2;
+	public List<Card> getCards() {
+		return cards;
 	}
 
-	public void setPlayer2(Player player2) {
-		this.player2 = player2;
-	}
-
-	public Integer getCard1() {
-		return card1;
-	}
-
-	public void setCard1(Integer card1) {
-		this.card1 = card1;
-	}
-
-	public Integer getCard2() {
-		return card2;
-	}
-
-	public void setCard2(Integer card2) {
-		this.card2 = card2;
+	public void setCards(List<Card> cards) {
+		this.cards = cards;
 	}
 
 	public Boolean getIsGodMode() {
@@ -109,20 +91,36 @@ public class Game implements Serializable {
 		this.status = status;
 	}
 
-	public Long getCurrentPlayerId() {
-		return currentPlayerId;
+	/*
+	public Player getCurrentPlayer() {
+		return currentPlayer;
 	}
 
-	public void setCurrentPlayerId(Long currentPlayerId) {
-		this.currentPlayerId = currentPlayerId;
+	public void setCurrentPlayer(Player currentPlayer) {
+		this.currentPlayer = currentPlayer;
 	}
+	*/
 
-	public Integer getCurrentWorker() {
+	public Worker getCurrentWorker() {
 		return currentWorker;
 	}
 
-	public void setCurrentWorker(Integer currentWorker) {
+	public void setCurrentWorker(Worker currentWorker) {
 		this.currentWorker = currentWorker;
+	}
+
+	public Game() {
+	}
+
+	public Game(List<Player> matchedPlayers, Integer numberOfFields) {
+		this.players = matchedPlayers;
+		this.isGodMode = matchedPlayers.get(0).getIsGodMode();
+		this.status = GameStatus.CARDS10;
+		//this.currentPlayer = matchedPlayers.get(0);
+
+		// Delete board and save fields in game entity directly?
+		Board newBoard = new Board(numberOfFields);
+		this.board = newBoard;
 	}
 
 	@Override
