@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.service;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
+import ch.uzh.ifi.seal.soprafs19.helper.MatchMaker;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,19 +9,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 @Transactional
 public class PlayerService {
 
     private final Logger log = LoggerFactory.getLogger(PlayerService.class);
 
-    private final PlayerRepository playerRepository;
-
+    @Autowired
+    private PlayerRepository playerRepository;
 
     @Autowired
-    public PlayerService(PlayerRepository playerRepository) {
+    private MatchMaker matchMaker;
+
+    //@Autowired
+    /*public PlayerService(PlayerRepository playerRepository, MatchMaker matchMaker) {
         this.playerRepository = playerRepository;
-    }
+        this.matchMaker = matchMaker;
+    }*/
 
     /*
     public Iterable<Player> getPlayers() {
@@ -28,12 +36,38 @@ public class PlayerService {
     }
     */
 
+    /**
+     * Get player by id
+     * @param id
+     * @return
+     */
+    public Optional<Player> getPlayerById(Long id) {
+        return playerRepository.findById(id);
+    }
+
+    /**
+     * Create a new player and start matchmaking
+     * @param newPlayer
+     * @return
+     */
     public Player createPlayer(Player newPlayer) {
 
-        // TODO: set properties of newPlayer
+        newPlayer.setToken(UUID.randomUUID().toString());
 
         playerRepository.save(newPlayer);
+
+        // Push player to matchmaking queue
+        matchMaker.pushPlayer(newPlayer);
+
         log.debug("Created Information for Player: {}", newPlayer);
         return newPlayer;
+    }
+
+    /**
+     * Update player
+     * @param newPlayer
+     */
+    public void updatePlayer(Player newPlayer) {
+        playerRepository.save(newPlayer);
     }
 }

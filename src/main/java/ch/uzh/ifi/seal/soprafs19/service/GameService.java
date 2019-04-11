@@ -28,11 +28,12 @@ public class GameService {
     }
     */
 
-    public Game createGame() {
-        Game newGame = new Game();
-
-        // TODO: set properties of newGame
-
+    /**
+     * Create a new game
+     * @param newGame
+     * @return
+     */
+    public Game createGame(Game newGame) {
         gameRepository.save(newGame);
         log.debug("Created Information for Game: {}", newGame);
         return newGame;

@@ -12,21 +12,21 @@ public class Field implements Serializable {
 	@Id
 	@GeneratedValue
 	private Long id;
-	
-	@Column(unique = true)
-	private Integer worker;
+
+	private Worker worker;
 
 	@Column(nullable = false)
 	private Integer blocks;
-	
+
 	@Column(nullable = false)
 	private Boolean hasDome;
 
 	@Column(nullable = false)
-	private Integer posX;
+	private Integer pos;
 
-	@Column(nullable = false)
-	private Integer posY;
+	@ManyToOne
+	@JoinColumn(name = "board_id")
+	private Board board;
 
 	public Long getId() {
 		return id;
@@ -36,7 +36,43 @@ public class Field implements Serializable {
 		this.id = id;
 	}
 
-	// TODO: Implement getters and setters
+	public Worker getWorker() {
+		return worker;
+	}
+
+	public void setWorker(Worker worker) {
+		this.worker = worker;
+	}
+
+	public Integer getBlocks() {
+		return blocks;
+	}
+
+	public void setBlocks(Integer blocks) {
+		this.blocks = blocks;
+	}
+
+	public Boolean getHasDome() {
+		return hasDome;
+	}
+
+	public void setHasDome(Boolean hasDome) {
+		this.hasDome = hasDome;
+	}
+
+	public Integer getPos() {
+		return pos;
+	}
+
+	public void setPos(Integer pos) {
+		this.pos = pos;
+	}
+
+	public Field(Integer pos) {
+		this.blocks = 0;
+		this.hasDome = false;
+		this.pos = pos;
+	}
 
 	@Override
 	public boolean equals(Object o) {

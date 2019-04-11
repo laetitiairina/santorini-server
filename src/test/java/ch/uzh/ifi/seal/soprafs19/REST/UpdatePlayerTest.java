@@ -64,7 +64,7 @@ public class UpdatePlayerTest {
 
         Player player = new Player();
         player.setUserId(testUser.getId());
-        player.setMode(0);
+        player.setIsGodMode(false);
 
         testPlayer = playerService.createPlayer(player);
 
@@ -77,18 +77,16 @@ public class UpdatePlayerTest {
 
         Player player = playerRepository.findByUserId(testUser.getId());
 
-        Assert.assertNull(player.getCard());
-        Assert.assertNull(player.getColor());
+        Assert.assertTrue(player.getIsGodMode() == false);
 
         mvc.perform(put("/players/"+testPlayer.getId())
                 .contentType("application/json;charset=UTF-8")
-                .content("{\"card\":1,\"color\":1}"))
+                .content("{\"isGodMode\":true}"))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
         player = playerRepository.findByUserId(testUser.getId());
 
-        Assert.assertTrue(player.getCard() == 1);
-        Assert.assertTrue(player.getColor() == 1);
+        Assert.assertTrue(player.getIsGodMode() == true);
     }
 }

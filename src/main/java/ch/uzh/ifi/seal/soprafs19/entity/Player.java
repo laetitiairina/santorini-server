@@ -1,9 +1,8 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -15,18 +14,20 @@ public class Player implements Serializable {
 	@Id
 	@GeneratedValue
 	private Long id;
-	
-	@Column(nullable = false, unique = true)
+
+	// TODO: Implement User
+	//@Column(nullable = false, unique = true)
 	private Long userId;
 
-	private Long gameId;
-
 	@Column(nullable = false)
-	private Integer mode;
-	
-	private Integer card;
+	private Boolean isGodMode;
 
-	private Integer color;
+	@Column(nullable = false, unique = true)
+	private String token;
+
+	@ManyToOne
+	@JoinColumn(name = "game_id")
+	private Game game;
 
 	public Long getId() {
 		return id;
@@ -44,36 +45,37 @@ public class Player implements Serializable {
 		this.userId = userId;
 	}
 
-	public Long getGameId() {
-		return gameId;
+	public Boolean getIsGodMode() {
+		return isGodMode;
 	}
 
-	public void setGameId(Long gameId) {
-		this.gameId = gameId;
+	public void setIsGodMode(Boolean isGodMode) {
+		this.isGodMode = isGodMode;
 	}
 
-	public Integer getMode() {
-		return mode;
+	public String getToken() {
+		return token;
 	}
 
-	public void setMode(Integer mode) {
-		this.mode = mode;
+	public void setToken(String token) {
+		this.token = token;
 	}
 
-	public Integer getCard() {
-		return card;
+	@JsonIgnore
+	public Game getGame() {
+		return game;
 	}
 
-	public void setCard(Integer card) {
-		this.card = card;
+	@JsonIgnore
+	public void setGame(Game game) {
+		this.game = game;
 	}
 
-	public Integer getColor() {
-		return color;
-	}
-
-	public void setColor(Integer color) {
-		this.color = color;
+	public Long getGame_id() {
+		if (game != null) {
+			return game.getId();
+		}
+		return null;
 	}
 
 	@Override

@@ -68,20 +68,18 @@ public class CreatePlayerTest {
 
         mvc.perform(post("/players")
                 .contentType("application/json;charset=UTF-8")
-                .content("{\"userId\":" + testUser.getId() + ",\"mode\":0}"))
+                .content("{\"userId\":" + testUser.getId() + ",\"isGodMode\":false}"))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(jsonPath("$.url").exists())
-                .andExpect(jsonPath("$.playerId").exists());
+                .andExpect(jsonPath("$.url").exists());
 
         Assert.assertNotNull(playerRepository.findByUserId(testUser.getId()));
 
         Player player = playerRepository.findByUserId(testUser.getId());
 
-        //Assert.assertNull(player.getGameId());
-        Assert.assertTrue(player.getMode() == 0);
-        Assert.assertNull(player.getCard());
-        Assert.assertNull(player.getColor());
+        //Assert.assertNull(player.getGame_id());
+        Assert.assertFalse(player.getIsGodMode());
+        Assert.assertNotNull(player.getToken());
     }
 }

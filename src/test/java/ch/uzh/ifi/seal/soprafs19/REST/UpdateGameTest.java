@@ -82,53 +82,50 @@ public class UpdateGameTest {
 
         Player player1 = new Player();
         player1.setUserId(testUser1.getId());
-        player1.setMode(0);
+        player1.setIsGodMode(false);
 
         testPlayer1 = playerService.createPlayer(player1);
 
         Player player2 = new Player();
         player2.setUserId(testUser2.getId());
-        player2.setMode(0);
+        player2.setIsGodMode(false);
 
         testPlayer2 = playerService.createPlayer(player2);
 
-        testGame = gameService.createGame();
+        /*
+        List<Player> players = new ArrayList<Player>();
+        players.add(player1);
+        players.add(player2);
+
+        Game game = new Game(players, 25);
+        testGame = gameService.createGame(game);
+        */
 
     }
 
     @Test
     public void updateGameCorrect() throws Exception {
 
-        Assert.assertNotNull(gameRepository.findById(testGame.getId()));
+        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
 
-        Game game = gameRepository.findById(testGame.getId()).get();
+        Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
 
         Assert.assertTrue(game.getStatus() == GameStatus.CARDS10);
-        Assert.assertNotNull(game.getCurrentPlayerId());
+        //Assert.assertNotNull(game.getCurrentPlayer());
 
-        Long firstPlayerId;
-        Long secondPlayerId;
+        //Long firstPlayerId = game.getCurrentPlayer().getId();
 
-        if(game.getCurrentPlayerId() == testPlayer1.getId()) {
-            firstPlayerId = testPlayer1.getId();
-            secondPlayerId = testPlayer2.getId();
-        } else {
-            firstPlayerId = testPlayer2.getId();
-            secondPlayerId = testPlayer1.getId();
-        }
-
-        mvc.perform(put("/games/"+testGame.getId())
+        mvc.perform(put("/games/"+testPlayer1.getGame_id())
                 .contentType("application/json;charset=UTF-8")
-                .content("{\"card1\":1,\"card2\":5}"))
+                .content("{\"cards\":[{\"cardNr\":1},{\"cardNr\":5}]}"))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
 
-        game = gameRepository.findById(testGame.getId()).get();
+        game = gameRepository.findById(testPlayer1.getGame_id()).get();
 
         Assert.assertTrue(game.getStatus() == GameStatus.CARDS2);
-        Assert.assertTrue(game.getCurrentPlayerId() == secondPlayerId);
-        Assert.assertTrue(game.getCard1() == 1);
-        Assert.assertTrue(game.getCard2() == 5);
+        //Assert.assertTrue(game.getCurrentPlayer().getId() != firstPlayerId);
+        Assert.assertTrue(game.getCards().size() == 2);
     }
 }

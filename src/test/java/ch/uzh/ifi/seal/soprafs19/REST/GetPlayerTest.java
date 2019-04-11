@@ -64,7 +64,7 @@ public class GetPlayerTest {
 
         Player player = new Player();
         player.setUserId(testUser.getId());
-        player.setMode(0);
+        player.setIsGodMode(false);
 
         testPlayer = playerService.createPlayer(player);
 
@@ -82,8 +82,8 @@ public class GetPlayerTest {
                 .andExpect(jsonPath("$.id").value(testPlayer.getId()))
                 .andExpect(jsonPath("$.userId").value(testUser.getId()))
                 .andExpect(jsonPath("$.gameId").exists())
-                .andExpect(jsonPath("$.mode").value(testPlayer.getMode()))
-                .andExpect(jsonPath("$.card").isEmpty())
-                .andExpect(jsonPath("$.color").isEmpty());
+                .andExpect(jsonPath("$.isGodMode").value(testPlayer.getIsGodMode()));
+                //.andExpect(jsonPath("$.card").isEmpty())
+                //.andExpect(jsonPath("$.color").isEmpty());
     }
 }
