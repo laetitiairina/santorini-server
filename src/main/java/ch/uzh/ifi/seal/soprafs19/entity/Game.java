@@ -8,30 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.EnumBiMap;
-import com.google.common.collect.HashBiMap;
-
 @Entity
 public class Game implements Serializable {
 	
 
 	private static final long serialVersionUID = 1L;
-
-	private static final Map statesMap = new HashMap<Integer, GameStatus>() {{
-		put(0, GameStatus.CARDS10);
-		put(1, GameStatus.CARDS2);
-		put(2, GameStatus.STARTPLAYER);
-		put(3, GameStatus.COLOR1);
-		put(4, GameStatus.POSITION1);
-		put(5, GameStatus.COLOR2);
-		put(6, GameStatus.POSITION2);
-		put(7, GameStatus.MOVE);
-		put(8, GameStatus.BUILD);
-		put(9, GameStatus.END);
-	}};
-
-    private static final BiMap<Integer, GameStatus> statesBiMap = EnumBiMap.create(statesMap);
 
 	@Id
 	@GeneratedValue
@@ -139,11 +120,11 @@ public class Game implements Serializable {
 	}
 
 	public int getGameStatusInt (GameStatus status) {
-		return statesBiMap.inverse().get(status);
+        return status.ordinal();
 	}
 
 	public GameStatus getGameStatusEnum (int status) {
-	    return statesBiMap.get(status);
+        return GameStatus.values()[status];
     }
 
 }
