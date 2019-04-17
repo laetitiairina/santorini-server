@@ -23,6 +23,10 @@ public class Player implements Serializable {
 
 	@Column(nullable = false)
 	private Boolean isGodMode;
+	
+	@ManyToOne
+	@JoinColumn(name = "card_id")
+	private Card card;
 
 	@Column(nullable = false, unique = true)
 	private String token;
@@ -59,6 +63,14 @@ public class Player implements Serializable {
 
 	public void setIsGodMode(Boolean isGodMode) {
 		this.isGodMode = isGodMode;
+	}
+	
+	public String getCard() {
+		return card;
+	}
+
+	public void setToken(Card card) {
+		this.card = card;
 	}
 
 	public String getToken() {
