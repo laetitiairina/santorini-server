@@ -24,7 +24,10 @@ public class Field implements Serializable {
 	private Boolean hasDome;
 
 	@Column(nullable = false)
-	private Integer pos;
+	private Integer posX;
+	
+	@Column(nullable = false)
+	private Integer posY;
 
 	@ManyToOne
 	@JoinColumn(name = "board_id")
@@ -63,11 +66,19 @@ public class Field implements Serializable {
 	}
 
 	public Integer getPos() {
-		return pos;
+		return posX;
 	}
 
-	public void setPos(Integer pos) {
-		this.pos = pos;
+	public void setPos(Integer posX) {
+		this.posX = posX;
+	}
+	
+	public Integer getPos() {
+		return posY;
+	}
+
+	public void setPos(Integer posY) {
+		this.posY = posY;
 	}
 
 	public Field(Integer pos) {
