@@ -65,26 +65,27 @@ public class Field implements Serializable {
 		this.hasDome = hasDome;
 	}
 
-	public Integer getPos() {
+	public Integer getPosX() {
 		return posX;
 	}
 
-	public void setPos(Integer posX) {
+	public void setPosX(Integer posX) {
 		this.posX = posX;
 	}
 	
-	public Integer getPos() {
+	public Integer getPosY() {
 		return posY;
 	}
 
-	public void setPos(Integer posY) {
+	public void setPosY(Integer posY) {
 		this.posY = posY;
 	}
 
-	public Field(Integer pos) {
+	public Field(Integer posX, Integer posY) {
 		this.blocks = 0;
 		this.hasDome = false;
-		this.pos = pos;
+		this.posX = posX;
+		this.posY = posY;
 	}
 
 	@Override
