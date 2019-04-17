@@ -27,6 +27,9 @@ public class Player implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "card_id")
 	private Card card;
+	
+	@Column()
+	private String color;
 
 	@Column(nullable = false, unique = true)
 	private String token;
@@ -67,6 +70,14 @@ public class Player implements Serializable {
 	
 	public String getCard() {
 		return card;
+	}
+	
+	public void setColor(String color) {
+		this.color = color;
+	}
+
+	public String getColor() {
+		return color;
 	}
 
 	public void setToken(Card card) {
