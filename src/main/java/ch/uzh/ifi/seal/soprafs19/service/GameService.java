@@ -2,6 +2,9 @@ package ch.uzh.ifi.seal.soprafs19.service;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
+import ch.uzh.ifi.seal.soprafs19.rules.IRuleSet;
+import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
+import org.apache.tomcat.util.digester.Rules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +49,7 @@ public class GameService {
 
         // react to update depending on status
         Boolean successfullyUpdated = false; // set to true later, if update is valid
+        IRuleSet rules= new SimpleRuleSet();
         switch (currentGame.getStatus()) {
             case CARDS10:
                 //
@@ -69,7 +73,10 @@ public class GameService {
                 //
                 break;
             case MOVE:
-                // Todo: Laetitia
+                if (rules.checkMovePhase(currentGame, newGame)) {
+                    //
+                    successfullyUpdated = true;
+                }
                 break;
             case BUILD:
                 //
