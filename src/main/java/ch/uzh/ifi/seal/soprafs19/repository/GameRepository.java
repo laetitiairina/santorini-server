@@ -11,4 +11,5 @@ public interface GameRepository extends CrudRepository<Game, Long> {
 	//Game findByName(String name);
 
     // TODO ewa - Add methods
+    Game findById(long gameId);
 }

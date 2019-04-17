@@ -1,6 +1,8 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 
+import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,14 +42,13 @@ public class GameController {
 
         // TODO: get game by id
 
+
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PutMapping("/games/{id}")
-    ResponseEntity updateGame(@PathVariable Long id) {
-
-        // TODO: update game by id
-
+    ResponseEntity updateGame(@PathVariable Long id, @RequestBody Game game) {
+        service.updateGame(game);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
