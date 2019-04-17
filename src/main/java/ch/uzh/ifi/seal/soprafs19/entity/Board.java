@@ -20,10 +20,6 @@ public class Board implements Serializable {
 	@Column(nullable = false)
 	private List<Field> fields;
 
-	@OneToMany(mappedBy = "board")
-	//@Column(nullable = false)
-	private List<Worker> workers;
-
 	@OneToOne
 	@JoinColumn(name = "game_id")
 	private Game game;
@@ -45,14 +41,6 @@ public class Board implements Serializable {
 		this.fields = fields;
 	}
 
-	public List<Worker> getWorkers() {
-		return workers;
-	}
-
-	public void setWorkers(List<Worker> workers) {
-		this.workers = workers;
-	}
-
 	public Board(Integer numberOfFields) {
 
 		this.fields = new ArrayList<Field>();
@@ -61,12 +49,6 @@ public class Board implements Serializable {
 			this.fields.add(new Field(i));
 		}
 
-		// TODO: Initialize workers
-		/*
-		for (int i = 0; i < numberOfWorkers; i++) {
-			this.workers.add(new Worker());
-		}
-		*/
 	}
 
 

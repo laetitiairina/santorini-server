@@ -55,14 +55,8 @@ public class Game implements Serializable {
 	@Column(nullable = false)
 	private GameStatus status;
 
-	// TODO: Fix currentPlayer or include isCurrentPlayer in player entity
-	/*
-	@OneToOne(mappedBy = "game")
-	//@Column(nullable = false)
-	private Player currentPlayer;
-	*/
-
-	private Worker currentWorker;
+	@Column
+	private boolean hasMovedUp;
 
 	public Long getId() {
 		return id;
@@ -112,22 +106,12 @@ public class Game implements Serializable {
 		this.status = status;
 	}
 
-	/*
-	public Player getCurrentPlayer() {
-		return currentPlayer;
+	public boolean isHasMovedUp() {
+		return hasMovedUp;
 	}
 
-	public void setCurrentPlayer(Player currentPlayer) {
-		this.currentPlayer = currentPlayer;
-	}
-	*/
-
-	public Worker getCurrentWorker() {
-		return currentWorker;
-	}
-
-	public void setCurrentWorker(Worker currentWorker) {
-		this.currentWorker = currentWorker;
+	public void setHasMovedUp(boolean hasMovedUp) {
+		this.hasMovedUp = hasMovedUp;
 	}
 
 	public Game() {

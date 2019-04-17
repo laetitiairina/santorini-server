@@ -1,5 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -14,10 +16,12 @@ public class Worker implements Serializable {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "board_id")
-	private Board board;
+	@JoinColumn(name = "player_id")
+	private Player player;
 
-	// TODO: Implement Worker
+	@OneToOne
+	@JoinColumn(name="field_id")
+	private Field field;
 
 	public Long getId() {
 		return id;
@@ -25,6 +29,26 @@ public class Worker implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	@JsonIgnore
+	public Player getPlayer() {
+		return player;
+	}
+
+	@JsonIgnore
+	public void setPlayer(Player player) {
+		this.player = player;
+	}
+
+	@JsonIgnore
+	public Field getField() {
+		return field;
+	}
+
+	@JsonIgnore
+	public void setField(Field field) {
+		this.field = field;
 	}
 
 	@Override

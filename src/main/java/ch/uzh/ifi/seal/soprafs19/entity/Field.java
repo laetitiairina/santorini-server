@@ -11,8 +11,10 @@ public class Field implements Serializable {
 
 	@Id
 	@GeneratedValue
+	@Column(name = "field_id")
 	private Long id;
 
+	@OneToOne(mappedBy = "field", cascade = CascadeType.ALL)
 	private Worker worker;
 
 	@Column(nullable = false)

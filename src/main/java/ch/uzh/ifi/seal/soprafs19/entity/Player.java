@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 public class Player implements Serializable {
@@ -13,6 +14,7 @@ public class Player implements Serializable {
 
 	@Id
 	@GeneratedValue
+	@Column(name="player_id")
 	private Long id;
 
 	// TODO: Implement User
@@ -28,6 +30,12 @@ public class Player implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "game_id")
 	private Game game;
+
+	@OneToMany
+	@Column
+	private List<Worker> workers;
+
+	private boolean isCurrentPlayer;
 
 	public Long getId() {
 		return id;
@@ -76,6 +84,22 @@ public class Player implements Serializable {
 			return game.getId();
 		}
 		return null;
+	}
+
+	public List<Worker> getWorkers() {
+		return workers;
+	}
+
+	public void setWorkers(List<Worker> workers) {
+		this.workers = workers;
+	}
+
+	public boolean isCurrentPlayer() {
+		return isCurrentPlayer;
+	}
+
+	public void setCurrentPlayer(boolean currentPlayer) {
+		isCurrentPlayer = currentPlayer;
 	}
 
 	@Override
