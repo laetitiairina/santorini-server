@@ -1,5 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
+import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -14,7 +16,7 @@ public class Card implements Serializable {
 	private Long id;
 
 	@Column(nullable = false, unique = true)
-	private Integer CardNr;
+	private SimpleGodCard cardName;
 
 	@ManyToOne
 	@JoinColumn(name = "game_id")
@@ -30,12 +32,12 @@ public class Card implements Serializable {
 		this.id = id;
 	}
 
-	public Integer getCardNr() {
-		return CardNr;
+	public SimpleGodCard getCardName() {
+		return cardName;
 	}
 
-	public void setCardNr(Integer cardNr) {
-		CardNr = cardNr;
+	public void setCardName(SimpleGodCard cardName) {
+		this.cardName = cardName;
 	}
 
 	@Override

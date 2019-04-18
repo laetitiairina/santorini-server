@@ -101,8 +101,15 @@ public class Game implements Serializable {
 	public Game(List<Player> matchedPlayers, Integer numberOfRows) {
 		this.players = matchedPlayers;
 		this.isGodMode = matchedPlayers.get(0).getIsGodMode();
-		this.status = GameStatus.CARDS10;
-		//this.currentPlayer = matchedPlayers.get(0);
+		this.status = GameStatus.CARDS1;
+
+		// set Start Player according to Simple or God Mode
+        // default value of Player.isCurrentPlayer is false
+        if (this.isGodMode) {
+            matchedPlayers.get(0).setCurrentPlayer(true);
+        } else {
+            // TODO: @Florian add logic for simple game mode (birthday, etc..)
+        }
 
 		// Delete board and save fields in game entity directly?
 		this.board = new Board(numberOfRows);
