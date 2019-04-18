@@ -41,12 +41,13 @@ public class Board implements Serializable {
 		this.fields = fields;
 	}
 
-	public Board(Integer numberOfFields) {
+	public Board(Integer numberOfRows) {
 
 		this.fields = new ArrayList<Field>();
 
-		for (int i = 0; i < numberOfFields; i++) {
-			this.fields.add(new Field(i));
+		for (int i = 0; i < numberOfRows; i++) {
+			for (int j = 0; j < numberOfRows; j++)
+			this.fields.add(new Field(i, i));
 		}
 
 	}

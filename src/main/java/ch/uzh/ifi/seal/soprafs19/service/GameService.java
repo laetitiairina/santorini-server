@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.service;
 
+import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.rules.IRuleSet;
@@ -44,14 +45,16 @@ public class GameService {
         return newGame;
     }
 
-    public void updateGame(Game newGame) {
+    public void updateGame(Game updatedGame) {
         // get the current game from repository
-        long id = newGame.getId();
+        long id = updatedGame.getId();
         Game currentGame = gameRepository.findById(id);
 
-        // react to update depending on status
-        Boolean successfullyUpdated = false; // set to true later, if update is valid
+        // Todo: look at how to use correctly
         IRuleSet rules= new SimpleRuleSet();
+
+        // react to update depending on status
+        boolean successfullyUpdated = false; // set to true later, if update is valid
         switch (currentGame.getStatus()) {
             case CARDS10:
                 //
@@ -75,13 +78,25 @@ public class GameService {
                 //
                 break;
             case MOVE:
-                if (rules.checkMovePhase(currentGame, newGame)) {
-                    //
+                // check if it's a valid move
+                if (rules.checkMovePhase(currentGame, updatedGame)) {
+                    for (Field field : updatedGame.getBoard().getFields()) {
+                        // find field that needs to be updated
+                        long fieldId = field.getId();
+                        Field fieldToUpdate = getFieldById(currentGame, fieldId);
+
+                        // update the worker values of the field
+                        fieldToUpdate.setWorker(field.getWorker());
+                    }
+                    gameRepository.save(currentGame);
                     successfullyUpdated = true;
                 }
                 break;
             case BUILD:
-                //
+                if (rules.checkBuildPhase(currentGame, updatedGame)) {
+                    //
+                    successfullyUpdated = true;
+                }
                 break;
             case END:
                 //
@@ -90,8 +105,27 @@ public class GameService {
 
         // update the status of the game for pinging
         if (successfullyUpdated) {
-            incrementGameStatus(currentGame, currentGame.getIsGodMode(), false); // isEnd may vary
+            if (rules.checkWinCondition(currentGame, updatedGame)) {
+                incrementGameStatus(currentGame, currentGame.getIsGodMode(), true);
+            } else {
+                incrementGameStatus(currentGame, currentGame.getIsGodMode(), false);
+            }
         }
+    }
+
+    /**
+     * get Field by Id
+     * @param game
+     * @param fieldId
+     * @return
+     */
+    public Field getFieldById (Game game, long fieldId) {
+        for (Field field : game.getBoard().getFields()) {
+            if (field.getId() == fieldId) {
+                return field;
+            }
+        }
+        return null;
     }
 
     /**

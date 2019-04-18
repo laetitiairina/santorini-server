@@ -68,21 +68,21 @@ public class Player implements Serializable {
 		this.isGodMode = isGodMode;
 	}
 	
-	public String getCard() {
+	public Card getCard() {
 		return card;
 	}
-	
-	public void setColor(String color) {
-		this.color = color;
-	}
+
+    public void setCard(Card card) {
+        this.card = card;
+    }
 
 	public String getColor() {
 		return color;
 	}
 
-	public void setToken(Card card) {
-		this.card = card;
-	}
+	public void setColor(String color) {
+        this.color = color;
+    }
 
 	public String getToken() {
 		return token;
