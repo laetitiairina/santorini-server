@@ -20,7 +20,7 @@ public class MatchMaker {
 
     private static final Integer playerCount = 2;
 
-    private static final Integer fieldCount = 25;
+    private static final Integer rowCount = 5;
 
     private List<Player> simpleQueue;
 
@@ -49,14 +49,14 @@ public class MatchMaker {
             godQueue.add(player);
 
             // Check if player can be matched
-            scanQueue(godQueue, playerCount, fieldCount);
+            scanQueue(godQueue, playerCount, rowCount);
         } else {
 
             // Add player to simple queue
             simpleQueue.add(player);
 
             // Check if player can be matched
-            scanQueue(simpleQueue, playerCount, fieldCount);
+            scanQueue(simpleQueue, playerCount, rowCount);
         }
     }
 
@@ -68,7 +68,7 @@ public class MatchMaker {
      * @param queue
      * @param numberOfPlayers
      */
-    private void scanQueue(List<Player> queue, Integer numberOfPlayers, Integer numberOfFields) {
+    private void scanQueue(List<Player> queue, Integer numberOfPlayers, Integer numberOfRows) {
 
         List<Player> matchedPlayers = new ArrayList<Player>();
 
@@ -81,7 +81,7 @@ public class MatchMaker {
             }
 
             // Create game with matched players
-            Game game = new Game(matchedPlayers, numberOfFields);
+            Game game = new Game(matchedPlayers, numberOfRows);
             gameService.createGame(game);
 
             // Set game of matched players

@@ -98,15 +98,14 @@ public class Game implements Serializable {
 	public Game() {
 	}
 
-	public Game(List<Player> matchedPlayers, Integer numberOfFields) {
+	public Game(List<Player> matchedPlayers, Integer numberOfRows) {
 		this.players = matchedPlayers;
 		this.isGodMode = matchedPlayers.get(0).getIsGodMode();
 		this.status = GameStatus.CARDS10;
 		//this.currentPlayer = matchedPlayers.get(0);
 
 		// Delete board and save fields in game entity directly?
-		Board newBoard = new Board(numberOfFields);
-		this.board = newBoard;
+		this.board = new Board(numberOfRows);
 	}
 
 	@Override
