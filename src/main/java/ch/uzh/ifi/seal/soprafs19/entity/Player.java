@@ -72,17 +72,17 @@ public class Player implements Serializable {
 		return card;
 	}
 
-    public void setCard(Card card) {
-        this.card = card;
-    }
+  public void setCard(Card card) {
+    this.card = card;
+  }
 
-	public String getColor() {
-		return color;
-	}
+  public String getColor() {
+    return color;
+  }
 
-	public void setColor(String color) {
-        this.color = color;
-    }
+  public void setColor(String color) {
+    this.color = color;
+  }
 
 	public String getToken() {
 		return token;
@@ -91,6 +91,7 @@ public class Player implements Serializable {
 	public void setToken(String token) {
 		this.token = token;
 	}
+
 
 	@JsonIgnore
 	public Game getGame() {
