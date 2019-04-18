@@ -47,7 +47,7 @@ public class Board implements Serializable {
 
 		for (int i = 0; i < numberOfRows; i++) {
 			for (int j = 0; j < numberOfRows; j++)
-			this.fields.add(new Field(i, i));
+			this.fields.add(new Field(i, j));
 		}
 
 	}
