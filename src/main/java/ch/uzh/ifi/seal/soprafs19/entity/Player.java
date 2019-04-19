@@ -31,7 +31,7 @@ public class Player implements Serializable {
 	@Column()
 	private String color;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
 	private String token;
 
 	@ManyToOne

@@ -41,7 +41,7 @@ public class PlayerController {
         // TODO: Authentication: Check if token sent in header matches token stored in player with requested id
 
         // Get player by id
-        Optional<Player> player = service.getPlayerById(id);
+        Optional<Player> player = service.getPlayerByIdWithoutToken(id);
 
         // Check if player exists
         if (player.isEmpty()) {

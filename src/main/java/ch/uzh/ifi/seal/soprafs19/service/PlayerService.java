@@ -39,12 +39,20 @@ public class PlayerService {
     */
 
     /**
-     * Get player by id
+     * Get player by id without token
      * @param id
      * @return
      */
-    public Optional<Player> getPlayerById(Long id) {
-        return playerRepository.findById(id);
+    public Optional<Player> getPlayerByIdWithoutToken(Long id) {
+
+        Optional<Player> player = playerRepository.findById(id);
+
+        // Set token to null
+        if (player.isPresent()) {
+            player.get().setToken(null);
+        }
+
+        return player;
     }
 
     /**
@@ -54,7 +62,9 @@ public class PlayerService {
      */
     public Player createPlayer(Player newPlayer) {
 
-        newPlayer.setToken(UUID.randomUUID().toString());
+        if (newPlayer.getToken().isEmpty()) {
+            newPlayer.setToken(UUID.randomUUID().toString());
+        }
 
         playerRepository.save(newPlayer);
 
