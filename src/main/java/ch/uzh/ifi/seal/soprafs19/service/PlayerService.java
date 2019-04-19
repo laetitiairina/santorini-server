@@ -3,6 +3,10 @@ package ch.uzh.ifi.seal.soprafs19.service;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.helper.MatchMaker;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +14,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,20 +44,12 @@ public class PlayerService {
     */
 
     /**
-     * Get player by id without token
+     * Get player by id
      * @param id
      * @return
      */
-    public Optional<Player> getPlayerByIdWithoutToken(Long id) {
-
-        Optional<Player> player = playerRepository.findById(id);
-
-        // Set token to null
-        if (player.isPresent()) {
-            player.get().setToken(null);
-        }
-
-        return player;
+    public Optional<Player> getPlayerById(Long id) {
+        return playerRepository.findById(id);
     }
 
     /**
@@ -62,8 +59,11 @@ public class PlayerService {
      */
     public Player createPlayer(Player newPlayer) {
 
-        if (newPlayer.getToken().isEmpty()) {
+        if (newPlayer.getUserId() == null) {
             newPlayer.setToken(UUID.randomUUID().toString());
+        } else {
+            // TODO: Implement player creation with token from user
+            //newPlayer.setToken(userRepository.findById(newPlayer.getUserId()).get().getToken());
         }
 
         playerRepository.save(newPlayer);
