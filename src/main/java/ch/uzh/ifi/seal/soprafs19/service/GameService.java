@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Optional;
+
 @Primary
 @Service
 @Transactional
@@ -44,6 +46,15 @@ public class GameService {
     */
 
     /**
+     * Get game by id
+     * @param id
+     * @return
+     */
+    public Optional<Game> getGameById(Long id) {
+        return gameRepository.findById(id);
+    }
+
+    /**
      * Create a new game
      *
      * @param newGame
@@ -55,12 +66,9 @@ public class GameService {
         return newGame;
     }
 
-    /**
-     * Updates the game according to it's status
-     *
-     * @param updatedGame
-     */
-    public void updateGame(Game updatedGame) {
+    public boolean updateGame(Game currentGame, Game updatedGame) {
+        // Authentication and checks done in GameController
+
         // get the current game from repository
         long id = updatedGame.getId();
         Game currentGame = gameRepository.findById(id);
@@ -112,7 +120,16 @@ public class GameService {
             } else {
                 incrementGameStatus(successfullyUpdatedGame, false);
             }
+            return true;
         }
+
+        /*
+         * TODO:
+         * Only return false if request itself was bad (e.g. updatedGame contained invalid JSON),
+         * return true even if the turn was invalid but request/updatedGame was ok
+         */
+        //return false;
+        return true;
     }
 
     public Game setGodModeInit(Game currentGame, Game updatedGame) {
@@ -298,5 +315,23 @@ public class GameService {
         }
         // save
         gameRepository.save(game);
+    }
+    /**
+     * Check if token matches the current player in the current game
+     * @param currentGame
+     * @param token
+     * @return
+     */
+    public boolean checkPlayerAuthentication(Game currentGame, String token) {
+        for (Player player : currentGame.getPlayers()) {
+            if (player.getToken().equals(token)) {
+                if (player.getIsCurrentPlayer()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 }

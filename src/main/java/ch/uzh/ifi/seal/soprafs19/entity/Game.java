@@ -111,6 +111,7 @@ public class Game implements Serializable {
             // TODO: @Florian add logic for simple game mode (birthday, etc..)
         }
 
+		// TODO: FIX: Board is null
 		// Delete board and save fields in game entity directly?
 		this.board = new Board(numberOfRows);
 	}

@@ -32,8 +32,8 @@ public class Player implements Serializable {
     @Column()
     private String color;
 
-    @Column(nullable = false, unique = true)
-    private String token;
+	@Column(nullable = false)
+	private String token;
 
     @ManyToOne
     @JoinColumn(name = "game_id")
@@ -78,27 +78,28 @@ public class Player implements Serializable {
         this.card = card;
     }
 
-    public String getColor() {
-        return color;
-    }
+  	public String getColor() {
+    return color;
+  }
 
-    public void setColor(String color) {
-        this.color = color;
-    }
+  	public void setColor(String color) {
+    this.color = color;
+  }
 
-    public String getToken() {
-        return token;
-    }
+	@JsonIgnore
+	public String getToken() {
+		return token;
+	}
 
-    public void setToken(String token) {
-        this.token = token;
-    }
+	@JsonIgnore
+	public void setToken(String token) {
+		this.token = token;
+	}
 
-
-    @JsonIgnore
-    public Game getGame() {
-        return game;
-    }
+	@JsonIgnore
+	public Game getGame() {
+		return game;
+	}
 
     @JsonIgnore
     public void setGame(Game game) {
@@ -124,9 +125,9 @@ public class Player implements Serializable {
         return isCurrentPlayer;
     }
 
-    public void setCurrentPlayer(boolean currentPlayer) {
-        isCurrentPlayer = currentPlayer;
-    }
+	public void setIsCurrentPlayer(boolean isCurrentPlayer) {
+		this.isCurrentPlayer = isCurrentPlayer;
+	}
 
     @Override
     public boolean equals(Object o) {

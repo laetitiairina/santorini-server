@@ -84,6 +84,9 @@ public class MatchMaker {
             Game game = new Game(matchedPlayers, numberOfRows);
             gameService.createGame(game);
 
+            // TODO: Choose player who starts selecting cards
+            matchedPlayers.get(0).setIsCurrentPlayer(true);
+
             // Set game of matched players
             for (Player player : matchedPlayers) {
                 player.setGame(game);
