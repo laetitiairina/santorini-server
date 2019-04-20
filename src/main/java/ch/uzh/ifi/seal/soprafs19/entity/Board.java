@@ -24,7 +24,6 @@ public class Board implements Serializable {
 	@JoinColumn(name = "game_id")
 	private Game game;
 
-
 	public Long getId() {
 		return id;
 	}
@@ -51,7 +50,6 @@ public class Board implements Serializable {
 		}
 
 	}
-
 
 	@Override
 	public boolean equals(Object o) {
