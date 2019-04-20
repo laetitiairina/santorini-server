@@ -2,6 +2,7 @@ package ch.uzh.ifi.seal.soprafs19.service;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.rules.IRuleSet;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Primary
 @Service
@@ -35,6 +38,15 @@ public class GameService {
     */
 
     /**
+     * Get game by id
+     * @param id
+     * @return
+     */
+    public Optional<Game> getGameById(Long id) {
+        return gameRepository.findById(id);
+    }
+
+    /**
      * Create a new game
      * @param newGame
      * @return
@@ -45,10 +57,8 @@ public class GameService {
         return newGame;
     }
 
-    public void updateGame(Game updatedGame) {
-        // get the current game from repository
-        long id = updatedGame.getId();
-        Game currentGame = gameRepository.findById(id);
+    public boolean updateGame(Game currentGame, Game updatedGame) {
+        // Authentication and checks done in GameController
 
         // Todo: look at how to use correctly
         IRuleSet rules= new SimpleRuleSet();
@@ -110,7 +120,16 @@ public class GameService {
             } else {
                 incrementGameStatus(currentGame, currentGame.getIsGodMode(), false);
             }
+            return true;
         }
+
+        /*
+         * TODO:
+         * Only return false if request itself was bad (e.g. updatedGame contained invalid JSON),
+         * return true even if the turn was invalid but request/updatedGame was ok
+         */
+        //return false;
+        return true;
     }
 
     /**
@@ -154,4 +173,22 @@ public class GameService {
         gameRepository.save(game);
     }
 
+    /**
+     * Check if token matches the current player in the current game
+     * @param currentGame
+     * @param token
+     * @return
+     */
+    public boolean checkPlayerAuthentication(Game currentGame, String token) {
+        for (Player player : currentGame.getPlayers()) {
+            if (player.getToken().equals(token)) {
+                if (player.getIsCurrentPlayer()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
 }

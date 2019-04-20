@@ -31,7 +31,7 @@ public class Player implements Serializable {
 	@Column()
 	private String color;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
 	private String token;
 
 	@ManyToOne
@@ -72,26 +72,27 @@ public class Player implements Serializable {
 		return card;
 	}
 
-  public void setCard(Card card) {
+  	public void setCard(Card card) {
     this.card = card;
   }
 
-  public String getColor() {
+  	public String getColor() {
     return color;
   }
 
-  public void setColor(String color) {
+  	public void setColor(String color) {
     this.color = color;
   }
 
+	@JsonIgnore
 	public String getToken() {
 		return token;
 	}
 
+	@JsonIgnore
 	public void setToken(String token) {
 		this.token = token;
 	}
-
 
 	@JsonIgnore
 	public Game getGame() {
@@ -118,12 +119,12 @@ public class Player implements Serializable {
 		this.workers = workers;
 	}
 
-	public boolean isCurrentPlayer() {
+	public boolean getIsCurrentPlayer() {
 		return isCurrentPlayer;
 	}
 
-	public void setCurrentPlayer(boolean currentPlayer) {
-		isCurrentPlayer = currentPlayer;
+	public void setIsCurrentPlayer(boolean isCurrentPlayer) {
+		this.isCurrentPlayer = isCurrentPlayer;
 	}
 
 	@Override
