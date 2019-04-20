@@ -69,10 +69,6 @@ public class GameService {
     public boolean updateGame(Game currentGame, Game updatedGame) {
         // Authentication and checks done in GameController
 
-        // get the current game from repository
-        long id = updatedGame.getId();
-        Game currentGame = gameRepository.findById(id);
-
         // Todo: look at how to use correctly
         IRuleSet rules = new SimpleRuleSet();
 
@@ -188,8 +184,8 @@ public class GameService {
                     players.remove(player);
 
                     // set the chosen player as Start Player
-                    player.setCurrentPlayer(true);
-                    players.get(0).setCurrentPlayer(false);
+                    player.setIsCurrentPlayer(true);
+                    players.get(0).setIsCurrentPlayer(false);
                     return currentGame;
                 }
         }
@@ -311,7 +307,7 @@ public class GameService {
     public void nextTurn(Game game) {
         for (Player player : game.getPlayers()) {
             // reverse value
-            player.setCurrentPlayer(!player.isCurrentPlayer());
+            player.setIsCurrentPlayer(!player.isCurrentPlayer());
         }
         // save
         gameRepository.save(game);
@@ -325,7 +321,7 @@ public class GameService {
     public boolean checkPlayerAuthentication(Game currentGame, String token) {
         for (Player player : currentGame.getPlayers()) {
             if (player.getToken().equals(token)) {
-                if (player.getIsCurrentPlayer()) {
+                if (player.isCurrentPlayer()) {
                     return true;
                 } else {
                     return false;
