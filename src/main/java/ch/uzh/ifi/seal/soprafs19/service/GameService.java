@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Primary
 @Service
 @Transactional
@@ -35,6 +37,15 @@ public class GameService {
     */
 
     /**
+     * Get game by id
+     * @param id
+     * @return
+     */
+    public Optional<Game> getGameById(Long id) {
+        return gameRepository.findById(id);
+    }
+
+    /**
      * Create a new game
      * @param newGame
      * @return
@@ -45,10 +56,25 @@ public class GameService {
         return newGame;
     }
 
-    public void updateGame(Game updatedGame) {
+    public boolean updateGame(Long reqId, Game updatedGame) {
         // get the current game from repository
         long id = updatedGame.getId();
-        Game currentGame = gameRepository.findById(id);
+        Optional<Game> currentGameOpt = gameRepository.findById(id);
+
+        // Authentication
+
+        // Check if id of updatedGame is same as request id
+        if (id != reqId) {
+            return false;
+        }
+
+        // Check if currentGame exists
+        if (currentGameOpt.isEmpty()) {
+            return false;
+        }
+        Game currentGame = currentGameOpt.get();
+
+        // TODO: Player authentication
 
         // Todo: look at how to use correctly
         IRuleSet rules= new SimpleRuleSet();
@@ -111,6 +137,8 @@ public class GameService {
                 incrementGameStatus(currentGame, currentGame.getIsGodMode(), false);
             }
         }
+
+        return true;
     }
 
     /**

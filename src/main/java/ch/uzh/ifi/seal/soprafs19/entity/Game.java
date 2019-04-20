@@ -104,6 +104,7 @@ public class Game implements Serializable {
 		this.status = GameStatus.CARDS10;
 		//this.currentPlayer = matchedPlayers.get(0);
 
+		// TODO: FIX: Board is null
 		// Delete board and save fields in game entity directly?
 		this.board = new Board(numberOfRows);
 	}
