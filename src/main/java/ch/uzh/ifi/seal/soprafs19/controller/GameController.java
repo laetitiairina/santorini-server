@@ -65,13 +65,35 @@ public class GameController {
     }
 
     @PutMapping("/games/{id}")
-    ResponseEntity updateGame(@PathVariable Long id, @RequestBody Game game) {
-        if (service.updateGame(id, game)) {
+    ResponseEntity updateGame(@RequestHeader("Token") String token, @PathVariable Long id, @RequestBody Game updatedGame) {
+
+        // Get game by id
+        Optional<Game> currentGame = service.getGameById(id);
+
+        // Check if game exists
+        if (currentGame.isEmpty()) {
+            // Send response 404
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game was not found!");
+        }
+
+        // Check if requested id is same as updatedGame id
+        if (!currentGame.get().getId().equals(updatedGame.getId())) {
+            // Send response 400
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request!");
+        }
+
+        // Check if request came from the current player in the current game
+        if (!service.checkPlayerAuthentication(currentGame.get(), token)) {
+            // Send response 403
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthenticated request!");
+        }
+
+        if (service.updateGame(currentGame.get(), updatedGame)) {
             // Send response 204
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
-            // Send response 404
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game was not found!");
+            // Send response 400
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad request!");
         }
     }
 }
