@@ -1,16 +1,14 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
+import org.hibernate.annotations.Proxy;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 public class Game implements Serializable {
-	
 
 	private static final long serialVersionUID = 1L;
 
@@ -20,14 +18,14 @@ public class Game implements Serializable {
 	private Long id;
 
 	@OneToOne(mappedBy = "game", cascade = CascadeType.ALL)
-	//@Column(nullable = false)
+	@JoinColumn(name="board_id")
 	private Board board;
 
-	@OneToMany(mappedBy = "game")
+	@OneToMany(mappedBy = "game", cascade = CascadeType.MERGE)
 	@Column(nullable = false)
 	private List<Player> players;
 
-	@OneToMany(mappedBy = "game")
+	@OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
 	private List<Card> cards;
 	
 	@Column(nullable = false)
@@ -95,23 +93,23 @@ public class Game implements Serializable {
 		this.hasMovedUp = hasMovedUp;
 	}
 
-	public Game() {
-	}
+	public Game() {}
 
 	public Game(List<Player> matchedPlayers, Integer numberOfRows) {
 		this.players = matchedPlayers;
 		this.isGodMode = matchedPlayers.get(0).getIsGodMode();
-		this.status = GameStatus.CARDS1;
 
 		// set Start Player according to Simple or God Mode
         // default value of Player.isCurrentPlayer is false
         if (this.isGodMode) {
-            matchedPlayers.get(0).setCurrentPlayer(true);
+			this.status = GameStatus.CARDS1;
+            matchedPlayers.get(0).setIsCurrentPlayer(true);
         } else {
+			this.status = GameStatus.COLOR1;
             // TODO: @Florian add logic for simple game mode (birthday, etc..)
+			matchedPlayers.get(0).setIsCurrentPlayer(true);
         }
 
-		// TODO: FIX: Board is null
 		// Delete board and save fields in game entity directly?
 		this.board = new Board(numberOfRows);
 	}

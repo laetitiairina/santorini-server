@@ -8,17 +8,20 @@ import java.io.Serializable;
 @Entity
 public class Worker implements Serializable {
 
-
 	private static final long serialVersionUID = 1L;
 
+
+	// TODO: ID is null!
 	@Id
 	@GeneratedValue
+	@Column(name = "worker_id")
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne()
 	@JoinColumn(name = "player_id")
 	private Player player;
 
+	// TODO: field is null
 	@OneToOne
 	@JoinColumn(name="field_id")
 	private Field field;

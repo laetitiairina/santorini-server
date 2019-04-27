@@ -1,7 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
+import ch.uzh.ifi.seal.soprafs19.constant.Color;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import net.bytebuddy.implementation.bind.annotation.Default;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -25,12 +25,12 @@ public class Player implements Serializable {
     @Column(nullable = false)
     private Boolean isGodMode;
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "card_id")
     private Card card;
 
     @Column()
-    private String color;
+    private Color color;
 
 	@Column(nullable = false)
 	private String token;
@@ -78,11 +78,11 @@ public class Player implements Serializable {
         this.card = card;
     }
 
-  	public String getColor() {
+  	public Color getColor() {
     return color;
   }
 
-  	public void setColor(String color) {
+  	public void setColor(Color color) {
     this.color = color;
   }
 

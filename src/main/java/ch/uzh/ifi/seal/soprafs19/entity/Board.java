@@ -7,7 +7,6 @@ import java.util.List;
 
 @Entity
 public class Board implements Serializable {
-	
 
 	private static final long serialVersionUID = 1L;
 
@@ -16,11 +15,12 @@ public class Board implements Serializable {
 	@Column(name = "board_id")
 	private Long id;
 
-	@OneToMany(mappedBy = "board")
+	@OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
 	@Column(nullable = false)
 	private List<Field> fields;
 
-	@OneToOne
+	// TODO: game is null!
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "game_id")
 	private Game game;
 
@@ -39,6 +39,12 @@ public class Board implements Serializable {
 	public void setFields(List<Field> fields) {
 		this.fields = fields;
 	}
+
+	public Game getGame() { return game;}
+
+	public void setGame(Game game) {this.game = game;}
+
+	public Board() {}
 
 	public Board(Integer numberOfRows) {
 

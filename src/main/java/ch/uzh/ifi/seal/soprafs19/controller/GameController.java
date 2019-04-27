@@ -16,17 +16,15 @@ import java.util.Optional;
 @RestController
 public class GameController {
 
-    @Autowired
     private GameService service;
 
-    @Autowired
     private JsonHelper helper;
 
-    /*
-    GameController(GameService gameService) {
+    GameController(GameService gameService, JsonHelper helper) {
         this.service = gameService;
+        this.helper = helper;
     }
-    */
+
 
     /*
     @GetMapping("/games")

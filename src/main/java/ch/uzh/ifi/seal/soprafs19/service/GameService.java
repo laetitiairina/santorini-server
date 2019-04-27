@@ -1,14 +1,17 @@
 package ch.uzh.ifi.seal.soprafs19.service;
 
+import ch.uzh.ifi.seal.soprafs19.constant.Color;
 import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.Card;
 import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
+import ch.uzh.ifi.seal.soprafs19.repository.CardRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs19.rules.IRuleSet;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
+//import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +20,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,15 +33,25 @@ public class GameService {
 
     private final Logger log = LoggerFactory.getLogger(GameService.class);
 
-    private final GameRepository gameRepository;
+    @Autowired
+    private GameRepository gameRepository;
 
-    private final PlayerRepository playerRepository;
+    @Autowired
+    private PlayerRepository playerRepository;
 
+    @Autowired
+    private CardRepository cardRepository;
+
+    @Autowired
+    private EntityManager entityManager;
+
+    /*
     @Autowired
     public GameService(GameRepository gameRepository, PlayerRepository playerRepository) {
         this.gameRepository = gameRepository;
         this.playerRepository = playerRepository;
     }
+    */
 
     /*
     public Iterable<Game> getGames() {
@@ -58,22 +72,21 @@ public class GameService {
      * Create a new game
      *
      * @param newGame
-     * @return
      */
-    public Game createGame(Game newGame) {
+    public void createGame(Game newGame) {
         gameRepository.save(newGame);
         log.debug("Created Information for Game: {}", newGame);
-        return newGame;
     }
 
     public boolean updateGame(Game currentGame, Game updatedGame) {
         // Authentication and checks done in GameController
 
-        // Todo: look at how to use correctly
+        // Todo: look at how to use correctly after Can is done with the implementation
         IRuleSet rules = new SimpleRuleSet();
 
         // react to update depending on status
         Game successfullyUpdatedGame = null; // set to true later, if update is valid
+        boolean isBadRequest = true; // true if the move / build valid but JSON, etc. was incorrect
 
         // only checks the first 3 states, if isGodMode is true
         if (currentGame.getIsGodMode()) {
@@ -91,23 +104,23 @@ public class GameService {
                 successfullyUpdatedGame = setPosition(currentGame, updatedGame);
                 break;
             case MOVE:
+                // TODO: include isBadRequest handling, add check logic
                 // check if it's a valid move
-                if (rules.checkMovePhase(currentGame, updatedGame)) {
+                //if (rules.checkMovePhase(currentGame, updatedGame)) {
                     successfullyUpdatedGame = move(currentGame, updatedGame);
-                }
+                //}
                 break;
             case BUILD:
+                // TODO: include isBadRequest handling, add check logic
                 // check if it's a valid build
-                if (rules.checkBuildPhase(currentGame, updatedGame)) {
+                //if (rules.checkBuildPhase(currentGame, updatedGame)) {
                     successfullyUpdatedGame = build(currentGame, updatedGame);
-                }
+                //}
                 break;
         }
 
         // update the status of the game for pinging
         if (successfullyUpdatedGame != null) {
-            // saves updates to database
-            gameRepository.save(successfullyUpdatedGame);
 
             // increment the status
             // TODO: actually only needs to send successfullyUpdatedGame to check..
@@ -116,82 +129,137 @@ public class GameService {
             } else {
                 incrementGameStatus(successfullyUpdatedGame, false);
             }
-            return true;
-        }
 
-        /*
-         * TODO:
-         * Only return false if request itself was bad (e.g. updatedGame contained invalid JSON),
-         * return true even if the turn was invalid but request/updatedGame was ok
-         */
-        //return false;
-        return true;
+            // saves updates to database
+            gameRepository.save(successfullyUpdatedGame);
+
+            return true;
+        } else {
+            /*
+             * TODO:
+             * Only return false if request itself was bad (e.g. updatedGame contained invalid JSON),
+             * return true even if the turn was invalid but request/updatedGame was ok
+             */
+            return !isBadRequest;
+        }
     }
 
     public Game setGodModeInit(Game currentGame, Game updatedGame) {
         switch (currentGame.getStatus()) {
             case CARDS1:
-                // check if the cards are valid
-                List<Card> cards = new ArrayList<>();
-
-                for (Card card : updatedGame.getCards()) {
-                    // check, if the given value is a valid card
-                    // TODO: really necessary?
-                    if (EnumUtils.isValidEnum(SimpleGodCard.class, card.getCardName().toString())) {
-                        cards.add(card);
-                    }
-                }
-
-                // front-end has to send exactly 2 cards
-                if (cards.size() == 2 && updatedGame.getCards().size() == 2) {
-                    // set cards
-                    currentGame.setCards(cards);
-
-                    // other player is now current player
-                    nextTurn(currentGame);
-                    return currentGame;
-                }
+                return setCards1 (currentGame, updatedGame);
             case CARDS2:
-                // front-end has to send exactly 1 player
-                if (updatedGame.getPlayers().size() == 1) {
-                    // get cards
-                    // TODO: does this work, or do we need to get the card from the currentGame first?
-                    Card chosenCard = updatedGame.getPlayers().get(0).getCard();
-                    List<Card> currentCards = currentGame.getCards();
-
-                    // get players
-                    List<Player> currentPlayers = currentGame.getPlayers();
-                    Player currentPlayer = playerRepository.findByPlayerId(updatedGame.getPlayers().get(0).getId());
-
-                    // check if the chosenCard is one of the 2 currentCards
-                    // and the currentPlayer is one of the two currentPlayers and the Challenger
-                    if (currentCards.remove(chosenCard) && currentPlayers.remove(currentPlayer) && currentPlayer.isCurrentPlayer()) {
-                        // now currentPlayers only contains the opponent
-                        // and currentCards only contains the other card
-                        currentPlayers.get(0).setCard(currentCards.get(0));
-                        currentPlayer.setCard(chosenCard);
-                        return currentGame;
-                    }
-                }
+                return setCards2(currentGame, updatedGame);
             case STARTPLAYER:
-                Player player = updatedGame.getPlayers().get(0);
-                List<Player> players = currentGame.getPlayers();
-
-                if (player.isCurrentPlayer()) {
-                    player = playerRepository.findByPlayerId(player.getId());
-
-                    // remove player from list of players
-                    players.remove(player);
-
-                    // set the chosen player as Start Player
-                    player.setIsCurrentPlayer(true);
-                    players.get(0).setIsCurrentPlayer(false);
-                    return currentGame;
-                }
+                return setStartPlayer(currentGame, updatedGame);
         }
         return null;
     }
 
+    public Game setStartPlayer (Game currentGame, Game updatedGame) {
+        Player currentPlayer = updatedGame.getPlayers().get(0);
+        List<Player> players = currentGame.getPlayers();
+
+        if (currentPlayer.isCurrentPlayer()) { // && currentPlayer.getGame().getId() == currentGame.getId()
+            long id = currentPlayer.getId();
+            currentPlayer = playerRepository.findById(id);
+
+            for (Player player: players) {
+                if (player.getId().equals(currentPlayer.getId())) {
+                    player.setIsCurrentPlayer(true);
+                } else {
+                    player.setIsCurrentPlayer(false);
+                }
+            }
+
+            return currentGame;
+        }
+        return null;
+    }
+
+    /**
+     * sets the two cards in the player entities at status CARDS2
+     *
+     * @param currentGame
+     * @param updatedGame
+     * @return
+     */
+    public Game setCards2 (Game currentGame, Game updatedGame) {
+        // front-end has to send exactly 1 player and an existing card
+        Card card = null;
+        if (updatedGame.getPlayers().get(0).getCard().getId() != null) {
+            card = entityManager.find(Card.class, updatedGame.getPlayers().get(0).getCard().getId());
+        }
+        if (updatedGame.getPlayers().size() == 1 && card != null) {
+            // get cards
+            // TODO: does this work, or do we need to get the card from the currentGame first?
+            Card chosenCard = updatedGame.getPlayers().get(0).getCard();
+            List<Card> currentCards = currentGame.getCards();
+
+            // get players
+            List<Player> currentPlayers = currentGame.getPlayers();
+            long id = updatedGame.getPlayers().get(0).getId();
+            Player currentPlayer = playerRepository.findById(id);
+
+            // check if the chosenCard is one of the 2 currentCards
+            // and the currentPlayer is one of the two currentPlayers and the Challenger
+            if (currentCards.contains(chosenCard) && currentPlayers.contains(currentPlayer) && currentPlayer.isCurrentPlayer()) {
+                currentCards.remove(chosenCard);
+                currentPlayers.remove(currentPlayer);
+
+                // now currentPlayers only contains the opponent
+                // and currentCards only contains the other card
+                currentPlayers.get(0).setCard(currentCards.get(0));
+                currentPlayer.setCard(chosenCard);
+
+                // add again
+                currentPlayers.add(currentPlayer);
+                currentCards.add(chosenCard);
+
+                // other player is now current player
+                nextTurn(currentGame);
+                return currentGame;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * sets the two cards in the game at status CARDS1
+     *
+     * @param currentGame
+     * @param updatedGame
+     * @return
+     */
+    public Game setCards1 (Game currentGame, Game updatedGame) {
+        // check if the cards are valid
+        List<Card> cards = new ArrayList<>();
+
+        for (Card card : updatedGame.getCards()) {
+            // check, if the given value is a valid card
+            // TODO: really necessary?
+            if (EnumUtils.isValidEnum(SimpleGodCard.class, card.getCardName().toString())) {
+                cards.add(card);
+            }
+        }
+
+        // front-end has to send exactly 2 cards
+        if (cards.size() == 2 && updatedGame.getCards().size() == 2 && cards.get(0).getCardName() != cards.get(1).getCardName()) {
+
+            for(Card card : cards) {
+                cardRepository.save(card);
+            }
+
+            // set cards
+            currentGame.setCards(cards);
+            gameRepository.save(currentGame);
+
+            // other player is now current player
+            nextTurn(currentGame);
+            return currentGame;
+        }
+        return null;
+    }
     /**
      * updates the position of a worker
      *
@@ -207,6 +275,7 @@ public class GameService {
             // update the worker values of the field
             fieldToUpdate.setWorker(field.getWorker());
         }
+        nextTurn(currentGame);
         return currentGame;
     }
 
@@ -226,6 +295,7 @@ public class GameService {
             fieldToUpdate.setBlocks(field.getBlocks());
             fieldToUpdate.setHasDome(field.getHasDome());
         }
+        nextTurn(currentGame);
         return currentGame;
     }
 
@@ -249,13 +319,19 @@ public class GameService {
         Player updatedPlayer = updatedGame.getPlayers().get(0);
 
         if (updatedGame.getPlayers().size() == 1 && updatedPlayer.isCurrentPlayer()) {
-            Player player = playerRepository.findByPlayerId(updatedGame.getPlayers().get(0).getId());
-            player.setColor(updatedGame.getPlayers().get(0).getColor());
-
-            // other player is now current player
-            nextTurn(currentGame);
-
-            return currentGame;
+            long id = updatedGame.getPlayers().get(0).getId();
+            for (Player player : currentGame.getPlayers()) {
+                if (player.getId() == id) {
+                    if (updatedPlayer.getColor() != null && EnumUtils.isValidEnum(Color.class, updatedPlayer.getColor().toString())) {
+                        player.setColor(updatedPlayer.getColor());
+                    } else {
+                        return null;
+                    }
+                }
+            }
+            if (currentGame.getPlayers().get(0).getColor() != currentGame.getPlayers().get(1).getColor()) {
+                return currentGame;
+            }
         }
         return null;
     }
@@ -268,11 +344,16 @@ public class GameService {
             Field currentField = getFieldById(currentGame, updatedField.getId());
             if (currentField.getWorker() == null) {
                 currentField.setWorker(updatedField.getWorker());
-                ++count;
+                // only works if it's the current Player
+                Player player = updatedField.getWorker().getPlayer();
+                if (player.isCurrentPlayer() && playerRepository.findByToken(player.getToken()).isCurrentPlayer()) {
+                    ++count;
+                }
             }
         }
         // both fields need to be valid
         if (count == 2) {
+            nextTurn(currentGame);
             return currentGame;
         } else {
             return null;
@@ -290,7 +371,7 @@ public class GameService {
         int status = game.getGameStatusInt(game.getStatus());
 
         // increment the status
-        if (status == 9 && !isEnd) {
+        if (status == 8 && !isEnd) {
             // loop for move and build phase
             --status;
         } else {
