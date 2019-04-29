@@ -5,7 +5,6 @@ import java.io.Serializable;
 
 @Entity
 public class Field implements Serializable {
-	
 
 	private static final long serialVersionUID = 1L;
 
@@ -15,6 +14,7 @@ public class Field implements Serializable {
 	private Long id;
 
 	@OneToOne(mappedBy = "field", cascade = CascadeType.ALL)
+	@JoinColumn(name = "worker_id")
 	private Worker worker;
 
 	@Column(nullable = false)
@@ -29,6 +29,7 @@ public class Field implements Serializable {
 	@Column(nullable = false)
 	private Integer posY;
 
+	// TODO: IS NULL
 	@ManyToOne
 	@JoinColumn(name = "board_id")
 	private Board board;
@@ -80,6 +81,8 @@ public class Field implements Serializable {
 	public void setPosY(Integer posY) {
 		this.posY = posY;
 	}
+
+	public Field () {}
 
 	public Field(Integer posX, Integer posY) {
 		this.blocks = 0;
