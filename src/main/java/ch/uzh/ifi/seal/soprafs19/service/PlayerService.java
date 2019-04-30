@@ -1,8 +1,10 @@
 package ch.uzh.ifi.seal.soprafs19.service;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
+import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.helper.MatchMaker;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.UUID;
 
 @Primary
@@ -27,6 +30,9 @@ public class PlayerService {
 
     @Autowired
     private PlayerRepository playerRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private MatchMaker matchMaker;
@@ -59,11 +65,20 @@ public class PlayerService {
      */
     public Player createPlayer(Player newPlayer) {
 
+        // Check if a userId was given
         if (newPlayer.getUserId() == null) {
             newPlayer.setToken(UUID.randomUUID().toString());
         } else {
-            // TODO: Implement player creation with token from user
-            //newPlayer.setToken(userRepository.findById(newPlayer.getUserId()).get().getToken());
+            Optional<User> user = userRepository.findById(newPlayer.getUserId());
+
+            // Check if userId of player is valid and token is correct
+            // TODO: NOT IMPORTANT: Clean up and return pretty error messages
+            if (user.isEmpty()) {
+                return null;
+            }
+            if (!user.get().getToken().equals(newPlayer.getToken())) {
+                return null;
+            }
         }
 
         playerRepository.save(newPlayer);

@@ -47,6 +47,12 @@ public class PlayerController {
         // Create player
         Player player = service.createPlayer(newPlayer);
 
+        // Check if player was created successfully
+        if (player == null) {
+            // Send response 409
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("There was a conflict while creating a player!");
+        }
+
         // Transform player to json node
         JsonNode playerNode = helper.objectToJsonNode(player);
         //JsonNode playerNode = helper.getFilteredObjectAsJsonNode(player, Arrays.asList("id"));
