@@ -17,9 +17,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -616,7 +613,7 @@ public class GameServiceTest {
         // set current player's color to red and remove other player
         for (Player player : players) {
             if (player.isCurrentPlayer()) {
-                player.setColor(Color.RED);
+                player.setColor(Color.WHITE);
             } else {
                 playerToBeRemoved = player;
             }
@@ -635,7 +632,7 @@ public class GameServiceTest {
 
         for (Player player : simpleGame.getPlayers()) {
             if (player.isCurrentPlayer()) {
-                Assert.assertEquals(Color.RED, player.getColor());
+                Assert.assertEquals(Color.WHITE, player.getColor());
             } else {
                 Assert.assertEquals(Color.BLUE, player.getColor());
             }
