@@ -10,8 +10,6 @@ import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs19.rules.IRuleSet;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
-//import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.EnumUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -330,7 +328,7 @@ public class GameService {
             long id = updatedGame.getPlayers().get(0).getId();
             for (Player player : currentGame.getPlayers()) {
                 if (player.getId() == id) {
-                    if (updatedPlayer.getColor() != null && EnumUtils.isValidEnum(Color.class, updatedPlayer.getColor().toString())) {
+                    if (updatedPlayer.getColor() != null) {
                         player.setColor(updatedPlayer.getColor());
                     } else {
                         return null;
