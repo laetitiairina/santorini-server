@@ -121,7 +121,7 @@ public class Player implements Serializable {
         this.workers = workers;
     }
 
-    public boolean isCurrentPlayer() {
+    public boolean getIsCurrentPlayer() {
         return isCurrentPlayer;
     }
 
