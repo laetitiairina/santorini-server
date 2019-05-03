@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,8 +40,8 @@ public class Player implements Serializable {
     @JoinColumn(name = "game_id")
     private Game game;
 
-    @OneToMany
-    @Column
+    @OneToMany(mappedBy = "player", cascade = CascadeType.PERSIST)
+    @Column(nullable = false)
     private List<Worker> workers;
 
     // default value is false
@@ -128,6 +129,12 @@ public class Player implements Serializable {
 	public void setIsCurrentPlayer(boolean isCurrentPlayer) {
 		this.isCurrentPlayer = isCurrentPlayer;
 	}
+
+	public Player() {
+        this.workers = new ArrayList<>();
+        workers.add(new Worker());
+        workers.add(new Worker());
+    }
 
     @Override
     public boolean equals(Object o) {

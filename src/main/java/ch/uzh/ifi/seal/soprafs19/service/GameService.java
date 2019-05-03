@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
+import ch.uzh.ifi.seal.soprafs19.entity.Worker;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs19.rules.IRuleSet;
@@ -56,6 +57,7 @@ public class GameService {
 
     /**
      * Get game by id
+     *
      * @param id
      * @return
      */
@@ -102,14 +104,14 @@ public class GameService {
                 // TODO: include isBadRequest handling, add check logic
                 // check if it's a valid move
                 //if (rules.checkMovePhase(currentGame, updatedGame)) {
-                    successfullyUpdatedGame = move(currentGame, updatedGame);
+                successfullyUpdatedGame = move(currentGame, updatedGame);
                 //}
                 break;
             case BUILD:
                 // TODO: include isBadRequest handling, add check logic
                 // check if it's a valid build
                 //if (rules.checkBuildPhase(currentGame, updatedGame)) {
-                    successfullyUpdatedGame = build(currentGame, updatedGame);
+                successfullyUpdatedGame = build(currentGame, updatedGame);
                 //}
                 break;
         }
@@ -140,7 +142,7 @@ public class GameService {
     public Game setGodModeInit(Game currentGame, Game updatedGame) {
         switch (currentGame.getStatus()) {
             case CARDS1:
-                return setCards1 (currentGame, updatedGame);
+                return setCards1(currentGame, updatedGame);
             case CARDS2:
                 return setCards2(currentGame, updatedGame);
             case STARTPLAYER:
@@ -149,7 +151,7 @@ public class GameService {
         return null;
     }
 
-    public Game setStartPlayer (Game currentGame, Game updatedGame) {
+    public Game setStartPlayer(Game currentGame, Game updatedGame) {
         Player currentPlayer = updatedGame.getPlayers().get(0);
         List<Player> players = currentGame.getPlayers();
 
@@ -157,7 +159,7 @@ public class GameService {
             long id = currentPlayer.getId();
             currentPlayer = playerRepository.findById(id);
 
-            for (Player player: players) {
+            for (Player player : players) {
                 if (player.getId().equals(currentPlayer.getId())) {
                     player.setIsCurrentPlayer(true);
                 } else {
@@ -177,7 +179,7 @@ public class GameService {
      * @param updatedGame
      * @return
      */
-    public Game setCards2 (Game currentGame, Game updatedGame) {
+    public Game setCards2(Game currentGame, Game updatedGame) {
 
         // front-end has to send exactly 1 player and an existing card
         if (updatedGame.getPlayers().size() == 1 && updatedGame.getPlayers().get(0).getCard() != null) {
@@ -220,7 +222,7 @@ public class GameService {
      * @param updatedGame
      * @return
      */
-    public Game setCards1 (Game currentGame, Game updatedGame) {
+    public Game setCards1(Game currentGame, Game updatedGame) {
 
         // TODO: where to check this?!
         /*
@@ -246,6 +248,7 @@ public class GameService {
         }
         return null;
     }
+
     /**
      * updates the position of a worker
      *
@@ -253,14 +256,33 @@ public class GameService {
      * @param updatedGame
      * @return updated game
      */
-    public Game move (Game currentGame, Game updatedGame) {
+    public Game move(Game currentGame, Game updatedGame) {
+        Worker currentWorker = null;
+
         for (Field field : updatedGame.getBoard().getFields()) {
             // find field that needs to be updated
             Field fieldToUpdate = getFieldById(currentGame, field.getId());
 
-            // update the worker values of the field
+            // update the worker value of the field and remember current Worker
+            if (field.getWorker() != null) {
+                currentWorker = field.getWorker();
+            }
             fieldToUpdate.setWorker(field.getWorker());
         }
+
+        //  set the right worker as isCurrentWorker for build phase
+        for (Player player : currentGame.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                for (Worker worker : player.getWorkers()) {
+                    if (worker.getId().equals(currentWorker.getId())) {
+                        worker.setIsCurrentWorker(true);
+                    } else {
+                        worker.setIsCurrentWorker(false);
+                    }
+                }
+            }
+        }
+
         nextTurn(currentGame);
         return currentGame;
     }
@@ -272,7 +294,7 @@ public class GameService {
      * @param updatedGame
      * @return updated game
      */
-    public Game build (Game currentGame, Game updatedGame) {
+    public Game build(Game currentGame, Game updatedGame) {
         for (Field field : updatedGame.getBoard().getFields()) {
             // find field that needs to be updated
             Field fieldToUpdate = getFieldById(currentGame, field.getId());
@@ -324,21 +346,30 @@ public class GameService {
 
     public Game setPosition(Game currentGame, Game updatedGame) {
         List<Field> fields = updatedGame.getBoard().getFields();
-        int count = 0;
+        List<Long> count = new ArrayList<>();
 
         for (Field updatedField : fields) {
+
             Field currentField = getFieldById(currentGame, updatedField.getId());
+
             if (currentField.getWorker() == null) {
+
                 currentField.setWorker(updatedField.getWorker());
+
                 // only works if it's the current Player
-                Player player = updatedField.getWorker().getPlayer();
-                if (player.getIsCurrentPlayer() && playerRepository.findByToken(player.getToken()).getIsCurrentPlayer()) {
-                    ++count;
+                for (Player player : currentGame.getPlayers()) {
+                    if (player.getIsCurrentPlayer()) {
+                        for (Worker worker : player.getWorkers()) {
+                            if (worker.getId().equals(updatedField.getWorker().getId())) {
+                                count.add(worker.getId());
+                            }
+                        }
+                    }
                 }
             }
         }
-        // both fields need to be valid
-        if (count == 2) {
+        // both fields need to be valid and two different workers has to be placed on them
+        if (count.size() == 2 && !count.get(0).equals(count.get(1))) {
             nextTurn(currentGame);
             return currentGame;
         } else {
@@ -379,8 +410,10 @@ public class GameService {
         // save
         gameRepository.save(game);
     }
+
     /**
      * Check if token matches the current player in the current game
+     *
      * @param currentGame
      * @param token
      * @return

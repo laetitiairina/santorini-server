@@ -400,12 +400,13 @@ public class GameServiceTest {
         Board board = updatedGame.getBoard();
 
         // create Workers
-        Worker worker1 = new Worker();
-        Worker worker2 = new Worker();
+        Worker worker1 = null;
+        Worker worker2 = null;
+
         for (Player player : updatedGame.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
-                worker1.setPlayer(player);
-                worker2.setPlayer(player);
+                worker1 = player.getWorkers().get(0);
+                worker2 = player.getWorkers().get(1);
             }
         }
 
@@ -452,12 +453,13 @@ public class GameServiceTest {
         Board board = updatedGame.getBoard();
 
         // create Workers
-        Worker worker1 = new Worker();
-        Worker worker2 = new Worker();
+        Worker worker1 = null;
+        Worker worker2 = null;
+
         for (Player player : updatedGame.getPlayers()) {
             if (!player.getIsCurrentPlayer()) {
-                worker1.setPlayer(player);
-                worker2.setPlayer(player);
+                worker1 = player.getWorkers().get(0);
+                worker2 = player.getWorkers().get(1);
             }
         }
 
@@ -491,12 +493,13 @@ public class GameServiceTest {
         Board board = updatedGame.getBoard();
 
         // create Workers
-        Worker worker1 = new Worker();
-        Worker worker2 = new Worker();
+        Worker worker1 = null;
+        Worker worker2 = null;
+
         for (Player player : updatedGame.getPlayers()) {
-            if (!player.getIsCurrentPlayer()) {
-                worker1.setPlayer(player);
-                worker2.setPlayer(player);
+            if (player.getIsCurrentPlayer()) {
+                worker1 = player.getWorkers().get(0);
+                worker2 = player.getWorkers().get(1);
             }
         }
 
@@ -529,12 +532,13 @@ public class GameServiceTest {
         Board board = updatedGame.getBoard();
 
         // create Workers
-        Worker worker1 = new Worker();
-        Worker worker2 = new Worker();
+        Worker worker1 = null;
+        Worker worker2 = null;
+
         for (Player player : updatedGame.getPlayers()) {
-            if (!player.getIsCurrentPlayer()) {
-                worker1.setPlayer(player);
-                worker2.setPlayer(player);
+            if (player.getIsCurrentPlayer()) {
+                worker1 = player.getWorkers().get(0);
+                worker2 = player.getWorkers().get(1);
             }
         }
 
@@ -564,12 +568,13 @@ public class GameServiceTest {
         Board board = updatedGame.getBoard();
 
         // create Workers
-        Worker worker1 = new Worker();
-        Worker worker2 = new Worker();
+        Worker worker1 = null;
+        Worker worker2 = null;
+
         for (Player player : updatedGame.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
-                worker1.setPlayer(player);
-                worker2.setPlayer(player);
+                worker1 = player.getWorkers().get(0);
+                worker2 = player.getWorkers().get(1);
             }
         }
 
@@ -676,13 +681,13 @@ public class GameServiceTest {
         Board board = updatedGame.getBoard();
 
         // create Workers
-        Worker worker1 = new Worker();
-        Worker worker2 = new Worker();
+        Worker worker1 = null;
+        Worker worker2 = null;
 
         for (Player player : updatedGame.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
-                worker1.setPlayer(player);
-                worker2.setPlayer(player);
+                worker1 = player.getWorkers().get(0);
+                worker2 = player.getWorkers().get(1);
             }
         }
 
@@ -732,13 +737,13 @@ public class GameServiceTest {
         Board board = updatedGame.getBoard();
 
         // create Workers
-        Worker worker1 = new Worker();
-        Worker worker2 = new Worker();
+        Worker worker1 = null;
+        Worker worker2 = null;
 
         for (Player player : updatedGame.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
-                worker1.setPlayer(player);
-                worker2.setPlayer(player);
+                worker1 = player.getWorkers().get(0);
+                worker2 = player.getWorkers().get(1);
             }
         }
 

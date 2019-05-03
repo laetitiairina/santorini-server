@@ -10,21 +10,21 @@ public class Worker implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-
-	// TODO: ID is null!
 	@Id
 	@GeneratedValue
 	@Column(name = "worker_id")
 	private Long id;
 
-	@ManyToOne()
+	@ManyToOne
 	@JoinColumn(name = "player_id")
 	private Player player;
 
-	// TODO: field is null
 	@OneToOne
 	@JoinColumn(name="field_id")
 	private Field field;
+
+	@Column
+	private boolean isCurrentWorker;
 
 	public Long getId() {
 		return id;
@@ -53,6 +53,10 @@ public class Worker implements Serializable {
 	public void setField(Field field) {
 		this.field = field;
 	}
+
+	public Boolean getIsCurrentWorker() {return isCurrentWorker;}
+
+	public void setIsCurrentWorker(Boolean isCurrentWorker) {this.isCurrentWorker = isCurrentWorker;}
 
 	@Override
 	public boolean equals(Object o) {
