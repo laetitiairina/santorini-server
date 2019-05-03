@@ -122,17 +122,15 @@ public class GameService {
         // update the status of the game for pinging
         if (successfullyUpdatedGame != null) {
 
+            // saves updates to database
+            gameRepository.save(successfullyUpdatedGame);
+
             // increment the status
-            // TODO: actually only needs to send successfullyUpdatedGame to check..
-            if (rules.checkWinCondition(currentGame, updatedGame)) {
+            if (rules.checkWinCondition(successfullyUpdatedGame)) {
                 incrementGameStatus(successfullyUpdatedGame, true);
             } else {
                 incrementGameStatus(successfullyUpdatedGame, false);
             }
-
-            // saves updates to database
-            gameRepository.save(successfullyUpdatedGame);
-
             return true;
         } else {
             /*
@@ -160,7 +158,7 @@ public class GameService {
         Player currentPlayer = updatedGame.getPlayers().get(0);
         List<Player> players = currentGame.getPlayers();
 
-        if (currentPlayer.isCurrentPlayer()) { // && currentPlayer.getGame().getId() == currentGame.getId()
+        if (currentPlayer.getIsCurrentPlayer()) { // && currentPlayer.getGame().getId() == currentGame.getId()
             long id = currentPlayer.getId();
             currentPlayer = playerRepository.findById(id);
 
@@ -203,7 +201,7 @@ public class GameService {
 
             // check if the chosenCard is one of the 2 currentCards
             // and the currentPlayer is one of the two currentPlayers and the Challenger
-            if (currentCards.contains(chosenCard) && currentPlayers.contains(currentPlayer) && currentPlayer.isCurrentPlayer()) {
+            if (currentCards.contains(chosenCard) && currentPlayers.contains(currentPlayer) && currentPlayer.getIsCurrentPlayer()) {
                 currentCards.remove(chosenCard);
                 currentPlayers.remove(currentPlayer);
 
@@ -318,7 +316,7 @@ public class GameService {
     public Game setColor(Game currentGame, Game updatedGame) {
         Player updatedPlayer = updatedGame.getPlayers().get(0);
 
-        if (updatedGame.getPlayers().size() == 1 && updatedPlayer.isCurrentPlayer()) {
+        if (updatedGame.getPlayers().size() == 1 && updatedPlayer.getIsCurrentPlayer()) {
             long id = updatedGame.getPlayers().get(0).getId();
             for (Player player : currentGame.getPlayers()) {
                 if (player.getId() == id) {
@@ -346,7 +344,7 @@ public class GameService {
                 currentField.setWorker(updatedField.getWorker());
                 // only works if it's the current Player
                 Player player = updatedField.getWorker().getPlayer();
-                if (player.isCurrentPlayer() && playerRepository.findByToken(player.getToken()).isCurrentPlayer()) {
+                if (player.getIsCurrentPlayer() && playerRepository.findByToken(player.getToken()).getIsCurrentPlayer()) {
                     ++count;
                 }
             }
@@ -388,7 +386,7 @@ public class GameService {
     public void nextTurn(Game game) {
         for (Player player : game.getPlayers()) {
             // reverse value
-            player.setIsCurrentPlayer(!player.isCurrentPlayer());
+            player.setIsCurrentPlayer(!player.getIsCurrentPlayer());
         }
         // save
         gameRepository.save(game);
@@ -402,7 +400,7 @@ public class GameService {
     public boolean checkPlayerAuthentication(Game currentGame, String token) {
         for (Player player : currentGame.getPlayers()) {
             if (player.getToken().equals(token)) {
-                if (player.isCurrentPlayer()) {
+                if (player.getIsCurrentPlayer()) {
                     return true;
                 } else {
                     return false;

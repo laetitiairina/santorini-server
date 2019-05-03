@@ -153,7 +153,7 @@ public class GameServiceTest {
         List<Player> players = new ArrayList<>();
 
         for (Player player : updatedGame.getPlayers()) {
-            if (player.isCurrentPlayer()) {
+            if (player.getIsCurrentPlayer()) {
                 player.setCard(updatedGame.getCards().get(0));
                 players.add(player);
             }
@@ -181,7 +181,7 @@ public class GameServiceTest {
         List<Player> players = new ArrayList<>();
 
         for (Player player : updatedGame.getPlayers()) {
-            if (player.isCurrentPlayer()) {
+            if (player.getIsCurrentPlayer()) {
                 player.setCard(new Card(SimpleGodCard.HEPHAESTUS));
                 players.add(player);
             }
@@ -209,7 +209,7 @@ public class GameServiceTest {
         List<Player> players = new ArrayList<>();
 
         for (Player player : updatedGame.getPlayers()) {
-            if (!player.isCurrentPlayer()) {
+            if (!player.getIsCurrentPlayer()) {
                 player.setCard(updatedGame.getCards().get(0));
                 players.add(player);
             }
@@ -312,7 +312,7 @@ public class GameServiceTest {
 
         // set current player's color to blue and remove other player
         for (Player player : players) {
-            if (player.isCurrentPlayer()) {
+            if (player.getIsCurrentPlayer()) {
                 player.setColor(Color.BLUE);
             } else {
                 playerToBeRemoved = player;
@@ -331,7 +331,7 @@ public class GameServiceTest {
         Assert.assertEquals(GameStatus.POSITION1, simpleGame.getStatus());
 
         for (Player player : simpleGame.getPlayers()) {
-            if (player.isCurrentPlayer()) {
+            if (player.getIsCurrentPlayer()) {
                 Assert.assertEquals(Color.BLUE, player.getColor());
             } else {
                 Assert.assertNull(player.getColor());
@@ -352,7 +352,7 @@ public class GameServiceTest {
 
         // here: current player is removed and other player's color is set.
         for (Player player : players) {
-            if (player.isCurrentPlayer()) {
+            if (player.getIsCurrentPlayer()) {
                 playerToBeRemoved = player;
             } else {
                 player.setColor(Color.BLUE);
@@ -381,7 +381,7 @@ public class GameServiceTest {
 
         // here: current player is removed and other player's color is set.
         for (Player player : players) {
-            if (!player.isCurrentPlayer()) {
+            if (!player.getIsCurrentPlayer()) {
                 playerToBeRemoved = player;
             }
         }
@@ -410,7 +410,7 @@ public class GameServiceTest {
         Worker worker1 = new Worker();
         Worker worker2 = new Worker();
         for (Player player : updatedGame.getPlayers()) {
-            if (player.isCurrentPlayer()) {
+            if (player.getIsCurrentPlayer()) {
                 worker1.setPlayer(player);
                 worker2.setPlayer(player);
             }
@@ -462,7 +462,7 @@ public class GameServiceTest {
         Worker worker1 = new Worker();
         Worker worker2 = new Worker();
         for (Player player : updatedGame.getPlayers()) {
-            if (!player.isCurrentPlayer()) {
+            if (!player.getIsCurrentPlayer()) {
                 worker1.setPlayer(player);
                 worker2.setPlayer(player);
             }
@@ -501,7 +501,7 @@ public class GameServiceTest {
         Worker worker1 = new Worker();
         Worker worker2 = new Worker();
         for (Player player : updatedGame.getPlayers()) {
-            if (!player.isCurrentPlayer()) {
+            if (!player.getIsCurrentPlayer()) {
                 worker1.setPlayer(player);
                 worker2.setPlayer(player);
             }
@@ -539,7 +539,7 @@ public class GameServiceTest {
         Worker worker1 = new Worker();
         Worker worker2 = new Worker();
         for (Player player : updatedGame.getPlayers()) {
-            if (!player.isCurrentPlayer()) {
+            if (!player.getIsCurrentPlayer()) {
                 worker1.setPlayer(player);
                 worker2.setPlayer(player);
             }
@@ -574,7 +574,7 @@ public class GameServiceTest {
         Worker worker1 = new Worker();
         Worker worker2 = new Worker();
         for (Player player : updatedGame.getPlayers()) {
-            if (player.isCurrentPlayer()) {
+            if (player.getIsCurrentPlayer()) {
                 worker1.setPlayer(player);
                 worker2.setPlayer(player);
             }
@@ -612,7 +612,7 @@ public class GameServiceTest {
 
         // set current player's color to red and remove other player
         for (Player player : players) {
-            if (player.isCurrentPlayer()) {
+            if (player.getIsCurrentPlayer()) {
                 player.setColor(Color.WHITE);
             } else {
                 playerToBeRemoved = player;
@@ -631,7 +631,7 @@ public class GameServiceTest {
         Assert.assertEquals(GameStatus.POSITION2, simpleGame.getStatus());
 
         for (Player player : simpleGame.getPlayers()) {
-            if (player.isCurrentPlayer()) {
+            if (player.getIsCurrentPlayer()) {
                 Assert.assertEquals(Color.WHITE, player.getColor());
             } else {
                 Assert.assertEquals(Color.BLUE, player.getColor());
@@ -653,7 +653,7 @@ public class GameServiceTest {
 
         // set current player's color to red and remove other player
         for (Player player : players) {
-            if (player.isCurrentPlayer()) {
+            if (player.getIsCurrentPlayer()) {
                 player.setColor(Color.BLUE);
             } else {
                 playerToBeRemoved = player;
@@ -687,7 +687,7 @@ public class GameServiceTest {
         Worker worker2 = new Worker();
 
         for (Player player : updatedGame.getPlayers()) {
-            if (player.isCurrentPlayer()) {
+            if (player.getIsCurrentPlayer()) {
                 worker1.setPlayer(player);
                 worker2.setPlayer(player);
             }
@@ -743,7 +743,7 @@ public class GameServiceTest {
         Worker worker2 = new Worker();
 
         for (Player player : updatedGame.getPlayers()) {
-            if (player.isCurrentPlayer()) {
+            if (player.getIsCurrentPlayer()) {
                 worker1.setPlayer(player);
                 worker2.setPlayer(player);
             }

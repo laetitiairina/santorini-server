@@ -4,7 +4,6 @@ import ch.uzh.ifi.seal.soprafs19.entity.Game;
 
 public class SimpleRuleSet implements IRuleSet {
 
-
     public Boolean checkMovePhase (Game before, Game after) {
         return false;
     }
@@ -13,7 +12,7 @@ public class SimpleRuleSet implements IRuleSet {
         return false;
     }
 
-    public Boolean checkWinCondition(Game before, Game after) {
+    public Boolean checkWinCondition(Game game) {
         return false;
     }
 
