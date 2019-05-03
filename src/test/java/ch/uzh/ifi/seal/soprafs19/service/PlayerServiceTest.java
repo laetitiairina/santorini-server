@@ -37,7 +37,6 @@ public class PlayerServiceTest {
     @Test
     public void createPlayer() {
 
-        /*
         // creating players
         Player player1 = newPlayer(false);
         Player player2 = newPlayer(true);
@@ -53,8 +52,8 @@ public class PlayerServiceTest {
         Assert.assertEquals(player2, playerRepository.findByToken(player2.getToken()));
 
         // players should not be matched, as they have different modes
-        Assert.assertNotEquals(player1.getGame(), player2.getGame());
-        */
+        Assert.assertTrue((player1.getGame() == null && player2.getGame() == null) || player1.getGame() !=  player2.getGame());
+
 
     }
 
