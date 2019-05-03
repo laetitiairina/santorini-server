@@ -2,11 +2,9 @@ package ch.uzh.ifi.seal.soprafs19.service;
 
 import ch.uzh.ifi.seal.soprafs19.constant.Color;
 import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
-import ch.uzh.ifi.seal.soprafs19.entity.Card;
 import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
-import ch.uzh.ifi.seal.soprafs19.repository.CardRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs19.rules.IRuleSet;
@@ -38,9 +36,6 @@ public class GameService {
 
     @Autowired
     private PlayerRepository playerRepository;
-
-    @Autowired
-    private CardRepository cardRepository;
 
     @Autowired
     private EntityManager entityManager;
@@ -183,16 +178,12 @@ public class GameService {
      * @return
      */
     public Game setCards2 (Game currentGame, Game updatedGame) {
+
         // front-end has to send exactly 1 player and an existing card
-        Card card = null;
-        if (updatedGame.getPlayers().get(0).getCard().getId() != null) {
-            card = entityManager.find(Card.class, updatedGame.getPlayers().get(0).getCard().getId());
-        }
-        if (updatedGame.getPlayers().size() == 1 && card != null) {
+        if (updatedGame.getPlayers().size() == 1 && updatedGame.getPlayers().get(0).getCard() != null) {
             // get cards
-            // TODO: does this work, or do we need to get the card from the currentGame first?
-            Card chosenCard = updatedGame.getPlayers().get(0).getCard();
-            List<Card> currentCards = currentGame.getCards();
+            SimpleGodCard chosenCard = updatedGame.getPlayers().get(0).getCard();
+            List<SimpleGodCard> currentCards = currentGame.getCards();
 
             // get players
             List<Player> currentPlayers = currentGame.getPlayers();
@@ -230,27 +221,24 @@ public class GameService {
      * @return
      */
     public Game setCards1 (Game currentGame, Game updatedGame) {
-        // check if the cards are valid
-        List<Card> cards = new ArrayList<>();
 
-        for (Card card : updatedGame.getCards()) {
+        // TODO: where to check this?!
+        /*
+        // check if the cards are valid
+        List<SimpleGodCard> cards = new ArrayList<>();
+        for (SimpleGodCard card : updatedGame.getCards()) {
             // check, if the given value is a valid card
             // TODO: really necessary?
-            if (EnumUtils.isValidEnum(SimpleGodCard.class, card.getCardName().toString())) {
+            if (EnumUtils.isValidEnum(SimpleGodCard.class, card.toString())) {
                 cards.add(card);
             }
         }
+        */
 
         // front-end has to send exactly 2 cards
-        if (cards.size() == 2 && updatedGame.getCards().size() == 2 && cards.get(0).getCardName() != cards.get(1).getCardName()) {
-
-            for(Card card : cards) {
-                cardRepository.save(card);
-            }
-
+        if (updatedGame.getCards().size() == 2 && updatedGame.getCards().get(0) != updatedGame.getCards().get(1)) {
             // set cards
-            currentGame.setCards(cards);
-            gameRepository.save(currentGame);
+            currentGame.setCards(updatedGame.getCards());
 
             // other player is now current player
             nextTurn(currentGame);

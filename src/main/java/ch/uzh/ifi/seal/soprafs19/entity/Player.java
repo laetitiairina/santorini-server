@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
 import ch.uzh.ifi.seal.soprafs19.constant.Color;
+import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
@@ -25,9 +26,8 @@ public class Player implements Serializable {
     @Column(nullable = false)
     private Boolean isGodMode;
 
-    @ManyToOne()
-    @JoinColumn(name = "card_id")
-    private Card card;
+    @Column()
+    private SimpleGodCard card;
 
     @Column()
     private Color color;
@@ -70,11 +70,11 @@ public class Player implements Serializable {
         this.isGodMode = isGodMode;
     }
 
-    public Card getCard() {
+    public SimpleGodCard getCard() {
         return card;
     }
 
-    public void setCard(Card card) {
+    public void setCard(SimpleGodCard card) {
         this.card = card;
     }
 

@@ -6,7 +6,7 @@ import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
 public class PanRuleSet extends SimpleRuleSet {
 
     @Override
-    public Boolean checkWinCondition(Game before, Game after) {
+    public Boolean checkWinCondition(Game game) {
         return false;
     }
 

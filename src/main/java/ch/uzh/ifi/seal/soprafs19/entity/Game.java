@@ -1,9 +1,11 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
+import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import org.hibernate.annotations.Proxy;
 
 import javax.persistence.*;
+import java.beans.SimpleBeanInfo;
 import java.io.Serializable;
 import java.util.List;
 
@@ -25,8 +27,9 @@ public class Game implements Serializable {
 	@Column(nullable = false)
 	private List<Player> players;
 
-	@OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
-	private List<Card> cards;
+	@Column()
+	@ElementCollection(targetClass=SimpleGodCard.class)
+	private List<SimpleGodCard> cards;
 	
 	@Column(nullable = false)
 	private Boolean isGodMode;
@@ -61,11 +64,11 @@ public class Game implements Serializable {
 		this.players = players;
 	}
 
-	public List<Card> getCards() {
+	public List<SimpleGodCard> getCards() {
 		return cards;
 	}
 
-	public void setCards(List<Card> cards) {
+	public void setCards(List<SimpleGodCard> cards) {
 		this.cards = cards;
 	}
 

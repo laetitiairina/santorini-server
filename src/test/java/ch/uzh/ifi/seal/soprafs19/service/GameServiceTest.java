@@ -68,12 +68,12 @@ public class GameServiceTest {
 
         // select the two cards
         Game updatedGame = SerializationUtils.clone(godGame);
-        List<Card> cards = new ArrayList<>();
+        List<SimpleGodCard> cards = new ArrayList<>();
 
-        Card card1 = new Card(SimpleGodCard.APOLLO);
+        SimpleGodCard card1 = SimpleGodCard.APOLLO;
         cards.add(card1);
 
-        Card card2 = new Card(SimpleGodCard.ARTEMIS);
+        SimpleGodCard card2 = SimpleGodCard.ARTEMIS;
         cards.add(card2);
 
         updatedGame.setCards(cards);
@@ -96,15 +96,10 @@ public class GameServiceTest {
 
         // select the two cards
         Game updatedGame = SerializationUtils.clone(godGame);
-        List<Card> cards = new ArrayList<>();
+        List<SimpleGodCard> cards = new ArrayList<>();
 
-        Card card1 = new Card();
-        card1.setCardName(SimpleGodCard.APOLLO);
-        cards.add(card1);
-
-        Card card2 = new Card();
-        card2.setCardName(SimpleGodCard.APOLLO);
-        cards.add(card2);
+        cards.add(SimpleGodCard.APOLLO);
+        cards.add(SimpleGodCard.APOLLO);
 
         updatedGame.setCards(cards);
 
@@ -125,11 +120,9 @@ public class GameServiceTest {
 
         // select the two cards
         Game updatedGame = SerializationUtils.clone(godGame);
-        List<Card> cards = new ArrayList<>();
+        List<SimpleGodCard> cards = new ArrayList<>();
 
-        Card card1 = new Card();
-        card1.setCardName(SimpleGodCard.APOLLO);
-        cards.add(card1);
+        cards.add(SimpleGodCard.APOLLO);
 
         updatedGame.setCards(cards);
 
@@ -182,7 +175,7 @@ public class GameServiceTest {
 
         for (Player player : updatedGame.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
-                player.setCard(new Card(SimpleGodCard.HEPHAESTUS));
+                player.setCard(SimpleGodCard.HEPHAESTUS);
                 players.add(player);
             }
         }
