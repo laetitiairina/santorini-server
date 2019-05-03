@@ -494,12 +494,10 @@ public class GameServiceTest {
 
         // create Workers
         Worker worker1 = null;
-        Worker worker2 = null;
 
         for (Player player : updatedGame.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
                 worker1 = player.getWorkers().get(0);
-                worker2 = player.getWorkers().get(1);
             }
         }
 
@@ -530,17 +528,6 @@ public class GameServiceTest {
         // create game with chosen position
         Game updatedGame = SerializationUtils.clone(simpleGame);
         Board board = updatedGame.getBoard();
-
-        // create Workers
-        Worker worker1 = null;
-        Worker worker2 = null;
-
-        for (Player player : updatedGame.getPlayers()) {
-            if (player.getIsCurrentPlayer()) {
-                worker1 = player.getWorkers().get(0);
-                worker2 = player.getWorkers().get(1);
-            }
-        }
 
         // place Workers on two random fields
         List<Field> fields = new ArrayList<>();
@@ -843,7 +830,8 @@ public class GameServiceTest {
         Assert.assertEquals(GameStatus.MOVE, simpleGame.getStatus());
 
         List<Field> assertFields = simpleGame.getBoard().getFields();
-        Assert.assertTrue(1 == assertFields.get(13).getBlocks());
+        long blocks = assertFields.get(13).getBlocks();
+        Assert.assertEquals((long) 1, blocks);
 
         int count = 0;
 
