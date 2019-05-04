@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import javax.validation.constraints.AssertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -842,6 +843,31 @@ public class GameServiceTest {
         }
 
         Assert.assertEquals(24, count);
+
+    }
+
+    @Test
+    public void updateTokenSuccessfully(){
+
+        //get to end of round
+        setup();
+
+        //create game with chosen move position
+        Game updatedGame = SerializationUtils.clone(simpleGame);
+        List<Player> players = updatedGame.getPlayers();
+        Player currentPlayer = null;
+
+        for(Player player : players){
+            if(player.getIsCurrentPlayer()){
+                currentPlayer = player;
+            }
+        }
+
+        String token1 = currentPlayer.getToken();
+        boolean tokenOnCurrentPlayer = gameService.checkPlayerAuthentication(simpleGame, token1);
+        //Asserts
+        Assert.assertNotNull(token1);
+        Assert.assertTrue(tokenOnCurrentPlayer);
 
     }
 
