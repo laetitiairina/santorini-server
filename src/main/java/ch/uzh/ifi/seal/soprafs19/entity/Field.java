@@ -29,7 +29,6 @@ public class Field implements Serializable {
 	@Column(nullable = false)
 	private Integer posY;
 
-	// TODO: IS NULL
 	@ManyToOne
 	@JoinColumn(name = "board_id")
 	private Board board;
@@ -48,6 +47,11 @@ public class Field implements Serializable {
 
 	public void setWorker(Worker worker) {
 		this.worker = worker;
+
+		// Set reference to field in worker if not null
+		if (worker != null) {
+			worker.setField(this);
+		}
 	}
 
 	public Integer getBlocks() {
@@ -84,7 +88,8 @@ public class Field implements Serializable {
 
 	public Field () {}
 
-	public Field(Integer posX, Integer posY) {
+	public Field(Board board, Integer posX, Integer posY) {
+		this.board = board;
 		this.blocks = 0;
 		this.hasDome = false;
 		this.posX = posX;

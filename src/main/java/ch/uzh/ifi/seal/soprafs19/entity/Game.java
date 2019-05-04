@@ -109,12 +109,14 @@ public class Game implements Serializable {
             matchedPlayers.get(0).setIsCurrentPlayer(true);
         } else {
 			this.status = GameStatus.COLOR1;
-            // TODO: @Florian add logic for simple game mode (birthday, etc..)
+            // TODO: Add logic for simple game mode (birthday, etc..)
 			matchedPlayers.get(0).setIsCurrentPlayer(true);
         }
 
+        // Matched players reference to game gets set in MatchMaker
+
 		// Delete board and save fields in game entity directly?
-		this.board = new Board(numberOfRows);
+		this.board = new Board(this,numberOfRows);
 	}
 
 	@Override
