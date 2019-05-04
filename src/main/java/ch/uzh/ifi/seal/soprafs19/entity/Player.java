@@ -27,6 +27,9 @@ public class Player implements Serializable {
     @Column(nullable = false)
     private Boolean isGodMode;
 
+    @Column(nullable = false)
+    private Integer polls;
+
     @Column()
     private SimpleGodCard card;
 
@@ -130,10 +133,15 @@ public class Player implements Serializable {
 		this.isCurrentPlayer = isCurrentPlayer;
 	}
 
+	public int getPolls() {return polls;}
+
+	public void setPolls(int polls) {this.polls = polls;}
+
 	public Player() {
         this.workers = new ArrayList<>();
         workers.add(new Worker());
         workers.add(new Worker());
+        this.polls = 0;
     }
 
     @Override

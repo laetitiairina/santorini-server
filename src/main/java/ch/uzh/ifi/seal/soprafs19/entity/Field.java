@@ -13,7 +13,7 @@ public class Field implements Serializable {
 	@Column(name = "field_id")
 	private Long id;
 
-	@OneToOne(mappedBy = "field", cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "worker_id")
 	private Worker worker;
 

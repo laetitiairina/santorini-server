@@ -256,6 +256,7 @@ public class GameService {
      */
     public Game move(Game currentGame, Game updatedGame) {
         Worker currentWorker = null;
+        Field currentField = null;
 
         for (Field field : updatedGame.getBoard().getFields()) {
             // find field that needs to be updated
@@ -264,8 +265,11 @@ public class GameService {
             // update the worker value of the field and remember current Worker
             if (field.getWorker() != null) {
                 currentWorker = field.getWorker();
+                currentField = fieldToUpdate;
+            } else {
+                fieldToUpdate.setWorker(field.getWorker());
             }
-            fieldToUpdate.setWorker(field.getWorker());
+
         }
 
         //  set the right worker as isCurrentWorker for build phase
@@ -274,6 +278,7 @@ public class GameService {
                 for (Worker worker : player.getWorkers()) {
                     if (worker.getId().equals(currentWorker.getId())) {
                         worker.setIsCurrentWorker(true);
+                        currentField.setWorker(worker);
                     } else {
                         worker.setIsCurrentWorker(false);
                     }
@@ -281,7 +286,6 @@ public class GameService {
             }
         }
 
-        nextTurn(currentGame);
         return currentGame;
     }
 
@@ -427,5 +431,9 @@ public class GameService {
             }
         }
         return false;
+    }
+
+    public void incrementPolls(Game game, long playerId) {
+
     }
 }

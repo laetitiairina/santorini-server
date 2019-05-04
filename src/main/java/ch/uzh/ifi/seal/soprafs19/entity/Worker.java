@@ -19,7 +19,7 @@ public class Worker implements Serializable {
 	@JoinColumn(name = "player_id")
 	private Player player;
 
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="field_id")
 	private Field field;
 

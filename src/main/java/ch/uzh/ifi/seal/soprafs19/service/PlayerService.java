@@ -97,4 +97,9 @@ public class PlayerService {
     public void updatePlayer(Player newPlayer) {
         playerRepository.save(newPlayer);
     }
+
+    public void incrementPolls(Player player) {
+        player.setPolls(player.getPolls() + 1);
+        playerRepository.save(player);
+    }
 }

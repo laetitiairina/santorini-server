@@ -41,7 +41,7 @@ public class GameController {
     */
 
     @GetMapping("/games/{id}")
-    ResponseEntity getGame(@PathVariable("id") Long id, @RequestParam(required = false) List<String> fields) {
+    ResponseEntity getGame(@RequestHeader("Token") String token, @PathVariable("id") Long id, @RequestParam(required = false) List<String> fields) {
 
         // Get game by id
         Optional<Game> game = service.getGameById(id);
@@ -50,6 +50,9 @@ public class GameController {
         if (game.isEmpty()) {
             // Send response 404
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game was not found!");
+        } else {
+            // update the polls
+            service.incrementPolls(game.get(), id);
         }
 
         // If specific fields were requested, only send those fields of game entity

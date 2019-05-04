@@ -787,13 +787,14 @@ public class GameServiceTest {
 
         List<Field> assertFields = simpleGame.getBoard().getFields();
         Assert.assertEquals(worker, assertFields.get(5).getWorker());
+        Assert.assertTrue(assertFields.get(5).getWorker().getIsCurrentWorker());
         Assert.assertNull(assertFields.get(4).getWorker());
 
         int count = 0;
 
         for (Field field : assertFields) {
             Worker updatedWorker = field.getWorker();
-            if (updatedWorker != worker) {
+            if (updatedWorker == null || !updatedWorker.getId().equals(worker.getId())) {
                 count ++;
             }
         }
