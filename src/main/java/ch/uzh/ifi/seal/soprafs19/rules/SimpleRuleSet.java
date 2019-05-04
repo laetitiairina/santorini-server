@@ -231,14 +231,13 @@ public class SimpleRuleSet implements IRuleSet {
         }
 
             }
-            //Case when not the Current Player wins
-            else{
-                P2 =p;
-                if((WorkerCanNotMove(W1,game)&& WorkerCanNotMove(W2,game))){
-                    isValid = true;
-                }
+            }
 
-            }}
+        //Case when not the Current Player wins
+        if((WorkerCanNotMove(W1,game)&& WorkerCanNotMove(W2,game))){
+            isValid = true;
+            }
+        
 
         return isValid;
     }
