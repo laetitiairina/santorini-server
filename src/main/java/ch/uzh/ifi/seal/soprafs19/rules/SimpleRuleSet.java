@@ -169,22 +169,80 @@ public class SimpleRuleSet implements IRuleSet {
         return isValid;
     }
 
-    public Boolean checkWinCondition(Game game) {
+    //Method that Checks if a Worker Can not move anymore
+    public Boolean WorkerCanNotMove(Worker worker, Game game){
 
         boolean isValid = false;
 
-        for ( Player p: game.getPlayers() ) {
-            if(p.getIsCurrentPlayer()){
-                for (Worker w: p.getWorkers()){
-                    if(w.getField().getBlocks() == 3 && !w.getField().getHasDome()){
-                        isValid = true;
+        int PosX = worker.getField().getPosX();
+        int PosY = worker.getField().getPosY();
+
+
+        ArrayList <Field> NeighbouringFields = new ArrayList<>();
+
+        //Adds neighbouring fields to the array
+        for(Field field : game.getBoard().getFields()) {
+            if (field.getPosX() == PosX + 1 || field.getPosX() == PosX - 1 || field.getPosX() == PosX) {
+                if (field.getPosY() == PosY + 1 || field.getPosY() == PosY - 1 || field.getPosY() == PosY) {
+                    if (field.getPosX() >= 0 && field.getPosX() <= 4 || field.getPosY() <= 4 && field.getPosY() >= 0) {
+                        if (field.getPosX() != PosX || field.getPosY() != PosY) {
+                            NeighbouringFields.add(field);
+                        }
                     }
                 }
             }
         }
 
+        //Checks that it is not possible to move to a neighbouring field
+        for(Field field : NeighbouringFields){
+            if(field.getHasDome() && field.getWorker()!= null){
+                if(field.getBlocks()>= (worker.getField().getBlocks()+2)){
+                    isValid= true;
+                }
+
+            }
+        }
+
         return isValid;
     }
+
+    public Boolean checkWinCondition(Game game) {
+
+        boolean isValid = false;
+
+        Player P1 = new Player();
+        Player P2 = new Player();
+
+        Worker W1 = P1.getWorkers().get(0);
+        Worker W2 = P1.getWorkers().get(1);
+        Worker W3 = P2.getWorkers().get(0);
+        Worker W4 = P2.getWorkers().get(1);
+
+
+        //Case when the Current Player wins
+        for (Player p: game.getPlayers() ) {
+            if(p.getIsCurrentPlayer()){
+                P1 = p;
+                for (Worker w: P1.getWorkers()){
+                    if((w.getField().getBlocks() == 3 && !w.getField().getHasDome()) || (WorkerCanNotMove(W3,game)&& WorkerCanNotMove(W4,game))){
+                        isValid = true;
+            }
+
+        }
+
+            }
+            //Case when not the Current Player wins
+            else{
+                P2 =p;
+                if((WorkerCanNotMove(W1,game)&& WorkerCanNotMove(W2,game))){
+                    isValid = true;
+                }
+
+            }}
+
+        return isValid;
+    }
+
 
     public Boolean hasRuleForOpponentsTurn() {
         return false;
