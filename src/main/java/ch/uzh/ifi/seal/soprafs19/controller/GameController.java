@@ -52,7 +52,7 @@ public class GameController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game was not found!");
         } else {
             // update the polls
-            service.incrementPolls(game.get(), id);
+            service.incrementPolls(game.get(), token);
         }
 
         // If specific fields were requested, only send those fields of game entity

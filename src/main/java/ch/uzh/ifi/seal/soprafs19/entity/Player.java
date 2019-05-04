@@ -153,4 +153,9 @@ public class Player implements Serializable {
         Player player = (Player) o;
         return this.getId().equals(player.getId());
     }
+
+    public void incrementPolls() {
+        setPolls(getPolls() + 1);
+        System.out.println(getPolls());
+    }
 }
