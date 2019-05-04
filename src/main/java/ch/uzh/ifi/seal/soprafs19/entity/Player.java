@@ -132,8 +132,8 @@ public class Player implements Serializable {
 
 	public Player() {
         this.workers = new ArrayList<>();
-        workers.add(new Worker());
-        workers.add(new Worker());
+        workers.add(new Worker(this));
+        workers.add(new Worker(this));
     }
 
     @Override

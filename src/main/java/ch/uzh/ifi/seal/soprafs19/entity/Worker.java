@@ -58,6 +58,12 @@ public class Worker implements Serializable {
 
 	public void setIsCurrentWorker(Boolean isCurrentWorker) {this.isCurrentWorker = isCurrentWorker;}
 
+	public Worker() {}
+
+	public Worker(Player player) {
+		this.player = player;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) return true;

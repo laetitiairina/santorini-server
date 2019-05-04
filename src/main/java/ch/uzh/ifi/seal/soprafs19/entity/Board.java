@@ -1,5 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,7 +21,6 @@ public class Board implements Serializable {
 	@Column(nullable = false)
 	private List<Field> fields;
 
-	// TODO: game is null!
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "game_id")
 	private Game game;
@@ -40,19 +41,23 @@ public class Board implements Serializable {
 		this.fields = fields;
 	}
 
+    @JsonIgnore
 	public Game getGame() { return game;}
 
+    @JsonIgnore
 	public void setGame(Game game) {this.game = game;}
 
 	public Board() {}
 
-	public Board(Integer numberOfRows) {
+	public Board(Game game, Integer numberOfRows) {
+
+		this.game = game;
 
 		this.fields = new ArrayList<Field>();
 
 		for (int i = 0; i < numberOfRows; i++) {
 			for (int j = 0; j < numberOfRows; j++)
-			this.fields.add(new Field(i, j));
+			this.fields.add(new Field(this,i, j));
 		}
 
 	}
