@@ -45,11 +45,18 @@ public class PlayerServiceTest {
         Assert.assertNotNull(player1.getToken());
         Assert.assertNotNull(player2.getToken());
 
+        Assert.assertNotNull(player1.getId());
+        Assert.assertNotNull(player2.getId());
+
         Assert.assertEquals(player1.getIsGodMode(), false);
         Assert.assertEquals(player2.getIsGodMode(), true);
 
         Assert.assertEquals(player1, playerRepository.findByToken(player1.getToken()));
         Assert.assertEquals(player2, playerRepository.findByToken(player2.getToken()));
+
+        Assert.assertNotSame(player1.getId(),player2.getId());
+
+
 
         // players should not be matched, as they have different modes
         Assert.assertTrue((player1.getGame() == null && player2.getGame() == null) || player1.getGame() !=  player2.getGame());
@@ -78,6 +85,16 @@ public class PlayerServiceTest {
         }
     }
 
+/*    @Test
+    public void getPlayerById(){
+
+        Player player1 = newPlayer(false);
+        Player player2 = newPlayer(true);
+
+        Assert.assertEquals(playerService.getPlayerById(player1.getId()), playerRepository.findById(player1.getId()));
+        Assert.assertEquals(playerService.getPlayerById(player1.getId()), playerRepository.findById(player2.getId()));
+    }
+*/
     /**
      * creates a new player in the playerRepository
      *
