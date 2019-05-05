@@ -176,8 +176,10 @@ public class SimpleRuleSet implements IRuleSet {
         for ( Player p: game.getPlayers() ) {
             if(p.getIsCurrentPlayer()){
                 for (Worker w: p.getWorkers()){
-                    if(w.getField().getBlocks() == 3 && !w.getField().getHasDome()){
-                        isValid = true;
+                    if (w.getField() != null) {
+                        if(w.getField().getBlocks() == 3 && !w.getField().getHasDome()){
+                            isValid = true;
+                        }
                     }
                 }
             }
