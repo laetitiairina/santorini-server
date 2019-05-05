@@ -1,6 +1,5 @@
 package ch.uzh.ifi.seal.soprafs19.service;
 
-import ch.uzh.ifi.seal.soprafs19.constant.Color;
 import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
@@ -73,6 +72,12 @@ public class GameService {
         log.debug("Created Information for Game: {}", newGame);
     }
 
+    /**
+     * updates game information
+     * @param currentGame
+     * @param updatedGame
+     * @return
+     */
     public boolean updateGame(Game currentGame, Game updatedGame) {
         // Authentication and checks done in GameController
 
@@ -139,6 +144,12 @@ public class GameService {
         }
     }
 
+    /**
+     *  handles the states only used by the god mode
+     * @param currentGame
+     * @param updatedGame
+     * @return
+     */
     public Game setGodModeInit(Game currentGame, Game updatedGame) {
         switch (currentGame.getStatus()) {
             case CARDS1:
@@ -151,22 +162,22 @@ public class GameService {
         return null;
     }
 
-    public Game setStartPlayer(Game currentGame, Game updatedGame) {
-        Player currentPlayer = updatedGame.getPlayers().get(0);
-        List<Player> players = currentGame.getPlayers();
+    /**
+     * sets the two cards in the game at status CARDS1
+     *
+     * @param currentGame
+     * @param updatedGame
+     * @return
+     */
+    public Game setCards1(Game currentGame, Game updatedGame) {
 
-        if (currentPlayer.getIsCurrentPlayer()) { // && currentPlayer.getGame().getId() == currentGame.getId()
-            long id = currentPlayer.getId();
-            currentPlayer = playerRepository.findById(id);
+        // front-end has to send exactly 2 cards
+        if (updatedGame.getCards().size() == 2 && updatedGame.getCards().get(0) != updatedGame.getCards().get(1)) {
+            // set cards
+            currentGame.setCards(updatedGame.getCards());
 
-            for (Player player : players) {
-                if (player.getId().equals(currentPlayer.getId())) {
-                    player.setIsCurrentPlayer(true);
-                } else {
-                    player.setIsCurrentPlayer(false);
-                }
-            }
-
+            // other player is now current player
+            nextTurn(currentGame);
             return currentGame;
         }
         return null;
@@ -216,37 +227,95 @@ public class GameService {
     }
 
     /**
-     * sets the two cards in the game at status CARDS1
-     *
+     * sets the Start Player in God Mode
      * @param currentGame
      * @param updatedGame
      * @return
      */
-    public Game setCards1(Game currentGame, Game updatedGame) {
+    public Game setStartPlayer(Game currentGame, Game updatedGame) {
+        Player currentPlayer = updatedGame.getPlayers().get(0);
+        List<Player> players = currentGame.getPlayers();
 
-        // TODO: where to check this?!
-        /*
-        // check if the cards are valid
-        List<SimpleGodCard> cards = new ArrayList<>();
-        for (SimpleGodCard card : updatedGame.getCards()) {
-            // check, if the given value is a valid card
-            // TODO: really necessary?
-            if (EnumUtils.isValidEnum(SimpleGodCard.class, card.toString())) {
-                cards.add(card);
+        if (currentPlayer.getIsCurrentPlayer()) { // && currentPlayer.getGame().getId() == currentGame.getId()
+            long id = currentPlayer.getId();
+            currentPlayer = playerRepository.findById(id);
+
+            for (Player player : players) {
+                if (player.getId().equals(currentPlayer.getId())) {
+                    player.setIsCurrentPlayer(true);
+                } else {
+                    player.setIsCurrentPlayer(false);
+                }
             }
-        }
-        */
 
-        // front-end has to send exactly 2 cards
-        if (updatedGame.getCards().size() == 2 && updatedGame.getCards().get(0) != updatedGame.getCards().get(1)) {
-            // set cards
-            currentGame.setCards(updatedGame.getCards());
-
-            // other player is now current player
-            nextTurn(currentGame);
             return currentGame;
         }
         return null;
+    }
+
+    /**
+     * sets the color of a Player
+     * @param currentGame
+     * @param updatedGame
+     * @return
+     */
+    public Game setColor(Game currentGame, Game updatedGame) {
+        Player updatedPlayer = updatedGame.getPlayers().get(0);
+
+        if (updatedGame.getPlayers().size() == 1 && updatedPlayer.getIsCurrentPlayer()) {
+            long id = updatedPlayer.getId();
+            for (Player player : currentGame.getPlayers()) {
+                if (player.getId() == id) {
+                    if (updatedPlayer.getColor() != null) {
+                        player.setColor(updatedPlayer.getColor());
+                    } else {
+                        return null;
+                    }
+                }
+            }
+            if (currentGame.getPlayers().get(0).getColor() != currentGame.getPlayers().get(1).getColor()) {
+                return currentGame;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * sets the position of the two workers in the beginning
+     * @param currentGame
+     * @param updatedGame
+     * @return
+     */
+    public Game setPosition(Game currentGame, Game updatedGame) {
+        List<Long> workerIds = new ArrayList<>();
+
+        for (Field updatedField : updatedGame.getBoard().getFields()) {
+
+            // find field in back-end game
+            Field currentField = getFieldToUpdate(currentGame, updatedField);
+
+            if (currentField != null && currentField.getWorker() == null) {
+
+                // only works if it's the current Player
+                for (Player player : currentGame.getPlayers()) {
+                    if (player.getIsCurrentPlayer()) {
+                        for (Worker worker : player.getWorkers()) {
+                            if (worker.getId().equals(updatedField.getWorker().getId())) {
+                                currentField.setWorker(worker);
+                                workerIds.add(worker.getId());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // both fields need to be valid and two different workers have to be placed on them
+        if (workerIds.size() == 2 && !workerIds.get(0).equals(workerIds.get(1))) {
+            nextTurn(currentGame);
+            return currentGame;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -260,8 +329,10 @@ public class GameService {
         Worker currentWorker = null;
 
         for (Field field : updatedGame.getBoard().getFields()) {
+
+
             // find field that needs to be updated
-            Field fieldToUpdate = getFieldById(currentGame, field.getId());
+            Field fieldToUpdate = getFieldToUpdate(currentGame, field);
 
             // update the worker value of the field and remember current Worker
             if (field.getWorker() != null) {
@@ -296,7 +367,7 @@ public class GameService {
     public Game build(Game currentGame, Game updatedGame) {
         for (Field field : updatedGame.getBoard().getFields()) {
             // find field that needs to be updated
-            Field fieldToUpdate = getFieldById(currentGame, field.getId());
+            Field fieldToUpdate = getFieldToUpdate(currentGame, field);
 
             // update the blocks and has Dome value of the field
             fieldToUpdate.setBlocks(field.getBlocks());
@@ -304,81 +375,6 @@ public class GameService {
         }
         nextTurn(currentGame);
         return currentGame;
-    }
-
-    /**
-     * get Field by Id
-     *
-     * @param game
-     * @param fieldId
-     * @return
-     */
-    public Field getFieldById(Game game, long fieldId) {
-        for (Field field : game.getBoard().getFields()) {
-            if (field.getId() == fieldId) {
-                return field;
-            }
-        }
-        return null;
-    }
-
-    public Game setColor(Game currentGame, Game updatedGame) {
-        Player updatedPlayer = updatedGame.getPlayers().get(0);
-
-        if (updatedGame.getPlayers().size() == 1 && updatedPlayer.getIsCurrentPlayer()) {
-            long id = updatedPlayer.getId();
-            for (Player player : currentGame.getPlayers()) {
-                if (player.getId() == id) {
-                    if (updatedPlayer.getColor() != null) {
-                        player.setColor(updatedPlayer.getColor());
-                    } else {
-                        return null;
-                    }
-                }
-            }
-            if (currentGame.getPlayers().get(0).getColor() != currentGame.getPlayers().get(1).getColor()) {
-                return currentGame;
-            }
-        }
-        return null;
-    }
-
-    public Game setPosition(Game currentGame, Game updatedGame) {
-        List<Long> workerIds = new ArrayList<>();
-
-        for (Field updatedField : updatedGame.getBoard().getFields()) {
-
-            Field currentField = null;
-
-            // find field in back-end game
-            for (Field field : currentGame.getBoard().getFields()) {
-                if (field.getId().equals(updatedField.getId())) {
-                    currentField = field;
-                }
-            }
-
-            if (currentField != null && currentField.getWorker() == null) {
-
-                // only works if it's the current Player
-                for (Player player : currentGame.getPlayers()) {
-                    if (player.getIsCurrentPlayer()) {
-                        for (Worker worker : player.getWorkers()) {
-                            if (worker.getId().equals(updatedField.getWorker().getId())) {
-                                currentField.setWorker(worker);
-                                workerIds.add(worker.getId());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        // both fields need to be valid and two different workers have to be placed on them
-        if (workerIds.size() == 2 && !workerIds.get(0).equals(workerIds.get(1))) {
-            nextTurn(currentGame);
-            return currentGame;
-        } else {
-            return null;
-        }
     }
 
     /**
@@ -406,6 +402,10 @@ public class GameService {
         gameRepository.save(game);
     }
 
+    /**
+     * switches who's the current Player
+     * @param game
+     */
     public void nextTurn(Game game) {
         for (Player player : game.getPlayers()) {
             // reverse value
@@ -433,5 +433,21 @@ public class GameService {
             }
         }
         return false;
+    }
+
+    /**
+     * finds to field to be updated
+     * @param game
+     * @param field
+     * @return
+     */
+    private Field getFieldToUpdate(Game game, Field field) {
+        Field fieldToUpdate = null;
+        for (Field currentField : game.getBoard().getFields()) {
+            if (currentField.getId().equals(field.getId())) {
+                fieldToUpdate = currentField;
+            }
+        }
+        return fieldToUpdate;
     }
 }
