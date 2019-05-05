@@ -99,15 +99,17 @@ public class GameService {
                 successfullyUpdatedGame = setPosition(currentGame, updatedGame);
                 break;
             case MOVE:
-                // TODO: include isBadRequest handling, add check logic
+                // TODO: include isBadRequest handling, add check logic (low priority)
                 // check if it's a valid move
+                // TODO: @Can test it before uncommenting on master
                 //if (rules.checkMovePhase(currentGame, updatedGame)) {
                 successfullyUpdatedGame = move(currentGame, updatedGame);
                 //}
                 break;
             case BUILD:
-                // TODO: include isBadRequest handling, add check logic
+                // TODO: include isBadRequest handling, add check logic (low priority)
                 // check if it's a valid build
+                // TODO: @Can test it before uncommenting on master
                 //if (rules.checkBuildPhase(currentGame, updatedGame)) {
                 successfullyUpdatedGame = build(currentGame, updatedGame);
                 //}
