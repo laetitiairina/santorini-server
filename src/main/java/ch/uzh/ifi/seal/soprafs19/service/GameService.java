@@ -344,31 +344,36 @@ public class GameService {
     }
 
     public Game setPosition(Game currentGame, Game updatedGame) {
-        List<Field> fields = updatedGame.getBoard().getFields();
-        List<Long> count = new ArrayList<>();
+        List<Long> workerIds = new ArrayList<>();
 
-        for (Field updatedField : fields) {
+        for (Field updatedField : updatedGame.getBoard().getFields()) {
 
-            Field currentField = getFieldById(currentGame, updatedField.getId());
+            Field currentField = null;
 
-            if (currentField.getWorker() == null) {
+            // find field in back-end game
+            for (Field field : currentGame.getBoard().getFields()) {
+                if (field.getId().equals(updatedField.getId())) {
+                    currentField = field;
+                }
+            }
 
-                currentField.setWorker(updatedField.getWorker());
+            if (currentField != null && currentField.getWorker() == null) {
 
                 // only works if it's the current Player
                 for (Player player : currentGame.getPlayers()) {
                     if (player.getIsCurrentPlayer()) {
                         for (Worker worker : player.getWorkers()) {
                             if (worker.getId().equals(updatedField.getWorker().getId())) {
-                                count.add(worker.getId());
+                                currentField.setWorker(worker);
+                                workerIds.add(worker.getId());
                             }
                         }
                     }
                 }
             }
         }
-        // both fields need to be valid and two different workers has to be placed on them
-        if (count.size() == 2 && !count.get(0).equals(count.get(1))) {
+        // both fields need to be valid and two different workers have to be placed on them
+        if (workerIds.size() == 2 && !workerIds.get(0).equals(workerIds.get(1))) {
             nextTurn(currentGame);
             return currentGame;
         } else {

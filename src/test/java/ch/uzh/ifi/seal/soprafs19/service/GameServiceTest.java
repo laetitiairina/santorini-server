@@ -433,9 +433,8 @@ public class GameServiceTest {
         int count = 0;
         for (Field field : assertFields) {
             Worker worker = field.getWorker();
-            if (worker != worker1 && worker != worker2) {
-                Assert.assertNull(worker);
-                count ++;
+            if (worker == null) {
+                ++count;
             }
         }
         Assert.assertEquals(23, count);
@@ -704,7 +703,7 @@ public class GameServiceTest {
             Worker worker = field.getWorker();
             if (worker == null) {
                 count1 ++;
-            } else if (worker != worker1 && worker != worker2) {
+            } else if (!worker.getId().equals(worker1.getId()) && !worker.getId().equals(worker2.getId())) {
                 count2 ++;
             }
         }
