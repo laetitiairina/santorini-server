@@ -4,86 +4,84 @@ import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.entity.Worker;
-import ch.uzh.ifi.seal.soprafs19.entity.Board;
-import java.util.ArrayList;
 
 public class SimpleRuleSet implements IRuleSet {
 
     public Boolean checkMovePhase(Game before, Game after) {
+
         boolean isValid = false;
 
-        Board board = new Board();
+        Field fieldBefore = null;
+        Field fieldAfter = null;
 
-        Field fieldBefore = new Field(board,0, 0);
-        Field fieldAfter = new Field(board, 0, 0);
+        Field fieldBeforeBackEnd = null;
+        Field fieldAfterBackEnd = null;
 
-        Field FieldBeforeBackEnd = new Field(board, 0, 0);
-        Field FieldAfterBackEnd = new Field(board, 0, 0);
+        int xBefore = -1, yBefore = -1, xAfter = -1, yAfter = -1;
 
-        ArrayList<Integer> posBefore = new ArrayList<>();
-        ArrayList<Integer> posAfter = new ArrayList<>();
-
-        //adds the position of the two fields to the array and declares which is the before and after field
+        // adds the position of the two fields to the array and declares which is the before and after field
         for (Field field : after.getBoard().getFields()) {
             if (field.getWorker() != null) {
                 fieldAfter = field;
-                posAfter.add(fieldAfter.getPosX());
-                posAfter.add(fieldAfter.getPosY());
+                xAfter =fieldAfter.getPosX();
+                yAfter = fieldAfter.getPosY();
             } else {
                 fieldBefore = field;
-                posBefore.add(fieldBefore.getPosX());
-                posBefore.add(fieldBefore.getPosY());
+                xBefore = fieldBefore.getPosX();
+                yBefore = fieldBefore.getPosY();
+            }
+        }
+
+        // faulty information by front-end
+        if (fieldAfter == null || fieldBefore ==  null) {
+            return false;
+        }
+
+        for (Field field : before.getBoard().getFields()) {
+            if ((field.getPosX() == xBefore) && (field.getPosY() == yBefore)) {
+                fieldBeforeBackEnd = field;
             }
         }
 
         for (Field field : before.getBoard().getFields()) {
-            if ((field.getPosX() == fieldBefore.getPosX()) && (field.getPosY() == fieldBefore.getPosY())) {
-                FieldBeforeBackEnd = field;
+            if ((field.getPosX() == xAfter) && (field.getPosY() == yAfter)) {
+                fieldAfterBackEnd = field;
             }
         }
 
-        for (Field field : before.getBoard().getFields()) {
-            if ((field.getPosX() == fieldAfter.getPosX()) && (field.getPosY() == fieldAfter.getPosY())) {
-                FieldAfterBackEnd = field;
-            }
+        // faulty information by front-end
+        if (fieldBeforeBackEnd == null || fieldAfterBackEnd == null) {
+            return false;
         }
 
-
-        int BlockBefore = fieldBefore.getBlocks();
-        int BlockAfter = fieldAfter.getBlocks();
-
-        int Xbefore = posBefore.get(0);
-        int Ybefore = posBefore.get(1);
-
-        int Xafter = posAfter.get(0);
-        int Yafter = posAfter.get(1);
-
+        int blockBefore = fieldBefore.getBlocks();
+        int blockAfter = fieldAfter.getBlocks();
 
         // checks if the Worker's position is within the board's limitations
-        if (Xafter >= 0 && Xafter <= 4 && Yafter >= 0 && Yafter <= 4) {
+        if (xAfter >= 0 && xAfter <= 4 && yAfter >= 0 && yAfter <= 4) {
 
             // move 1 or 0 fields on X-axis
-            if ((Xafter == Xbefore) || (Xafter == Xbefore - 1) || (Xafter == Xbefore + 1)) {
+            if ((xAfter == xBefore) || (xAfter == xBefore - 1) || (xAfter == xBefore + 1)) {
 
                 // move 1 or 0 fields on Y-axis
-                if ((Yafter == Ybefore) || (Yafter == Ybefore - 1) || (Yafter == Ybefore + 1)) {
+                if ((yAfter == yBefore) || (yAfter == yBefore - 1) || (yAfter == yBefore + 1)) {
 
                     // not allowed to stay on same field
-                    if ((Xafter != Xbefore) || (Yafter != Ybefore)) {
+                    if ((xAfter != xBefore) || (yAfter != yBefore)) {
 
                         // origin field had a worker
-                        if ((FieldBeforeBackEnd.getWorker() != null)
+                        if ((fieldBeforeBackEnd.getWorker() != null)
                                 // destination field is unoccupied
-                                && (FieldAfterBackEnd.getWorker() == null)
+                                && (fieldAfterBackEnd.getWorker() == null)
                                 // destination field has no dome
-                                && (!FieldAfterBackEnd.getHasDome())
-                                && (FieldBeforeBackEnd.getBlocks() == BlockBefore)
-                                && (FieldAfterBackEnd.getBlocks() == BlockAfter)) {
+                                && (!fieldAfterBackEnd.getHasDome())
+                                && (fieldBeforeBackEnd.getBlocks() == blockBefore)
+                                && (fieldAfterBackEnd.getBlocks() == blockAfter)) {
                             // checks if number of blocks is within the game's limitations
-                            if (BlockAfter >= 0 && BlockAfter <= 3) {
+                            if (blockAfter >= 0 && blockAfter <= 3) {
 
                                 //check if blocks in after field is maximum 1 higher
-                                if ((BlockAfter <= BlockBefore + 1)) {
+                                if ((blockAfter <= blockBefore + 1)) {
                                     isValid = true;
                                 }
                             }
@@ -100,21 +98,24 @@ public class SimpleRuleSet implements IRuleSet {
 
         boolean isValid = false;
 
-        Board board = new Board();
+        Field fieldAfterBuilt = null;
+        Field fieldBuiltOnBackEnd = null;
 
-        Field FieldAfterBuilt = new Field(board, 0, 0);
-        Field FieldBuiltOnBackEnd = new Field(board, 0, 0);
-
-        ArrayList<Integer> FieldAfterBuiltPosition = new ArrayList<>();
-        ArrayList<Integer> PositionOfWorker = new ArrayList<>();
+        int posWorkerX = -1, posWorkerY = -1;
+        int posBuiltFieldX = -1, posBuiltFieldY = -1;
 
         //adds the position of the Field that has been sent from the front-end
         for (Field field : after.getBoard().getFields()) {
             if (field != null) {
-                FieldAfterBuilt = field;
-                FieldAfterBuiltPosition.add(FieldAfterBuilt.getPosX());
-                FieldAfterBuiltPosition.add(FieldAfterBuilt.getPosY());
+                fieldAfterBuilt = field;
+                posBuiltFieldX = fieldAfterBuilt.getPosX();
+                posBuiltFieldY = fieldAfterBuilt.getPosY();
             }
+        }
+
+        // if front-end sent no field at all, or faulty one
+        if (fieldAfterBuilt == null || posBuiltFieldX == -1 || posBuiltFieldY == -1) {
+            return false;
         }
 
         //gets the Position of the current Worker which is building a block
@@ -122,45 +123,43 @@ public class SimpleRuleSet implements IRuleSet {
             if (p.getIsCurrentPlayer()) {
                 for (Worker w : p.getWorkers()) {
                     if (w.getIsCurrentWorker()) {
-                        PositionOfWorker.add(w.getField().getPosX());
-                        PositionOfWorker.add(w.getField().getPosY());
+                        posWorkerX = w.getField().getPosX();
+                        posWorkerY = w.getField().getPosY();
                     }
                 }
             }
         }
 
         for (Field field : before.getBoard().getFields()) {
-            if ((field.getPosX() == FieldAfterBuilt.getPosX()) && (field.getPosY() == FieldAfterBuilt.getPosY())) {
-                FieldBuiltOnBackEnd = field;
+            if (field.getPosX() == posBuiltFieldX && field.getPosY() == posBuiltFieldY) {
+                fieldBuiltOnBackEnd = field;
             }
         }
 
-        int PosWorkerX = PositionOfWorker.get(0);
-        int PosWorkerY = PositionOfWorker.get(1);
-
-        int PosBuiltFieldX = FieldAfterBuiltPosition.get(0);
-        int PosBuiltFieldY = FieldAfterBuiltPosition.get(1);
-
+        // faulty information by front-end
+        if (fieldBuiltOnBackEnd == null) {
+            return false;
+        }
 
         // Built on 1 or 0 fields next to the worker on X-axis
-        if ((PosBuiltFieldX == PosWorkerX) || (PosBuiltFieldX == PosWorkerX - 1) || (PosBuiltFieldX == PosWorkerX + 1)) {
+        if ((posBuiltFieldX == posWorkerX) || (posBuiltFieldX == posWorkerX - 1) || (posBuiltFieldX == posWorkerX + 1)) {
 
             // Built on 1 or 0 fields next to the worker on Y-axis
-            if ((PosBuiltFieldY == PosWorkerY) || (PosBuiltFieldY == PosWorkerY - 1) || (PosBuiltFieldY == PosWorkerY + 1)) {
+            if ((posBuiltFieldY == posWorkerY) || (posBuiltFieldY == posWorkerY - 1) || (posBuiltFieldY == posWorkerY + 1)) {
 
                 // can not built on the same field as the worker
-                if ((PosBuiltFieldX != PosWorkerX) || (PosBuiltFieldY != PosWorkerY)) {
+                if ((posBuiltFieldX != posWorkerX) || (posBuiltFieldY != posWorkerY)) {
 
-                    //check if the field which is built on doesn't have a worker, dome and that a player only built one block up
-                    if ((FieldBuiltOnBackEnd.getWorker() == null) && !(FieldBuiltOnBackEnd.getHasDome()) && (FieldBuiltOnBackEnd.getBlocks() == FieldAfterBuilt.getBlocks() - 1) && (FieldAfterBuilt.getBlocks()<=3)) {
+                    // the field does not have a worker and no dome
+                    if (((fieldBuiltOnBackEnd.getWorker() == null) && !(fieldBuiltOnBackEnd.getHasDome())) &&
+                            // either the player added only a block
+                            ((fieldBuiltOnBackEnd.getBlocks() == fieldAfterBuilt.getBlocks() - 1) && (fieldAfterBuilt.getBlocks() <= 3)
+                                    && !fieldAfterBuilt.getHasDome())
+                            ||
+                            // or the player added a dome
+                            ((fieldBuiltOnBackEnd.getBlocks() == 3) && fieldAfterBuilt.getHasDome())) {
 
-                        //check if building a dome is valid
-                        if(FieldAfterBuilt.getHasDome() && FieldBuiltOnBackEnd.getBlocks() == 3) {
-
-                            isValid = true;
-
-                        }
-
+                        isValid = true;
                     }
                 }
             }
@@ -171,24 +170,77 @@ public class SimpleRuleSet implements IRuleSet {
 
     public Boolean checkWinCondition(Game game) {
 
-        boolean isValid = false;
+        // number of Workers of a Player, who can't move anymore
+        int stuckWorkers = 0;
 
-        for ( Player p: game.getPlayers() ) {
-            if(p.getIsCurrentPlayer()){
-                for (Worker w: p.getWorkers()){
-                    if (w.getField() != null) {
-                        if(w.getField().getBlocks() == 3 && !w.getField().getHasDome()){
-                            isValid = true;
+        // checking for both players
+        for (Player player : game.getPlayers()) {
+
+            // check positions of Workers
+            for (Worker worker : player.getWorkers()) {
+
+                // if worker has been at least dropped on the board
+                if (worker.getField() != null) {
+
+                    // win condition
+                    if ((worker.getField().getBlocks() == 3 && !worker.getField().getHasDome())) {
+                        // immediately return
+                        // ...
+                        return true;
+                    }
+                    // lose condition
+                    else if (isWorkerStuck(game, worker)) {
+                        ++stuckWorkers;
+                    }
+                }
+
+            }
+
+            // if both workers are stuck
+            if (stuckWorkers == 2) {
+                // ...
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+
+    public Boolean hasRuleForOpponentsTurn() {
+        return false;
+    }
+
+    /**
+     * Method that Checks if a Worker Can not move anymore
+     * @param game
+     * @param worker
+     * @return
+     */
+    private Boolean isWorkerStuck(Game game, Worker worker) {
+
+        int posX = worker.getField().getPosX();
+        int posY = worker.getField().getPosY();
+
+        // finds neighbouring fields
+        for (Field field : game.getBoard().getFields()) {
+            if (field.getPosX() == posX + 1 || field.getPosX() == posX - 1 || field.getPosX() == posX) {
+                if (field.getPosY() == posY + 1 || field.getPosY() == posY - 1 || field.getPosY() == posY) {
+                    if (field.getPosX() != posX || field.getPosY() != posY) {
+                        //Checks that it is possible to move to a neighbouring field
+                        // it's free, if it has no dome, no worker,
+                        if (!field.getHasDome() || field.getWorker() == null) {
+                            // or max. one block more than the worker's current field
+                            if (field.getBlocks() <= (worker.getField().getBlocks() + 1)) {
+                                return false;
+                            }
                         }
+
                     }
                 }
             }
         }
 
-        return isValid;
-    }
-
-    public Boolean hasRuleForOpponentsTurn() {
-        return false;
+        return true;
     }
 }
