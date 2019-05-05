@@ -5,8 +5,6 @@ import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.entity.Worker;
 
-import java.util.ArrayList;
-
 public class SimpleRuleSet implements IRuleSet {
 
     public Boolean checkMovePhase(Game before, Game after) {

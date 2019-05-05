@@ -121,7 +121,7 @@ public class GameService {
             gameRepository.save(successfullyUpdatedGame);
 
             // increment the status
-            if (rules.checkWinCondition(successfullyUpdatedGame)) {
+            if (rules.checkWinCondition(gameRepository.findById(successfullyUpdatedGame.getId()).get())) {
                 incrementGameStatus(successfullyUpdatedGame, true);
             } else {
                 incrementGameStatus(successfullyUpdatedGame, false);
@@ -281,7 +281,6 @@ public class GameService {
             }
         }
 
-        nextTurn(currentGame);
         return currentGame;
     }
 
@@ -325,7 +324,7 @@ public class GameService {
         Player updatedPlayer = updatedGame.getPlayers().get(0);
 
         if (updatedGame.getPlayers().size() == 1 && updatedPlayer.getIsCurrentPlayer()) {
-            long id = updatedGame.getPlayers().get(0).getId();
+            long id = updatedPlayer.getId();
             for (Player player : currentGame.getPlayers()) {
                 if (player.getId() == id) {
                     if (updatedPlayer.getColor() != null) {
