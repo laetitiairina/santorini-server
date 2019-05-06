@@ -4,7 +4,7 @@ import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
-import ch.uzh.ifi.seal.soprafs19.entity.Worker
+import ch.uzh.ifi.seal.soprafs19.entity.Worker;
 
 public class ApolloRuleSet extends SimpleRuleSet {
 
