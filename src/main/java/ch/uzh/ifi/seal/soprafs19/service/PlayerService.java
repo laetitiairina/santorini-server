@@ -1,7 +1,10 @@
 package ch.uzh.ifi.seal.soprafs19.service;
 
+import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
+import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
+import ch.uzh.ifi.seal.soprafs19.helper.CheckPolling;
 import ch.uzh.ifi.seal.soprafs19.helper.MatchMaker;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
@@ -16,10 +19,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Primary
 @Service
@@ -27,6 +28,8 @@ import java.util.UUID;
 public class PlayerService {
 
     private final Logger log = LoggerFactory.getLogger(PlayerService.class);
+
+    private int threadCount = 0;
 
     @Autowired
     private PlayerRepository playerRepository;
@@ -96,5 +99,19 @@ public class PlayerService {
      */
     public void updatePlayer(Player newPlayer) {
         playerRepository.save(newPlayer);
+    }
+
+    /**
+     * increments the number of polls by a player
+     * @param player
+     */
+    public void incrementPolls(Player player) {
+        player.incrementPolls();
+        playerRepository.save(player);
+        threadCount++;
+        CheckPolling check = new CheckPolling();
+        check.setName(Integer.toString(threadCount));
+        check.setPlayer(player);
+        check.start();
     }
 }

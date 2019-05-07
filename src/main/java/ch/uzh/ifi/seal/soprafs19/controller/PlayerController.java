@@ -2,11 +2,8 @@ package ch.uzh.ifi.seal.soprafs19.controller;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.helper.JsonHelper;
-import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -74,6 +71,8 @@ public class PlayerController {
         if (player.isEmpty()) {
             // Send response 404
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Player was not found!");
+        } else {
+            service.incrementPolls(player.get());
         }
 
         // If specific fields were requested, only send those fields of player entity

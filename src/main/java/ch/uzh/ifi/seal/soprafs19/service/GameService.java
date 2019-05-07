@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TimerTask;
 import java.util.Timer;
+import java.util.concurrent.*;
 
 @Primary
 @Service
@@ -463,52 +464,5 @@ public class GameService {
             }
         }
         return fieldToUpdate;
-    }
-
-    public void incrementPolls(Game game, String token) {
-        Player player = playerRepository.findByToken(token);
-        player.incrementPolls();
-        playerRepository.save(player);
-
-        if (player.getPolls() == 1) {
-            checkPlayerPolling(game, player);
-        }
-    }
-
-    public void checkPlayerPolling(Game game, Player player) {
-        // set timer for checking if a new poll has happened on player
-        final int POLL_TIME = 10000;
-        long diff = 0;
-        boolean isChecking = true;
-
-        // get number of polls
-        int polls = player.getPolls();
-
-        while (isChecking) {
-            if (diff < POLL_TIME) {
-                try {
-                    Thread.sleep(POLL_TIME - diff);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            final long startTime = System.currentTimeMillis();
-
-            int updatedPolls = player.getPolls();
-            if (updatedPolls == polls) {
-                // let game end inform front-end of crash
-                game.getPlayers().get(0).setIsCurrentPlayer(false);
-                game.getPlayers().get(1).setIsCurrentPlayer(false);
-                game.setStatus(GameStatus.END);
-                gameRepository.save(game);
-                isChecking = false;
-            } else {
-                polls = updatedPolls;
-            }
-
-            final long endTime = System.currentTimeMillis();
-            diff = endTime - startTime;
-        }
     }
 }

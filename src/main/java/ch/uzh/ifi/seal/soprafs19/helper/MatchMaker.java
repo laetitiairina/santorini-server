@@ -37,6 +37,14 @@ public class MatchMaker {
         this.godQueue = new ArrayList<Player>();
     }
 
+    public void removePlayer(Player player) {
+        if (player.getIsGodMode()) {
+            godQueue.remove(player);
+        } else {
+            simpleQueue.remove(player);
+        }
+    }
+
     /**
      * Adds player to a queue
      * @param player
