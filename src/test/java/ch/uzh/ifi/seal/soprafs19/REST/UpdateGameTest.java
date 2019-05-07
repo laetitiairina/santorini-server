@@ -105,4 +105,69 @@ public class UpdateGameTest {
         Assert.assertTrue(game.getStatus() == GameStatus.CARDS2);
         Assert.assertTrue(game.getCards().size() == 2);
     }
+
+    @Test
+    public void updateGameNotFound() throws Exception {
+
+        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
+        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
+
+        Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
+
+        Assert.assertTrue(game.getStatus() == GameStatus.CARDS1);
+
+        // wrong Id
+        mvc.perform(put("/games/123142")
+                .contentType("application/json;charset=UTF-8")
+                .header("Token", testPlayer1.getToken())
+                .content("{\"id\": \"123142\" , \"cards\":[\"ARTEMIS\",\"APOLLO\"]}"))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void updateGameBadRequest() throws Exception {
+
+        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
+        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
+
+        Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
+
+        Assert.assertTrue(game.getStatus() == GameStatus.CARDS1);
+
+        // wrong id in body
+        mvc.perform(put("/games/" + testPlayer1.getGame_id())
+                .contentType("application/json;charset=UTF-8")
+                .header("Token", testPlayer1.getToken())
+                .content("{\"id\": \"123142\" , \"cards\":[\"ARTEMIS\",\"APOLLO\"]}"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        // invalid input
+        mvc.perform(put("/games/" + testPlayer1.getGame_id())
+                .contentType("application/json;charset=UTF-8")
+                .header("Token", testPlayer1.getToken())
+                .content("{\"id\":" + game.getId() +", \"cards\":[\"ARTEMIS\",\"ARTEMIS\"]}"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void updateGameForbidden() throws Exception {
+
+        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
+        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
+
+        Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
+
+        Assert.assertTrue(game.getStatus() == GameStatus.CARDS1);
+
+        mvc.perform(put("/games/" + testPlayer1.getGame_id())
+                .contentType("application/json;charset=UTF-8")
+                .header("Token", "test")
+                .content("{\"id\":" + game.getId() +", \"cards\":[\"ARTEMIS\",\"APOLLO\"]}"))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
 }

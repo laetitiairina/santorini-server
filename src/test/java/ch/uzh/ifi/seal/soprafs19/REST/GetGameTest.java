@@ -106,4 +106,30 @@ public class GetGameTest {
                 .andExpect(jsonPath("$.hasMovedUp").value(false))
                 ;
     }
+
+    @Test
+    public void getGamewrongId() throws Exception {
+
+        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
+
+        mvc.perform(get("/games/122343243"))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+    }
+
+    @Test
+    public void getGameField() throws Exception {
+
+        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
+
+        mvc.perform(get("/games/"+testPlayer1.getGame_id()+"?fields=id"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.id").value(testPlayer1.getGame_id()))
+                .andExpect(jsonPath("$.board").doesNotExist())
+        ;
+        ;
+    }
 }

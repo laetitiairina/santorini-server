@@ -76,4 +76,27 @@ public class GetPlayerTest {
                 ;
 
     }
+
+    @Test
+    public void getPlayerNotFound() throws Exception {
+
+        mvc.perform(get("/players/1232421"))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+
+    }
+
+    @Test
+    public void getPlayerField() throws Exception {
+
+        mvc.perform(get("/players/"+testPlayer.getId()+"?fields=id"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.id").value(testPlayer.getId()))
+                .andExpect(jsonPath("$.color").doesNotExist())
+        ;
+
+    }
 }
