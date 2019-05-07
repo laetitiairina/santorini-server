@@ -847,7 +847,7 @@ public class GameServiceTest {
     }
 
     @Test
-    public void updateTokenSuccessfully(){
+    public void authenticateTokenSuccessfully(){
 
         //get to end of round
         setup();
