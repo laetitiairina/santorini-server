@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes= Application.class)
 public class GetGameTest {
 
-    /*@Qualifier("gameRepository")
+    @Qualifier("gameRepository")
     @Autowired
     private GameRepository gameRepository;
 
@@ -69,45 +69,29 @@ public class GetGameTest {
     public void setup() throws Exception {
         this.mvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
 
-        User user1 = new User();
-        user1.setUsername("testUsername1");
-        user1.setPassword("testPassword1");
-
-        testUser1 = userService.createUser(user1);
-
-        User user2 = new User();
-        user2.setUsername("testUsername2");
-        user2.setPassword("testPassword2");
-
-        testUser2 = userService.createUser(user2);
-
         Player player1 = new Player();
-        player1.setUserId(testUser1.getId());
         player1.setIsGodMode(false);
 
         testPlayer1 = playerService.createPlayer(player1);
 
         Player player2 = new Player();
-        player2.setUserId(testUser2.getId());
         player2.setIsGodMode(false);
 
-        testPlayer2 = playerService.createPlayer(player2);*/
+        testPlayer2 = playerService.createPlayer(player2);
 
-        /*
-        List<Player> players = new ArrayList<Player>();
+
+        List<Player> players = new ArrayList<>();
         players.add(player1);
         players.add(player2);
 
-        Game game = new Game(players, 25);
-        testGame = gameService.createGame(game);
-        */
-
-    //}
+        testGame = new Game(players, 25);
+        gameService.createGame(testGame);
+    }
 
     @Test
     public void getGameCorrect() throws Exception {
 
-       /* Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
+       Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
 
         mvc.perform(get("/games/"+testPlayer1.getGame_id()))
                 .andDo(print())
@@ -118,8 +102,8 @@ public class GetGameTest {
                 .andExpect(jsonPath("$.players").exists())
                 .andExpect(jsonPath("$.cards").isEmpty())
                 .andExpect(jsonPath("$.isGodMode").value(testPlayer1.getIsGodMode()))
-                .andExpect(jsonPath("$.status").value(GameStatus.CARDS10))
-                .andExpect(jsonPath("$.currentPlayer").exists())
-                .andExpect(jsonPath("$.currentWorker").exists());*/
+                .andExpect(jsonPath("$.status").value(GameStatus.COLOR1.toString()))
+                .andExpect(jsonPath("$.hasMovedUp").value(false))
+                ;
     }
 }
