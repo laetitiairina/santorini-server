@@ -1,5 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.service;
 
+import ch.uzh.ifi.seal.soprafs19.constant.Color;
+import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
@@ -19,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import java.util.Optional;
+import java.util.TimerTask;
+import java.util.Timer;
+import java.util.concurrent.*;
 
 @Primary
 @Service

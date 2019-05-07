@@ -434,7 +434,7 @@ public class GameServiceTest {
         for (Field field : assertFields) {
             Worker worker = field.getWorker();
             if (worker == null) {
-                ++count;
+                count++;
             }
         }
         Assert.assertEquals(23, count);

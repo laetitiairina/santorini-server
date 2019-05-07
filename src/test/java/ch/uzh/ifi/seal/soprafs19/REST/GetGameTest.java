@@ -57,9 +57,6 @@ public class GetGameTest {
 
     private MockMvc mvc;
 
-    private User testUser1;
-    private User testUser2;
-
     private Player testPlayer1;
     private Player testPlayer2;
 
@@ -79,7 +76,6 @@ public class GetGameTest {
 
         testPlayer2 = playerService.createPlayer(player2);
 
-
         List<Player> players = new ArrayList<>();
         players.add(player1);
         players.add(player2);
@@ -93,7 +89,9 @@ public class GetGameTest {
 
        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
 
-        mvc.perform(get("/games/"+testPlayer1.getGame_id()))
+        mvc.perform(get("/games/"+testPlayer1.getGame_id())
+                .contentType("application/json;charset=UTF-8")
+                .header("Token", testPlayer1.getToken()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
@@ -108,11 +106,13 @@ public class GetGameTest {
     }
 
     @Test
-    public void getGamewrongId() throws Exception {
+    public void getGameNotFound() throws Exception {
 
         Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
 
-        mvc.perform(get("/games/122343243"))
+        mvc.perform(get("/games/122343243")
+                .contentType("application/json;charset=UTF-8")
+                .header("Token", testPlayer1.getToken()))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
@@ -123,7 +123,9 @@ public class GetGameTest {
 
         Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
 
-        mvc.perform(get("/games/"+testPlayer1.getGame_id()+"?fields=id"))
+        mvc.perform(get("/games/"+testPlayer1.getGame_id()+"?fields=id")
+                .contentType("application/json;charset=UTF-8")
+                .header("Token", testPlayer1.getToken()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
