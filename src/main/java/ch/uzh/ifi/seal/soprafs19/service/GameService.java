@@ -115,18 +115,15 @@ public class GameService {
 
         // update the status of the game for pinging
         if (successfullyUpdatedGame != null) {
-
             // saves updates to database
             gameRepository.save(successfullyUpdatedGame);
 
-
             // increment the status
-
-                if (simpleRuleSet.checkWinCondition(successfullyUpdatedGame)) {
-                    incrementGameStatus(successfullyUpdatedGame, true);
-                } else {
-                    incrementGameStatus(successfullyUpdatedGame, false);
-                }
+            if (simpleRuleSet.checkWinCondition(successfullyUpdatedGame)) {
+                incrementGameStatus(successfullyUpdatedGame, true);
+            } else {
+                incrementGameStatus(successfullyUpdatedGame, false);
+            }
             return true;
         } else {
             /*
@@ -399,7 +396,9 @@ public class GameService {
         int status = game.getGameStatusInt(game.getStatus());
 
         // increment the status
-        if (status == 8 && !isEnd) {
+        if (isEnd) {
+            status = 9;
+        } else if (status == 8) {
             // loop for move and build phase
             status--;
         } else {
