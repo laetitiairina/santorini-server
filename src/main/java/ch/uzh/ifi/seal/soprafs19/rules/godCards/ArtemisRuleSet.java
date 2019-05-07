@@ -83,6 +83,8 @@ public class ArtemisRuleSet extends SimpleRuleSet {
         for (Field field : neighboringFields) {
             // Checks if the after field sent from Front-End is a direct Neighbouring field
             if ((field.getPosX() == xAfter) && (field.getPosY() == yAfter)) {
+                // checks if the Worker's position is within the board's limitations
+                if (xAfter >= 0 && xAfter <= 4 && yAfter >= 0 && yAfter <= 4) {
                 //Checks that it is possible to move to a neighbouring field
                 // it's free, if it has no dome, no worker,
                 // origin field had a worker
@@ -96,11 +98,13 @@ public class ArtemisRuleSet extends SimpleRuleSet {
                     // or max. one block more than the worker's current field
                     if (field.getBlocks() <= (blockBefore + 1)) {
                 isValid = true;
-                    } }}
+                    } }}}
            // if after field is not neighboring field, checks if the rules for after Field are followed
              else {
                 // worker moved max one more, than the neighboring field of the before Field, on x-Axis
                 if (field.getPosX() + 1  == xAfter  || field.getPosX() - 1== xAfter || field.getPosX() == xAfter) {
+                    // checks if the Worker's position is within the board's limitations
+                    if (xAfter >= 0 && xAfter <= 4 && yAfter >= 0 && yAfter <= 4) {
                     // worker moved max one more, than the neighboring field of the before Field, on y-Axis
                     if (field.getPosY() == yAfter + 1 || field.getPosY() == yAfter - 1 || field.getPosY() == yAfter) {
                             //Checks that it is possible to move to a neighbouring field
@@ -118,7 +122,7 @@ public class ArtemisRuleSet extends SimpleRuleSet {
                                     isValid = true;
                                 }
                             }
-
+                        }
 
                     }
                 }
