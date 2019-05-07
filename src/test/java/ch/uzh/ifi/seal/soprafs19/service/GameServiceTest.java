@@ -433,9 +433,8 @@ public class GameServiceTest {
         int count = 0;
         for (Field field : assertFields) {
             Worker worker = field.getWorker();
-            if (worker != worker1 && worker != worker2) {
-                Assert.assertNull(worker);
-                count ++;
+            if (worker == null) {
+                count++;
             }
         }
         Assert.assertEquals(23, count);
@@ -704,7 +703,7 @@ public class GameServiceTest {
             Worker worker = field.getWorker();
             if (worker == null) {
                 count1 ++;
-            } else if (worker != worker1 && worker != worker2) {
+            } else if (!worker.getId().equals(worker1.getId()) && !worker.getId().equals(worker2.getId())) {
                 count2 ++;
             }
         }
@@ -768,7 +767,7 @@ public class GameServiceTest {
         List<Field> fields = new ArrayList<>();
         Worker worker = board.getFields().get(4).getWorker();
 
-        fields.add(board.getFields().get(5));
+        fields.add(board.getFields().get(3));
         fields.get(0).setWorker(worker);
 
         fields.add(board.getFields().get(4));
@@ -786,15 +785,14 @@ public class GameServiceTest {
         Assert.assertEquals(GameStatus.BUILD, simpleGame.getStatus());
 
         List<Field> assertFields = simpleGame.getBoard().getFields();
-        Assert.assertEquals(worker, assertFields.get(5).getWorker());
-        Assert.assertTrue(assertFields.get(5).getWorker().getIsCurrentWorker());
+        Assert.assertEquals(worker, assertFields.get(3).getWorker());
         Assert.assertNull(assertFields.get(4).getWorker());
 
         int count = 0;
 
         for (Field field : assertFields) {
             Worker updatedWorker = field.getWorker();
-            if (updatedWorker == null || !updatedWorker.getId().equals(worker.getId())) {
+            if (updatedWorker != worker) {
                 count ++;
             }
         }
@@ -816,14 +814,14 @@ public class GameServiceTest {
         // build a block
         List<Field> fields = new ArrayList<>();
 
-        fields.add(board.getFields().get(13));
+        fields.add(board.getFields().get(8));
         fields.get(0).setBlocks(1);
 
         board.setFields(fields);
 
         Assert.assertEquals(1, board.getFields().size());
 
-        // update position of Workers
+        // update blocks
         boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
@@ -831,7 +829,7 @@ public class GameServiceTest {
         Assert.assertEquals(GameStatus.MOVE, simpleGame.getStatus());
 
         List<Field> assertFields = simpleGame.getBoard().getFields();
-        long blocks = assertFields.get(13).getBlocks();
+        long blocks = assertFields.get(8).getBlocks();
         Assert.assertEquals((long) 1, blocks);
 
         int count = 0;

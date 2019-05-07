@@ -13,8 +13,8 @@ public class Field implements Serializable {
 	@Column(name = "field_id")
 	private Long id;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "worker_id")
+	@OneToOne(cascade = CascadeType.REFRESH)
+	@JoinTable(name = "field_worker", joinColumns = {@JoinColumn(name = "field_id", referencedColumnName = "field_id")},inverseJoinColumns = {@JoinColumn(name = "worker_id", referencedColumnName = "worker_id")})
 	private Worker worker;
 
 	@Column(nullable = false)

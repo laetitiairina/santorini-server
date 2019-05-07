@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes= Application.class)
 public class GetPlayerTest {
 
-    /*@Qualifier("playerRepository")
+    @Qualifier("playerRepository")
     @Autowired
     private PlayerRepository playerRepository;
 
@@ -56,35 +56,47 @@ public class GetPlayerTest {
     public void setup() throws Exception {
         this.mvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
 
-        User user = new User();
-        user.setUsername("testUsername");
-        user.setPassword("testPassword");
-
-        testUser = userService.createUser(user);
-
         Player player = new Player();
-        player.setUserId(testUser.getId());
         player.setIsGodMode(false);
 
         testPlayer = playerService.createPlayer(player);
-
-    }*/
+    }
 
     @Test
     public void getPlayerCorrect() throws Exception {
-
-        /*Assert.assertNotNull(playerRepository.findByUserId(testUser.getId()));
 
         mvc.perform(get("/players/"+testPlayer.getId()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"))
                 .andExpect(jsonPath("$.id").value(testPlayer.getId()))
-                .andExpect(jsonPath("$.userId").value(testUser.getId()))
-                .andExpect(jsonPath("$.gameId").exists())
-                .andExpect(jsonPath("$.isGodMode").value(testPlayer.getIsGodMode()));
-                //.andExpect(jsonPath("$.card").isEmpty())
-                //.andExpect(jsonPath("$.color").isEmpty());
-                */
+                .andExpect(jsonPath("$.isGodMode").value(testPlayer.getIsGodMode()))
+                .andExpect(jsonPath("$.card").isEmpty())
+                .andExpect(jsonPath("$.color").isEmpty())
+                ;
+
+    }
+
+    @Test
+    public void getPlayerNotFound() throws Exception {
+
+        mvc.perform(get("/players/1232421"))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+        ;
+
+    }
+
+    @Test
+    public void getPlayerField() throws Exception {
+
+        mvc.perform(get("/players/"+testPlayer.getId()+"?fields=id"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.id").value(testPlayer.getId()))
+                .andExpect(jsonPath("$.color").doesNotExist())
+        ;
+
     }
 }
