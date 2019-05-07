@@ -56,12 +56,10 @@ public class GameController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game was not found!");
         } else {
             // update the polls
-            for (Player player : game.get().getPlayers()) {
-                if (player.getToken().equals(token)) {
-                    playerService.incrementPolls(player);
-                }
+            Player player = playerService.getPlayerByToken(token);
+            if (player != null) {
+                playerService.incrementPolls(player);
             }
-
         }
 
         // If specific fields were requested, only send those fields of game entity

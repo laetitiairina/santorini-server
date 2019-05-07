@@ -85,11 +85,10 @@ public class PlayerController {
         return ResponseEntity.ok(player.get());
     }
 
-    /*
+
     @PutMapping("/players/{id}")
     ResponseEntity updatePlayer(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    */
 }

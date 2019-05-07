@@ -30,6 +30,9 @@ public class Player implements Serializable {
     @Column(nullable = false)
     private Integer polls;
 
+    @Column(nullable = false)
+    private Boolean isLocked;
+
     @Column()
     private SimpleGodCard card;
 
@@ -137,11 +140,16 @@ public class Player implements Serializable {
 
 	public void setPolls(int polls) {this.polls = polls;}
 
+    public boolean getIsLocked() {return isLocked;}
+
+    public void setIsLocked(boolean isLocked) {this.isLocked = isLocked;}
+
 	public Player() {
         this.workers = new ArrayList<>();
         workers.add(new Worker(this));
         workers.add(new Worker(this));
         this.polls = 0;
+        this.isLocked= false;
     }
 
     @Override

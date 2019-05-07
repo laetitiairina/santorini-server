@@ -58,6 +58,10 @@ public class PlayerService {
         return playerRepository.findById(id);
     }
 
+    public Player getPlayerByToken(String token) {
+        return playerRepository.findByToken(token);
+    }
+
     /**
      * Create a new player and start matchmaking
      * @param newPlayer
@@ -105,9 +109,20 @@ public class PlayerService {
     public void incrementPolls(Player player) {
         player.incrementPolls();
         playerRepository.save(player);
-        threadCount++;
-        checkPolling.setName(Integer.toString(threadCount));
-        checkPolling.setPlayer(player);
-        checkPolling.start();
+        startThread(player);
+    }
+
+    public void startThread(Player player) {
+        if (!player.getIsLocked()) {
+            player.setIsLocked(true);
+            playerRepository.save(player);
+
+            // start thread
+            threadCount++;
+            checkPolling.setName(Integer.toString(threadCount));
+            checkPolling.setPlayer(player);
+            Thread thread = new Thread(checkPolling);
+            thread.start();
+        }
     }
 }
