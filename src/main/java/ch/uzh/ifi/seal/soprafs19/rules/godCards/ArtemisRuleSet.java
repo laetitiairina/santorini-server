@@ -114,7 +114,7 @@ public class ArtemisRuleSet extends SimpleRuleSet {
                                 && (fieldBeforeBackEnd.getBlocks() == blockBefore)
                                 && (fieldAfterBackEnd.getBlocks() == blockAfter)) {
                                 // or max. one block more than the worker's current field
-                                if (field.getBlocks() <= (blockAfter + 1)) {
+                                if (blockAfter <= (field.getBlocks() + 1)) {
                                     isValid = true;
                                 }
                             }
