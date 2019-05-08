@@ -30,7 +30,8 @@ public class AtlasRuleSet extends SimpleRuleSet {
         }
 
         // if front-end sent no field at all, or faulty one
-        if (fieldAfterBuilt == null || posBuiltFieldX == -1 || posBuiltFieldY == -1) {
+        if (fieldAfterBuilt == null
+                || (posBuiltFieldX < 0) || (posBuiltFieldX > 4) || (posBuiltFieldY < 0)|| (posBuiltFieldY > 4)) {
             return false;
         }
 
@@ -72,9 +73,8 @@ public class AtlasRuleSet extends SimpleRuleSet {
                             ((fieldBuiltOnBackEnd.getBlocks() == fieldAfterBuilt.getBlocks() - 1) && (fieldAfterBuilt.getBlocks() <= 3)
                                     && !fieldAfterBuilt.getHasDome())
                             ||
-                            // to built a dome, there mus be at least one block
-                            ((fieldBuiltOnBackEnd.getBlocks() >= 1) && fieldAfterBuilt.getHasDome())) {
-
+                            // atlas can build a dome even on the ground
+                            (fieldAfterBuilt.getHasDome())) {
                         isValid = true;
                     }
                 }
