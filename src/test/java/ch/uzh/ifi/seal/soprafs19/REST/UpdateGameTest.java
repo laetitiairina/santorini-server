@@ -86,7 +86,6 @@ public class UpdateGameTest {
     public void updateGameCorrect() throws Exception {
 
         Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
-        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
 
         Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
 
