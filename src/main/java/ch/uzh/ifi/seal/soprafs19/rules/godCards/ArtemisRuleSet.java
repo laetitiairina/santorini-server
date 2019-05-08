@@ -27,7 +27,7 @@ public class ArtemisRuleSet extends SimpleRuleSet {
         for (Field field : after.getBoard().getFields()) {
             if (field.getWorker() != null) {
                 fieldAfter = field;
-                xAfter =fieldAfter.getPosX();
+                xAfter = fieldAfter.getPosX();
                 yAfter = fieldAfter.getPosY();
             } else {
                 fieldBefore = field;
@@ -37,11 +37,11 @@ public class ArtemisRuleSet extends SimpleRuleSet {
         }
 
         // faulty information by front-end
-        if (fieldAfter == null || fieldBefore ==  null) {
+        if (fieldAfter == null || fieldBefore == null) {
             return false;
         }
 
-        // finds the field before Field in the Back-End
+        // finds the beforeField in the Back-End
         for (Field field : before.getBoard().getFields()) {
             if ((field.getPosX() == xBefore) && (field.getPosY() == yBefore)) {
                 fieldBeforeBackEnd = field;
@@ -64,7 +64,7 @@ public class ArtemisRuleSet extends SimpleRuleSet {
         int blockAfter = fieldAfter.getBlocks();
 
         //List of possible Neighboring Fields of the before field sent from Front-End
-        ArrayList <Field> neighboringFields = new ArrayList<>();
+        ArrayList<Field> neighboringFields = new ArrayList<>();
 
 
         // finds neighbouring fields of the before field that was sent from Front-End and adds them to the ArrayList
@@ -73,53 +73,66 @@ public class ArtemisRuleSet extends SimpleRuleSet {
                 if (field.getPosY() == yBefore + 1 || field.getPosY() == yBefore - 1 || field.getPosY() == yBefore) {
                     if (field.getPosX() != yBefore || field.getPosY() != yBefore) {
                         neighboringFields.add(field);
-                            }
-                        }
                     }
                 }
+            }
+        }
 
 
         // For all Neighbouring Fields
         for (Field field : neighboringFields) {
             // Checks if the after field sent from Front-End is a direct Neighbouring field
+            // -> normal move
             if ((field.getPosX() == xAfter) && (field.getPosY() == yAfter)) {
                 // checks if the Worker's position is within the board's limitations
                 if (xAfter >= 0 && xAfter <= 4 && yAfter >= 0 && yAfter <= 4) {
-                //Checks that it is possible to move to a neighbouring field
-                // it's free, if it has no dome, no worker,
-                // origin field had a worker
-                if ((fieldBeforeBackEnd.getWorker() != null)
-                        // destination field is unoccupied
-                        && (fieldAfterBackEnd.getWorker() == null)
-                        // destination field has no dome
-                        && (!fieldAfterBackEnd.getHasDome())
-                        && (fieldBeforeBackEnd.getBlocks() == blockBefore)
-                        && (fieldAfterBackEnd.getBlocks() == blockAfter)) {
-                    // or max. one block more than the worker's current field
-                    if (field.getBlocks() <= (blockBefore + 1)) {
-                isValid = true;
-                    } }}}
-           // if after field is not neighboring field, checks if the rules for after Field are followed
-             else {
-                // worker moved max one more, than the neighboring field of the before Field, on x-Axis
-                if (field.getPosX() + 1  == xAfter  || field.getPosX() - 1== xAfter || field.getPosX() == xAfter) {
-                    // checks if the Worker's position is within the board's limitations
-                    if (xAfter >= 0 && xAfter <= 4 && yAfter >= 0 && yAfter <= 4) {
-                    // worker moved max one more, than the neighboring field of the before Field, on y-Axis
-                    if (field.getPosY() == yAfter + 1 || field.getPosY() == yAfter - 1 || field.getPosY() == yAfter) {
+                    //Checks that it is possible to move to a neighbouring field
+                    // it's free, if it has no dome, no worker,
+                    // origin field had a worker
+                    if ((fieldBeforeBackEnd.getWorker() != null)
+                            // destination field is unoccupied
+                            && (fieldAfterBackEnd.getWorker() == null)
+                            // destination field has no dome
+                            && (!fieldAfterBackEnd.getHasDome())
+                            && (fieldBeforeBackEnd.getBlocks() == blockBefore)
+                            && (fieldAfterBackEnd.getBlocks() == blockAfter)) {
+                        // checks if number of blocks is within the game's limitations
+                        if (blockAfter >= 0 && blockAfter <= 3) {
+
+                            //check if blocks in after field is maximum 1 higher
+                            if ((blockAfter <= blockBefore + 1)) {
+                                isValid = true;
+                            }
+                        }
+                    }
+                }
+            }
+            // if after field is not neighboring field, checks if the rules for after Field are followed
+            // -> special artemis move
+            else {
+                // checks if the Worker's position is within the board's limitations
+                if (xAfter >= 0 && xAfter <= 4 && yAfter >= 0 && yAfter <= 4) {
+                    // worker moved max one more, than the neighboring field of the before Field, on x-Axis
+                    if (field.getPosX() + 1 == xAfter || field.getPosX() - 1 == xAfter || field.getPosX() == xAfter) {
+                        // worker moved max one more, than the neighboring field of the before Field, on y-Axis
+                        if (field.getPosY() == yAfter + 1 || field.getPosY() == yAfter - 1 || field.getPosY() == yAfter) {
                             //Checks that it is possible to move to a neighbouring field
                             // it's free, if it has no dome, no worker,
-                        // origin field had a worker
-                        if ((fieldBeforeBackEnd.getWorker() != null)
-                                // destination field is unoccupied
-                                && (fieldAfterBackEnd.getWorker() == null)
-                                // destination field has no dome
-                                && (!fieldAfterBackEnd.getHasDome())
-                                && (fieldBeforeBackEnd.getBlocks() == blockBefore)
-                                && (fieldAfterBackEnd.getBlocks() == blockAfter)) {
-                                // or max. one block more than the worker's current field
-                                if (blockAfter <= (field.getBlocks() + 1)) {
-                                    isValid = true;
+                            // origin field had a worker
+                            if ((fieldBeforeBackEnd.getWorker() != null)
+                                    // destination field is unoccupied
+                                    && (fieldAfterBackEnd.getWorker() == null)
+                                    // destination field has no dome
+                                    && (!fieldAfterBackEnd.getHasDome())
+                                    && (fieldBeforeBackEnd.getBlocks() == blockBefore)
+                                    && (fieldAfterBackEnd.getBlocks() == blockAfter)) {
+                                // checks if number of blocks is within the game's limitations
+                                if (blockAfter >= 0 && blockAfter <= 3) {
+
+                                    //check if blocks in after field is maximum 1 higher
+                                    if ((blockAfter <= blockBefore + 1)) {
+                                        isValid = true;
+                                    }
                                 }
                             }
                         }
