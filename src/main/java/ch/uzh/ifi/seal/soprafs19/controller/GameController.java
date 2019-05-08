@@ -5,6 +5,7 @@ import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.helper.JsonHelper;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
+import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,15 +17,18 @@ import java.util.Optional;
 @RestController
 public class GameController {
 
+    @Autowired
     private GameService service;
 
+    @Autowired
     private JsonHelper helper;
 
+    /*
     GameController(GameService gameService, JsonHelper helper) {
         this.service = gameService;
         this.helper = helper;
     }
-
+    */
 
     /*
     @GetMapping("/games")
@@ -41,7 +45,7 @@ public class GameController {
     */
 
     @GetMapping("/games/{id}")
-    ResponseEntity getGame(@PathVariable("id") Long id, @RequestParam(required = false) List<String> fields) {
+    ResponseEntity getGame(@RequestHeader("Token") String token, @PathVariable("id") Long id, @RequestParam(required = false) List<String> fields) {
 
         // Get game by id
         Optional<Game> game = service.getGameById(id);
@@ -50,6 +54,9 @@ public class GameController {
         if (game.isEmpty()) {
             // Send response 404
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game was not found!");
+        } else {
+            // Update polling
+            service.updatePolling(token);
         }
 
         // If specific fields were requested, only send those fields of game entity

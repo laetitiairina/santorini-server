@@ -7,6 +7,7 @@ import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+@Primary
 @Component
 @Transactional
 public class MatchMaker {
@@ -38,7 +40,7 @@ public class MatchMaker {
     }
 
     /**
-     * Adds player to a queue
+     * Add player to a queue
      * @param player
      */
     public void pushPlayer(Player player) {
@@ -60,11 +62,23 @@ public class MatchMaker {
         }
     }
 
+    /**
+     * Remove player from a queue
+     * @param player
+     */
+    public void removePlayer(Player player) {
+        if (player.getIsGodMode()) {
+            godQueue.remove(player);
+        } else {
+            simpleQueue.remove(player);
+        }
+    }
+
 
     // Make sure this function can't be executed multiple times at the same time! (@Transactional ?)
 
     /**
-     * Scans provided queue and matches players if possible
+     * Scan provided queue and match players if possible
      * @param queue
      * @param numberOfPlayers
      */
@@ -87,7 +101,8 @@ public class MatchMaker {
 
             // Set game of matched players
             for (Player player : matchedPlayers) {
-                player.setGame(game);
+                // Game of players gets set in Game constructor now
+                //player.setGame(game);
                 playerService.updatePlayer(player);
             }
         }

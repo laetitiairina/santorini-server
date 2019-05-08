@@ -5,10 +5,6 @@ import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.helper.MatchMaker;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +12,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.UUID;
+import java.util.*;
 
 @Primary
 @Service
@@ -58,14 +51,23 @@ public class PlayerService {
         return playerRepository.findById(id);
     }
 
+    public List<Player> getAllActivePlayers(){
+        return playerRepository.findByIsActive(true);
+    }
+
+    public Player getPlayerByToken(String token) {
+        return playerRepository.findByToken(token);
+    }
+
     /**
      * Create a new player and start matchmaking
      * @param newPlayer
      * @return
      */
-    public Player createPlayer(Player newPlayer) {
+    public Player createPlayer(Player newPlayer, Boolean matchmaking) {
 
         // Check if a userId was given
+        // TODO: !!!!!ATTENTION!!!!! Player token has to be unique, can't be a copy of user token (see CheckPolling)
         if (newPlayer.getUserId() == null) {
             newPlayer.setToken(UUID.randomUUID().toString());
         } else {
@@ -83,8 +85,10 @@ public class PlayerService {
 
         playerRepository.save(newPlayer);
 
-        // Push player to matchmaking queue
-        matchMaker.pushPlayer(newPlayer);
+        if (matchmaking) {
+            // Push player to matchmaking queue
+            matchMaker.pushPlayer(newPlayer);
+        }
 
         log.debug("Created Information for Player: {}", newPlayer);
         return newPlayer;
@@ -96,5 +100,15 @@ public class PlayerService {
      */
     public void updatePlayer(Player newPlayer) {
         playerRepository.save(newPlayer);
+    }
+
+    /**
+     * Remove player from matchmaking queue and set player to inactive
+     * @param player
+     */
+    public void abortSearch(Player player) {
+        matchMaker.removePlayer(player);
+        player.setIsActive(false);
+        playerRepository.save(player);
     }
 }

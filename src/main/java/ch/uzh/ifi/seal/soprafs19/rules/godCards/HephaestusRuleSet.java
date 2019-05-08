@@ -2,8 +2,12 @@ package ch.uzh.ifi.seal.soprafs19.rules.godCards;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-public class HephaestosRuleSet extends SimpleRuleSet {
+@Component
+@Transactional
+public class HephaestusRuleSet extends SimpleRuleSet {
 
     @Override
     public Boolean checkBuildPhase(Game before, Game after) {

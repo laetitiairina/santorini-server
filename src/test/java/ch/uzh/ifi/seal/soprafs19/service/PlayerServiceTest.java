@@ -104,7 +104,7 @@ public class PlayerServiceTest {
     public Player newPlayer(Boolean isGodMode) {
         Player player = new Player();
         player.setIsGodMode(isGodMode);
-        return playerService.createPlayer(player);
+        return playerService.createPlayer(player,true);
     }
 
 }
