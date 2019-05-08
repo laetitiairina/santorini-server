@@ -39,16 +39,8 @@ public class MatchMaker {
         this.godQueue = new ArrayList<Player>();
     }
 
-    public void removePlayer(Player player) {
-        if (player.getIsGodMode()) {
-            godQueue.remove(player);
-        } else {
-            simpleQueue.remove(player);
-        }
-    }
-
     /**
-     * Adds player to a queue
+     * Add player to a queue
      * @param player
      */
     public void pushPlayer(Player player) {
@@ -70,11 +62,23 @@ public class MatchMaker {
         }
     }
 
+    /**
+     * Remove player from a queue
+     * @param player
+     */
+    public void removePlayer(Player player) {
+        if (player.getIsGodMode()) {
+            godQueue.remove(player);
+        } else {
+            simpleQueue.remove(player);
+        }
+    }
+
 
     // Make sure this function can't be executed multiple times at the same time! (@Transactional ?)
 
     /**
-     * Scans provided queue and matches players if possible
+     * Scan provided queue and match players if possible
      * @param queue
      * @param numberOfPlayers
      */
@@ -97,7 +101,8 @@ public class MatchMaker {
 
             // Set game of matched players
             for (Player player : matchedPlayers) {
-                player.setGame(game);
+                // Game of players gets set in Game constructor now
+                //player.setGame(game);
                 playerService.updatePlayer(player);
             }
         }

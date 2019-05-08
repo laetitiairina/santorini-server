@@ -28,10 +28,10 @@ public class Player implements Serializable {
     private Boolean isGodMode;
 
     @Column(nullable = false)
-    private Integer polls;
+    private Long lastPollMillis;
 
     @Column(nullable = false)
-    private Boolean isLocked;
+    private Boolean isActive;
 
     @Column()
     private SimpleGodCard card;
@@ -136,20 +136,31 @@ public class Player implements Serializable {
 		this.isCurrentPlayer = isCurrentPlayer;
 	}
 
-	public int getPolls() {return polls;}
+    public Boolean getIsActive() {
+        return isActive;
+    }
 
-	public void setPolls(int polls) {this.polls = polls;}
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
 
-    public boolean getIsLocked() {return isLocked;}
+    @JsonIgnore
+    public Long getLastPollMillis() {
+        return lastPollMillis;
+    }
 
-    public void setIsLocked(boolean isLocked) {this.isLocked = isLocked;}
+    @JsonIgnore
+    public void setLastPollMillis(Long lastPollMillis) {
+        this.lastPollMillis = lastPollMillis;
+    }
 
 	public Player() {
         this.workers = new ArrayList<>();
         workers.add(new Worker(this));
         workers.add(new Worker(this));
-        this.polls = 0;
-        this.isLocked= false;
+
+        this.lastPollMillis = System.currentTimeMillis();
+        this.isActive = true;
     }
 
     @Override
@@ -162,8 +173,11 @@ public class Player implements Serializable {
         return this.getId().equals(player.getId());
     }
 
-    public void incrementPolls() {
-        setPolls(getPolls() + 1);
-        System.out.println(getPolls());
+    public void didPoll() {
+        setLastPollMillis(System.currentTimeMillis());
+    }
+
+    public Long lastPoll() {
+        return System.currentTimeMillis() - getLastPollMillis();
     }
 }

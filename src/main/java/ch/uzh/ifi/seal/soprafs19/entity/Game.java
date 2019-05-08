@@ -113,7 +113,10 @@ public class Game implements Serializable {
 			matchedPlayers.get(0).setIsCurrentPlayer(true);
         }
 
-        // Matched players reference to game gets set in MatchMaker
+		// Set game of matched players
+		for (Player player : matchedPlayers) {
+			player.setGame(this);
+		}
 
 		// Delete board and save fields in game entity directly?
 		this.board = new Board(this,numberOfRows);
