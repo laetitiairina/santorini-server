@@ -129,11 +129,13 @@ public class GameService {
             // saves updates to database
             gameRepository.save(successfullyUpdatedGame);
 
-            // increment the status
+            // check if a player has won
             Player winner = rules.checkWinCondition(successfullyUpdatedGame);
             if (winner == null) {
+                // increment the status normally
                 incrementGameStatus(successfullyUpdatedGame, false);
             } else {
+                // indicate winner and loser
                 for (Player p : successfullyUpdatedGame.getPlayers()) {
                     if (p.getId().equals(winner.getId())) {
                         p.setIsCurrentPlayer(true);
@@ -141,6 +143,7 @@ public class GameService {
                         p.setIsCurrentPlayer(false);
                     }
                 }
+                // increment the status to END
                 incrementGameStatus(successfullyUpdatedGame, true);
             }
             return true;
