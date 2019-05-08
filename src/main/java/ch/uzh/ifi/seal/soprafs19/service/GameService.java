@@ -23,9 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import java.util.Optional;
-import java.util.TimerTask;
-import java.util.Timer;
-import java.util.concurrent.*;
 
 @Primary
 @Service
@@ -458,6 +455,16 @@ public class GameService {
         gameRepository.save(game);
     }
 
+    public void abortGame(Game game) {
+        // let game end inform front-end of abort
+        game.getPlayers().get(0).setIsCurrentPlayer(false);
+        game.getPlayers().get(1).setIsCurrentPlayer(false);
+        game.getPlayers().get(0).setIsActive(false);
+        game.getPlayers().get(1).setIsActive(false);
+        game.setStatus(GameStatus.END);
+        gameRepository.save(game);
+    }
+
     /**
      * Check if token matches the current player in the current game
      *
@@ -476,6 +483,19 @@ public class GameService {
             }
         }
         return false;
+    }
+
+    /**
+     * Update polling of player with token
+     * @param token
+     */
+    public void updatePolling(String token) {
+        // update the polls
+        Player player = playerRepository.findByToken(token);
+        if (player != null) {
+            player.didPoll();
+            playerRepository.save(player);
+        }
     }
 
     /**

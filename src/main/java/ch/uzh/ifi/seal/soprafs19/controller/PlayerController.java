@@ -42,7 +42,7 @@ public class PlayerController {
     ResponseEntity createPlayer(@RequestBody Player newPlayer) {
 
         // Create player
-        Player player = service.createPlayer(newPlayer);
+        Player player = service.createPlayer(newPlayer,true);
 
         // Check if player was created successfully
         if (player == null) {
@@ -72,7 +72,8 @@ public class PlayerController {
             // Send response 404
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Player was not found!");
         } else {
-            service.incrementPolls(player.get());
+            // Update polling
+            player.get().didPoll();
         }
 
         // If specific fields were requested, only send those fields of player entity

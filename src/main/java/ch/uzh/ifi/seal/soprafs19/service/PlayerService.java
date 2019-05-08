@@ -2,7 +2,6 @@ package ch.uzh.ifi.seal.soprafs19.service;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
-import ch.uzh.ifi.seal.soprafs19.helper.CheckPolling;
 import ch.uzh.ifi.seal.soprafs19.helper.MatchMaker;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
@@ -13,7 +12,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Primary
@@ -23,8 +21,6 @@ public class PlayerService {
 
     private final Logger log = LoggerFactory.getLogger(PlayerService.class);
 
-    private int threadCount = 0;
-
     @Autowired
     private PlayerRepository playerRepository;
 
@@ -33,9 +29,6 @@ public class PlayerService {
 
     @Autowired
     private MatchMaker matchMaker;
-
-    @Autowired
-    CheckPolling checkPolling;
 
     //@Autowired
     /*public PlayerService(PlayerRepository playerRepository, MatchMaker matchMaker) {
@@ -58,6 +51,10 @@ public class PlayerService {
         return playerRepository.findById(id);
     }
 
+    public List<Player> getAllActivePlayers(){
+        return playerRepository.findByIsActive(true);
+    }
+
     public Player getPlayerByToken(String token) {
         return playerRepository.findByToken(token);
     }
@@ -67,9 +64,10 @@ public class PlayerService {
      * @param newPlayer
      * @return
      */
-    public Player createPlayer(Player newPlayer) {
+    public Player createPlayer(Player newPlayer, Boolean matchmaking) {
 
         // Check if a userId was given
+        // TODO: !!!!!ATTENTION!!!!! Player token has to be unique, can't be a copy of user token (see CheckPolling)
         if (newPlayer.getUserId() == null) {
             newPlayer.setToken(UUID.randomUUID().toString());
         } else {
@@ -87,8 +85,10 @@ public class PlayerService {
 
         playerRepository.save(newPlayer);
 
-        // Push player to matchmaking queue
-        matchMaker.pushPlayer(newPlayer);
+        if (matchmaking) {
+            // Push player to matchmaking queue
+            matchMaker.pushPlayer(newPlayer);
+        }
 
         log.debug("Created Information for Player: {}", newPlayer);
         return newPlayer;
@@ -103,26 +103,12 @@ public class PlayerService {
     }
 
     /**
-     * increments the number of polls by a player
+     * Remove player from matchmaking queue and set player to inactive
      * @param player
      */
-    public void incrementPolls(Player player) {
-        player.incrementPolls();
+    public void abortSearch(Player player) {
+        matchMaker.removePlayer(player);
+        player.setIsActive(false);
         playerRepository.save(player);
-        startThread(player);
-    }
-
-    public void startThread(Player player) {
-        if (!player.getIsLocked()) {
-            player.setIsLocked(true);
-            playerRepository.save(player);
-
-            // start thread
-            threadCount++;
-            checkPolling.setName(Integer.toString(threadCount));
-            checkPolling.setPlayer(player);
-            Thread thread = new Thread(checkPolling);
-            thread.start();
-        }
     }
 }

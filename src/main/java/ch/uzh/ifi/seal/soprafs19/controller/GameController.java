@@ -17,18 +17,18 @@ import java.util.Optional;
 @RestController
 public class GameController {
 
+    @Autowired
     private GameService service;
 
     @Autowired
-    private PlayerService playerService;
-
     private JsonHelper helper;
 
+    /*
     GameController(GameService gameService, JsonHelper helper) {
         this.service = gameService;
         this.helper = helper;
     }
-
+    */
 
     /*
     @GetMapping("/games")
@@ -55,11 +55,8 @@ public class GameController {
             // Send response 404
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game was not found!");
         } else {
-            // update the polls
-            Player player = playerService.getPlayerByToken(token);
-            if (player != null) {
-                playerService.incrementPolls(player);
-            }
+            // Update polling
+            service.updatePolling(token);
         }
 
         // If specific fields were requested, only send those fields of game entity
