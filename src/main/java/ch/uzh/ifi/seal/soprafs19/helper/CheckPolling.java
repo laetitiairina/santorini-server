@@ -40,7 +40,7 @@ public class CheckPolling implements Runnable {
                     System.out.println("Player removed from queue");
                     playerService.abortSearch(player);
                 // playing game
-                } else {
+                } else if (player.getGame().getStatus() != GameStatus.END) {
                     // Abort game if player hasn't polled in x seconds
                     System.out.println("Game aborted");
                     gameService.abortGame(player.getGame());
