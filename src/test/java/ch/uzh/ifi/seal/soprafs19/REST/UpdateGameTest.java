@@ -89,7 +89,6 @@ public class UpdateGameTest {
     public void updateGameCorrect() throws Exception {
 
         Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
-        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
 
         Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
 
@@ -103,7 +102,7 @@ public class UpdateGameTest {
                 .andExpect(status().isNoContent());
 
 
-        game = gameRepository.findById(testPlayer2.getGame_id()).get();
+        game = gameRepository.findById(testPlayer1.getGame_id()).get();
 
         Assert.assertTrue(game.getStatus() == GameStatus.CARDS2);
         Assert.assertTrue(game.getCards().size() == 2);
@@ -113,7 +112,6 @@ public class UpdateGameTest {
     public void updateGameNotFound() throws Exception {
 
         Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
-        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
 
         Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
 
@@ -132,7 +130,6 @@ public class UpdateGameTest {
     public void updateGameBadRequest() throws Exception {
 
         Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
-        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
 
         Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
 
@@ -159,7 +156,6 @@ public class UpdateGameTest {
     public void updateGameForbidden() throws Exception {
 
         Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
-        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
 
         Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
 
