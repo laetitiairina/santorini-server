@@ -5,11 +5,12 @@ import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.entity.Worker;
 import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Primary
-@Service
+@Component
 @Transactional
 public class SimpleRuleSet implements IRuleSet {
 
@@ -226,7 +227,7 @@ public class SimpleRuleSet implements IRuleSet {
      * @param worker
      * @return
      */
-    private Boolean isWorkerStuck(Game game, Worker worker) {
+    public Boolean isWorkerStuck(Game game, Worker worker) {
 
         int posX = worker.getField().getPosX();
         int posY = worker.getField().getPosY();

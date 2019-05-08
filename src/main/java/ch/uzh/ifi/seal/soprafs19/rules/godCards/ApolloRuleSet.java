@@ -5,10 +5,16 @@ import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
 import ch.uzh.ifi.seal.soprafs19.entity.Worker;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
+@Transactional
 public class ApolloRuleSet extends SimpleRuleSet {
 
     // difference to parent class: can only not move on fields which are occupied with own worker
@@ -95,7 +101,7 @@ public class ApolloRuleSet extends SimpleRuleSet {
                         // origin field had a worker
                         if ((fieldBeforeBackEnd.getWorker() != null)
                                 //destination field has not your own worker
-                                && (!fieldAfterBackEnd.getWorker().getId().equals(ownWorker.getId()))
+                                && (fieldAfterBackEnd.getWorker() == null || !fieldAfterBackEnd.getWorker().getId().equals(ownWorker.getId()))
                                 // destination field has no dome
                                 && (!fieldAfterBackEnd.getHasDome())
                                 && (fieldBeforeBackEnd.getBlocks() == blockBefore)
@@ -118,50 +124,9 @@ public class ApolloRuleSet extends SimpleRuleSet {
 
     }
 
-    // TODO: maybe doesn't need to be overwritten
-    @Override
-    public Boolean checkWinCondition(Game game) {
-
-        // checking for both players
-        for (Player player : game.getPlayers()) {
-
-            // number of Workers of a Player, who can't move anymore
-            int stuckWorkers = 0;
-
-            // check positions of Workers
-            for (Worker worker : player.getWorkers()) {
-
-                // if worker has been at least dropped on the board
-                if (worker.getField() != null) {
-
-                    // win condition
-                    if ((worker.getField().getBlocks() == 3 && !worker.getField().getHasDome())) {
-                        // immediately return
-                        worker.getPlayer().setIsCurrentPlayer(true);
-                        return true;
-                    }
-                    // lose condition
-                    else if (isWorkerStuck(game, worker)) {
-                        stuckWorkers++;
-                    }
-                }
-            }
-
-            // if both workers are stuck
-            if (stuckWorkers == 2) {
-                // set current Player for front-end
-                for (Player p : game.getPlayers()) {
-                    player.setIsCurrentPlayer(!p.getId().equals(player.getId()));
-                }
-                return true;
-            }
-
-        }
-        return false;
-    }
-
     //Worker is not Stuck when a opponent worker is on a neighboring field
-    private Boolean isWorkerStuck(Game game, Worker worker) {
+    @Override
+    public Boolean isWorkerStuck(Game game, Worker worker) {
 
         int posX = worker.getField().getPosX();
         int posY = worker.getField().getPosY();
@@ -193,10 +158,8 @@ public class ApolloRuleSet extends SimpleRuleSet {
 
                         // it's free, if it has no dome, max. one block more than the worker's current field,
                         if (!field.getHasDome() && (field.getBlocks() - 1) <= (worker.getField().getBlocks())) {
-
-                            // or an opponent's worker
-                            if (workers.contains(field.getWorker().getId())) {
-                                // a field is free
+                            // a field is free
+                            if (field.getWorker() == null || workers.contains(field.getWorker().getId())) {
                                 return false;
                             }
                         }

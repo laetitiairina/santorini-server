@@ -3,9 +3,15 @@ package ch.uzh.ifi.seal.soprafs19.rules.godCards;
 import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
+@Component
+@Transactional
 public class ArtemisRuleSet extends SimpleRuleSet {
 
     @Override

@@ -9,6 +9,8 @@ import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.entity.Worker;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
+import ch.uzh.ifi.seal.soprafs19.rules.IRuleSet;
+import ch.uzh.ifi.seal.soprafs19.rules.RuleFactory;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,7 @@ public class GameService {
     private PlayerRepository playerRepository;
 
     @Autowired
-    private SimpleRuleSet simpleRuleSet;
+    private RuleFactory ruleFactory;
 
     /*
     @Autowired
@@ -86,6 +88,14 @@ public class GameService {
         // react to update depending on status
         Game successfullyUpdatedGame = null; // set to true later, if update is valid
         boolean isBadRequest = true; // true if the move / build valid but JSON, etc. was incorrect
+        IRuleSet rules = null;
+
+        // get rules
+        for (Player player : currentGame.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                rules = ruleFactory.getRuleSet(player);
+            }
+        }
 
         // only checks the first 3 states, if isGodMode is true
         if (currentGame.getIsGodMode()) {
@@ -105,14 +115,14 @@ public class GameService {
             case MOVE:
                 // TODO: include isBadRequest handling, add check logic (low priority)
                 // check if it's a valid move
-                if (simpleRuleSet.checkMovePhase(currentGame, updatedGame)) {
+                if (rules.checkMovePhase(currentGame, updatedGame)) {
                 successfullyUpdatedGame = move(currentGame, updatedGame);
                 }
                 break;
             case BUILD:
                 // TODO: include isBadRequest handling, add check logic (low priority)
                 // check if it's a valid build
-                if (simpleRuleSet.checkBuildPhase(currentGame, updatedGame)) {
+                if (rules.checkBuildPhase(currentGame, updatedGame)) {
                 successfullyUpdatedGame = build(currentGame, updatedGame);
                 }
                 break;
@@ -124,7 +134,7 @@ public class GameService {
             gameRepository.save(successfullyUpdatedGame);
 
             // increment the status
-            if (simpleRuleSet.checkWinCondition(successfullyUpdatedGame)) {
+            if (rules.checkWinCondition(successfullyUpdatedGame)) {
                 incrementGameStatus(successfullyUpdatedGame, true);
             } else {
                 incrementGameStatus(successfullyUpdatedGame, false);
@@ -324,7 +334,7 @@ public class GameService {
     public Game move(Game currentGame, Game updatedGame) {
         Worker currentWorker = null;
         int blocksBefore = -1, blocksAfter = -1;
-        Field fieldAfter = null;
+        Field fieldBefore = null, fieldAfter = null;
 
         for (Field field : updatedGame.getBoard().getFields()) {
 
@@ -332,14 +342,19 @@ public class GameService {
             Field fieldToUpdate = getFieldToUpdate(currentGame, field);
 
             // update the worker value of the field and remember current Worker
+
             if (field.getWorker() != null) {
                 currentWorker = field.getWorker();
-                blocksBefore = fieldToUpdate.getBlocks();
+                blocksAfter = fieldToUpdate.getBlocks();
                 fieldAfter = fieldToUpdate;
             } else {
-                blocksAfter = fieldToUpdate.getBlocks();
+                fieldBefore = fieldToUpdate;
+                blocksBefore = fieldToUpdate.getBlocks();
             }
-            fieldToUpdate.setWorker(field.getWorker());
+        }
+
+        if (fieldAfter == null || fieldBefore == null) {
+            return null;
         }
 
         currentGame.setHasMovedUp((blocksBefore < blocksAfter));
@@ -350,7 +365,20 @@ public class GameService {
                 for (Worker worker : player.getWorkers()) {
                     if (worker.getId().equals(currentWorker.getId())) {
                         worker.setIsCurrentWorker(true);
+
+                        // switch of worker is happening
+                        if(fieldAfter.getWorker() != null) {
+                            Worker w = fieldAfter.getWorker();
+                            w.setField(fieldBefore);
+                            fieldBefore.setWorker(w);
+                        }
+                        // field was empty
+                        else {
+                            fieldBefore.setWorker(null);
+                        }
+
                         worker.setField(fieldAfter);
+                        fieldAfter.setWorker(worker);
                     } else {
                         worker.setIsCurrentWorker(false);
                     }

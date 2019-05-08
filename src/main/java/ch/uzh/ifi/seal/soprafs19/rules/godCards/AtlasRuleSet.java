@@ -5,7 +5,13 @@ import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.entity.Worker;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Component
+@Transactional
 public class AtlasRuleSet extends SimpleRuleSet {
 
     //same as parent class but, you can built a dome on any level -> player added a dome line changed
