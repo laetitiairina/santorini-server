@@ -120,7 +120,8 @@ public class SimpleRuleSet implements IRuleSet {
         }
 
         // if front-end sent no field at all, or faulty one
-        if (fieldAfterBuilt == null || posBuiltFieldX == -1 || posBuiltFieldY == -1) {
+        if (fieldAfterBuilt == null
+                || (posBuiltFieldX < 0) || (posBuiltFieldX > 4) || (posBuiltFieldY < 0)|| (posBuiltFieldY > 4)) {
             return false;
         }
 

@@ -6,6 +6,9 @@ import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
 import ch.uzh.ifi.seal.soprafs19.entity.Worker;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ApolloRuleSet extends SimpleRuleSet {
 
     // difference to parent class: can only not move on fields which are occupied with own worker
@@ -13,27 +16,7 @@ public class ApolloRuleSet extends SimpleRuleSet {
     public Boolean checkMovePhase(Game before, Game after) {
         boolean isValid = false;
 
-        Player currentPlayer = null;
-        Worker w1 = null;
-        Worker w2 = null;
-
-        //gets current player
-        for(Player p : before.getPlayers()){
-            if(p.getIsCurrentPlayer()){
-                currentPlayer = p;
-            }
-        }
-
-        // gets the two worker of the current player
-        for(Worker w : currentPlayer.getWorkers())
-            if(w != null){
-                if (w.getIsCurrentWorker()) {
-                w1 = w;
-
-            }   else {
-
-                w2 = w;
-            }}
+        Worker ownWorker = null;
 
         Field fieldBefore = null;
         Field fieldAfter = null;
@@ -47,7 +30,7 @@ public class ApolloRuleSet extends SimpleRuleSet {
         for (Field field : after.getBoard().getFields()) {
             if (field.getWorker() != null) {
                 fieldAfter = field;
-                xAfter =fieldAfter.getPosX();
+                xAfter = fieldAfter.getPosX();
                 yAfter = fieldAfter.getPosY();
             } else {
                 fieldBefore = field;
@@ -57,7 +40,7 @@ public class ApolloRuleSet extends SimpleRuleSet {
         }
 
         // faulty information by front-end
-        if (fieldAfter == null || fieldBefore ==  null) {
+        if (fieldAfter == null || fieldBefore == null) {
             return false;
         }
 
@@ -75,6 +58,22 @@ public class ApolloRuleSet extends SimpleRuleSet {
 
         // faulty information by front-end
         if (fieldBeforeBackEnd == null || fieldAfterBackEnd == null) {
+            return false;
+        }
+
+        // get Worker of current Player, which is not being moved
+        for (Player p : before.getPlayers()) {
+            if (p.getIsCurrentPlayer()) {
+                for (Worker w : p.getWorkers()) {
+                    if (w != null && !fieldBeforeBackEnd.getWorker().getId().equals(w.getId())) {
+                        ownWorker = w;
+                    }
+                }
+            }
+        }
+
+        // faulty info from front-end
+        if (ownWorker == null) {
             return false;
         }
 
@@ -96,7 +95,7 @@ public class ApolloRuleSet extends SimpleRuleSet {
                         // origin field had a worker
                         if ((fieldBeforeBackEnd.getWorker() != null)
                                 //destination field has not your own worker
-                                && (fieldAfterBackEnd.getWorker() != w2)
+                                && (!fieldAfterBackEnd.getWorker().getId().equals(ownWorker.getId()))
                                 // destination field has no dome
                                 && (!fieldAfterBackEnd.getHasDome())
                                 && (fieldBeforeBackEnd.getBlocks() == blockBefore)
@@ -119,13 +118,15 @@ public class ApolloRuleSet extends SimpleRuleSet {
 
     }
 
+    // TODO: maybe doesn't need to be overwritten
     @Override
-    public Boolean checkWinCondition(Game game){
-        // number of Workers of a Player, who can't move anymore
-        int stuckWorkers = 0;
+    public Boolean checkWinCondition(Game game) {
 
         // checking for both players
         for (Player player : game.getPlayers()) {
+
+            // number of Workers of a Player, who can't move anymore
+            int stuckWorkers = 0;
 
             // check positions of Workers
             for (Worker worker : player.getWorkers()) {
@@ -136,75 +137,73 @@ public class ApolloRuleSet extends SimpleRuleSet {
                     // win condition
                     if ((worker.getField().getBlocks() == 3 && !worker.getField().getHasDome())) {
                         // immediately return
-                        // ...
+                        worker.getPlayer().setIsCurrentPlayer(true);
                         return true;
                     }
                     // lose condition
                     else if (isWorkerStuck(game, worker)) {
-                        ++stuckWorkers;
+                        stuckWorkers++;
                     }
                 }
-
             }
 
             // if both workers are stuck
             if (stuckWorkers == 2) {
-                // ...
+                // set current Player for front-end
+                for (Player p : game.getPlayers()) {
+                    player.setIsCurrentPlayer(!p.getId().equals(player.getId()));
+                }
                 return true;
             }
 
         }
         return false;
-
     }
 
     //Worker is not Stuck when a opponent worker is on a neighboring field
-    private Boolean isWorkerStuck(Game game, Worker worker){
+    private Boolean isWorkerStuck(Game game, Worker worker) {
 
         int posX = worker.getField().getPosX();
         int posY = worker.getField().getPosY();
 
-        Player currentPlayer = null;
-        Worker w1 = null;
-        Worker w2 = null;
+        List<Long> workers = new ArrayList<>();
 
-        for(Player p : game.getPlayers()){
-            if(p.getIsCurrentPlayer()){
-                currentPlayer = p;
-            }
-        }
-
-        for(Worker w : currentPlayer.getWorkers()){
-            if(w != null){
-                if(w.getIsCurrentWorker()){
-                    w1 = w;
-
-            }
-                else{
-
-                    w2 = w;
-                }
-        }}
-
-        // finds neighbouring fields
-        for (Field field : game.getBoard().getFields()) {
-            if (field.getPosX() == posX + 1 || field.getPosX() == posX - 1 || field.getPosX() == posX) {
-                if (field.getPosY() == posY + 1 || field.getPosY() == posY - 1 || field.getPosY() == posY) {
-                    if (field.getPosX() != posX || field.getPosY() != posY) {
-                        //Checks that it is possible to move to a neighbouring field
-                        // it's free, if it has no dome, no worker,
-                        if (!field.getHasDome() && (field.getBlocks()<= (worker.getField().getBlocks() + 1))) {
-                            // if its the your own worker on a neighboring field, you are stuck
-                            if(field.getWorker() == w2)
-                                return false;
-                            }
-                        }
-
+        // find Workers of opponent
+        for (Player p : game.getPlayers()) {
+            if (!p.getIsCurrentPlayer()) {
+                for (Worker w : p.getWorkers()) {
+                    if (w != null) {
+                        workers.add(w.getId());
                     }
                 }
             }
+        }
 
+        // finds neighbouring fields
+        for (Field field : game.getBoard().getFields()) {
 
+            // on x axis
+            if (field.getPosX() == posX - 1 || field.getPosX() == posX || field.getPosX() == posX + 1) {
+
+                // on y axis
+                if (field.getPosY() == posY - 1 || field.getPosY() == posY || field.getPosY() == posY + 1) {
+
+                    // not the same field
+                    if (field.getPosX() != posX || field.getPosY() != posY) {
+
+                        // it's free, if it has no dome, max. one block more than the worker's current field,
+                        if (!field.getHasDome() && (field.getBlocks() - 1) <= (worker.getField().getBlocks())) {
+
+                            // or an opponent's worker
+                            if (workers.contains(field.getWorker().getId())) {
+                                // a field is free
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return true;
     }
 
