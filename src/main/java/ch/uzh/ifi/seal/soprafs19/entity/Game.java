@@ -28,7 +28,7 @@ public class Game implements Serializable {
 	private List<Player> players;
 
 	@Column()
-	@ElementCollection(targetClass=SimpleGodCard.class)
+	@ElementCollection(targetClass=SimpleGodCard.class, fetch = FetchType.EAGER)
 	private List<SimpleGodCard> cards;
 	
 	@Column(nullable = false)

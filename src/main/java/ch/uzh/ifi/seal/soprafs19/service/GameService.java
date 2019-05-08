@@ -1,5 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.service;
 
+import ch.uzh.ifi.seal.soprafs19.constant.Color;
+import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
@@ -7,7 +9,6 @@ import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.entity.Worker;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
-import ch.uzh.ifi.seal.soprafs19.rules.IRuleSet;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,11 +17,13 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 
 import java.util.Optional;
+import java.util.TimerTask;
+import java.util.Timer;
+import java.util.concurrent.*;
 
 @Primary
 @Service
@@ -36,7 +39,7 @@ public class GameService {
     private PlayerRepository playerRepository;
 
     @Autowired
-    private EntityManager entityManager;
+    private SimpleRuleSet simpleRuleSet;
 
     /*
     @Autowired
@@ -79,10 +82,6 @@ public class GameService {
      * @return
      */
     public boolean updateGame(Game currentGame, Game updatedGame) {
-        // Authentication and checks done in GameController
-
-        // Todo: look at how to use correctly after Can is done with the implementation
-        IRuleSet rules = new SimpleRuleSet();
 
         // react to update depending on status
         Game successfullyUpdatedGame = null; // set to true later, if update is valid
@@ -106,29 +105,26 @@ public class GameService {
             case MOVE:
                 // TODO: include isBadRequest handling, add check logic (low priority)
                 // check if it's a valid move
-                // TODO: @Can test it before uncommenting on master
-                //if (rules.checkMovePhase(currentGame, updatedGame)) {
+                if (simpleRuleSet.checkMovePhase(currentGame, updatedGame)) {
                 successfullyUpdatedGame = move(currentGame, updatedGame);
-                //}
+                }
                 break;
             case BUILD:
                 // TODO: include isBadRequest handling, add check logic (low priority)
                 // check if it's a valid build
-                // TODO: @Can test it before uncommenting on master
-                //if (rules.checkBuildPhase(currentGame, updatedGame)) {
+                if (simpleRuleSet.checkBuildPhase(currentGame, updatedGame)) {
                 successfullyUpdatedGame = build(currentGame, updatedGame);
-                //}
+                }
                 break;
         }
 
         // update the status of the game for pinging
         if (successfullyUpdatedGame != null) {
-
             // saves updates to database
             gameRepository.save(successfullyUpdatedGame);
 
             // increment the status
-            if (rules.checkWinCondition(gameRepository.findById(successfullyUpdatedGame.getId()).get())) {
+            if (simpleRuleSet.checkWinCondition(successfullyUpdatedGame)) {
                 incrementGameStatus(successfullyUpdatedGame, true);
             } else {
                 incrementGameStatus(successfullyUpdatedGame, false);
@@ -327,9 +323,10 @@ public class GameService {
      */
     public Game move(Game currentGame, Game updatedGame) {
         Worker currentWorker = null;
+        int blocksBefore = -1, blocksAfter = -1;
+        Field fieldAfter = null;
 
         for (Field field : updatedGame.getBoard().getFields()) {
-
 
             // find field that needs to be updated
             Field fieldToUpdate = getFieldToUpdate(currentGame, field);
@@ -337,9 +334,15 @@ public class GameService {
             // update the worker value of the field and remember current Worker
             if (field.getWorker() != null) {
                 currentWorker = field.getWorker();
+                blocksBefore = fieldToUpdate.getBlocks();
+                fieldAfter = fieldToUpdate;
+            } else {
+                blocksAfter = fieldToUpdate.getBlocks();
             }
             fieldToUpdate.setWorker(field.getWorker());
         }
+
+        currentGame.setHasMovedUp((blocksBefore < blocksAfter));
 
         //  set the right worker as isCurrentWorker for build phase
         for (Player player : currentGame.getPlayers()) {
@@ -347,6 +350,7 @@ public class GameService {
                 for (Worker worker : player.getWorkers()) {
                     if (worker.getId().equals(currentWorker.getId())) {
                         worker.setIsCurrentWorker(true);
+                        worker.setField(fieldAfter);
                     } else {
                         worker.setIsCurrentWorker(false);
                     }
@@ -372,6 +376,15 @@ public class GameService {
             // update the blocks and has Dome value of the field
             fieldToUpdate.setBlocks(field.getBlocks());
             fieldToUpdate.setHasDome(field.getHasDome());
+
+            // set both workers to non-current
+            for (Player player : currentGame.getPlayers()) {
+                if (player.getIsCurrentPlayer()) {
+                    for (Worker worker : player.getWorkers()) {
+                        worker.setIsCurrentWorker(false);
+                    }
+                }
+            }
         }
         nextTurn(currentGame);
         return currentGame;
@@ -388,11 +401,13 @@ public class GameService {
         int status = game.getGameStatusInt(game.getStatus());
 
         // increment the status
-        if (status == 8 && !isEnd) {
+        if (isEnd) {
+            status = 9;
+        } else if (status == 8) {
             // loop for move and build phase
-            --status;
+            status--;
         } else {
-            ++status;
+            status++;
         }
 
         // convert type Integer it back to type GameStatus

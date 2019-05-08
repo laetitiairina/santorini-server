@@ -4,7 +4,13 @@ import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.entity.Worker;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Primary
+@Service
+@Transactional
 public class SimpleRuleSet implements IRuleSet {
 
     public Boolean checkMovePhase(Game before, Game after) {
@@ -170,11 +176,11 @@ public class SimpleRuleSet implements IRuleSet {
 
     public Boolean checkWinCondition(Game game) {
 
-        // number of Workers of a Player, who can't move anymore
-        int stuckWorkers = 0;
-
         // checking for both players
         for (Player player : game.getPlayers()) {
+
+            // number of Workers of a Player, who can't move anymore
+            int stuckWorkers = 0;
 
             // check positions of Workers
             for (Worker worker : player.getWorkers()) {
@@ -185,20 +191,22 @@ public class SimpleRuleSet implements IRuleSet {
                     // win condition
                     if ((worker.getField().getBlocks() == 3 && !worker.getField().getHasDome())) {
                         // immediately return
-                        // ...
+                        worker.getPlayer().setIsCurrentPlayer(true);
                         return true;
                     }
                     // lose condition
                     else if (isWorkerStuck(game, worker)) {
-                        ++stuckWorkers;
+                        stuckWorkers++;
                     }
                 }
-
             }
 
             // if both workers are stuck
             if (stuckWorkers == 2) {
-                // ...
+                // set current Player for front-end
+                for (Player p : game.getPlayers()) {
+                    player.setIsCurrentPlayer(!p.getId().equals(player.getId()));
+                }
                 return true;
             }
 
@@ -224,18 +232,25 @@ public class SimpleRuleSet implements IRuleSet {
 
         // finds neighbouring fields
         for (Field field : game.getBoard().getFields()) {
-            if (field.getPosX() == posX + 1 || field.getPosX() == posX - 1 || field.getPosX() == posX) {
-                if (field.getPosY() == posY + 1 || field.getPosY() == posY - 1 || field.getPosY() == posY) {
+
+            // on x axis
+            if (field.getPosX() == posX - 1 || field.getPosX() == posX || field.getPosX() == posX + 1) {
+
+                // on y axis
+                if (field.getPosY() == posY - 1 || field.getPosY() == posY  || field.getPosY() == posY+ 1) {
+
+                    // not the same field
                     if (field.getPosX() != posX || field.getPosY() != posY) {
-                        //Checks that it is possible to move to a neighbouring field
-                        // it's free, if it has no dome, no worker,
-                        if (!field.getHasDome() || field.getWorker() == null) {
+
+                        // it's free, if it has no dome, no worker
+                        if (!field.getHasDome() && field.getWorker() == null) {
+
                             // or max. one block more than the worker's current field
-                            if (field.getBlocks() <= (worker.getField().getBlocks() + 1)) {
+                            if ((field.getBlocks() - 1) <= (worker.getField().getBlocks())) {
+                                // a field is free
                                 return false;
                             }
                         }
-
                     }
                 }
             }

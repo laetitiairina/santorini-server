@@ -19,8 +19,7 @@ public class Worker implements Serializable {
 	@JoinColumn(name = "player_id")
 	private Player player;
 
-	@OneToOne
-	@JoinColumn(name="field_id")
+	@OneToOne(mappedBy = "worker")
 	private Field field;
 
 	@Column

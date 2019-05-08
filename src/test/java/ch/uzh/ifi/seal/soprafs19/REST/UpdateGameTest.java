@@ -22,6 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -30,15 +32,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Test class for the REST interface.
- *
+ * <p>
  * /games/{id} PUT
  */
 @WebAppConfiguration
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes= Application.class)
+@SpringBootTest(classes = Application.class)
 public class UpdateGameTest {
 
-   /* @Qualifier("gameRepository")
+    @Qualifier("gameRepository")
     @Autowired
     private GameRepository gameRepository;
 
@@ -56,9 +58,6 @@ public class UpdateGameTest {
 
     private MockMvc mvc;
 
-    private User testUser1;
-    private User testUser2;
-
     private Player testPlayer1;
     private Player testPlayer2;
 
@@ -68,65 +67,106 @@ public class UpdateGameTest {
     public void setup() throws Exception {
         this.mvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
 
-        User user1 = new User();
-        user1.setUsername("testUsername1");
-        user1.setPassword("testPassword1");
-
-        testUser1 = userService.createUser(user1);
-
-        User user2 = new User();
-        user2.setUsername("testUsername2");
-        user2.setPassword("testPassword2");
-
-        testUser2 = userService.createUser(user2);
-
         Player player1 = new Player();
-        player1.setUserId(testUser1.getId());
-        player1.setIsGodMode(false);
-
+        player1.setIsGodMode(true);
         testPlayer1 = playerService.createPlayer(player1);
 
         Player player2 = new Player();
-        player2.setUserId(testUser2.getId());
-        player2.setIsGodMode(false);
+        player2.setIsGodMode(true);
+        testPlayer2 = playerService.createPlayer(player2);
 
-        testPlayer2 = playerService.createPlayer(player2); */
-
-        /*
-        List<Player> players = new ArrayList<Player>();
+        List<Player> players = new ArrayList<>();
         players.add(player1);
         players.add(player2);
 
-        Game game = new Game(players, 25);
-        testGame = gameService.createGame(game);
-        */
-
-    //}
+        testGame = new Game(players, 25);
+    }
 
     @Test
     public void updateGameCorrect() throws Exception {
 
-       /* Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
+        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
 
         Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
 
-        Assert.assertTrue(game.getStatus() == GameStatus.CARDS10);
-        //Assert.assertNotNull(game.getCurrentPlayer());
+        Assert.assertTrue(game.getStatus() == GameStatus.CARDS1);
 
-        //Long firstPlayerId = game.getCurrentPlayer().getId();
-
-        mvc.perform(put("/games/"+testPlayer1.getGame_id())
+        mvc.perform(put("/games/" + testPlayer1.getGame_id())
                 .contentType("application/json;charset=UTF-8")
-                .content("{\"cards\":[{\"cardNr\":1},{\"cardNr\":5}]}"))
+                .header("Token", testPlayer1.getToken())
+                .content("{\"id\":" + game.getId() +", \"cards\":[\"ARTEMIS\",\"APOLLO\"]}"))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
 
-        game = gameRepository.findById(testPlayer1.getGame_id()).get();
+        game = gameRepository.findById(testPlayer2.getGame_id()).get();
 
         Assert.assertTrue(game.getStatus() == GameStatus.CARDS2);
-        //Assert.assertTrue(game.getCurrentPlayer().getId() != firstPlayerId);
         Assert.assertTrue(game.getCards().size() == 2);
-        */
     }
+
+    @Test
+    public void updateGameNotFound() throws Exception {
+
+        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
+        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
+
+        Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
+
+        Assert.assertTrue(game.getStatus() == GameStatus.CARDS1);
+
+        // wrong Id
+        mvc.perform(put("/games/123142")
+                .contentType("application/json;charset=UTF-8")
+                .header("Token", testPlayer1.getToken())
+                .content("{\"id\": \"123142\" , \"cards\":[\"ARTEMIS\",\"APOLLO\"]}"))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void updateGameBadRequest() throws Exception {
+
+        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
+        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
+
+        Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
+
+        Assert.assertTrue(game.getStatus() == GameStatus.CARDS1);
+
+        // wrong id in body
+        mvc.perform(put("/games/" + testPlayer1.getGame_id())
+                .contentType("application/json;charset=UTF-8")
+                .header("Token", testPlayer1.getToken())
+                .content("{\"id\": \"123142\" , \"cards\":[\"ARTEMIS\",\"APOLLO\"]}"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        // invalid input
+        mvc.perform(put("/games/" + testPlayer1.getGame_id())
+                .contentType("application/json;charset=UTF-8")
+                .header("Token", testPlayer1.getToken())
+                .content("{\"id\":" + game.getId() +", \"cards\":[\"ARTEMIS\",\"ARTEMIS\"]}"))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void updateGameForbidden() throws Exception {
+
+        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
+        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
+
+        Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
+
+        Assert.assertTrue(game.getStatus() == GameStatus.CARDS1);
+
+        mvc.perform(put("/games/" + testPlayer1.getGame_id())
+                .contentType("application/json;charset=UTF-8")
+                .header("Token", "test")
+                .content("{\"id\":" + game.getId() +", \"cards\":[\"ARTEMIS\",\"APOLLO\"]}"))
+                .andDo(print())
+                .andExpect(status().isForbidden());
+    }
+
 }
