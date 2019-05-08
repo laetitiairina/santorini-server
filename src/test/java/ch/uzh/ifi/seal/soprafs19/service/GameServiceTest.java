@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import javax.validation.constraints.AssertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +50,114 @@ public class GameServiceTest {
         // get the games
         simpleGame = player1.getGame();
         godGame = player3.getGame();
+    }
+
+    public void statusCards2() {
+        setup();
+
+        // setting cards
+        List<SimpleGodCard> cards = new ArrayList<>();
+        cards.add(SimpleGodCard.APOLLO);
+        cards.add(SimpleGodCard.ARTEMIS);
+        godGame.setCards(cards);
+        godGame.setStatus(GameStatus.CARDS2);
+
+        // next Turn
+        nextTurn(godGame);
+    }
+
+    public void statusStartPlayer() {
+        statusCards2();
+
+        // set cards on players
+        for (Player player : godGame.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                player.setCard(godGame.getCards().get(0));
+            } else {
+                player.setCard(godGame.getCards().get(1));
+            }
+            playerService.savePlayer(player);
+        }
+
+        godGame.setStatus(GameStatus.STARTPLAYER);
+        gameService.saveGame(godGame);
+
+        nextTurn(godGame);
+    }
+
+    public void statusPosition1(Game game) {
+        for (Player player : game.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                player.setColor(Color.BLUE);
+                playerService.savePlayer(player);
+            }
+        }
+
+        game.setStatus(GameStatus.POSITION1);
+        gameService.saveGame(game);
+    }
+
+    public void statusColor2(Game game) {
+        statusPosition1(game);
+
+        for (Player player : game.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                game.getBoard().getFields().get(4).setWorker(player.getWorkers().get(0));
+                player.getWorkers().get(0).setField(game.getBoard().getFields().get(4));
+
+                game.getBoard().getFields().get(18).setWorker(player.getWorkers().get(1));
+                player.getWorkers().get(1).setField(game.getBoard().getFields().get(18));
+                playerService.savePlayer(player);
+            }
+        }
+        game.setStatus(GameStatus.COLOR2);
+        nextTurn(game);
+    }
+
+    public void statusPosition2(Game game) {
+
+        statusColor2(game);
+
+        for (Player player : game.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                player.setColor(Color.WHITE);
+                playerService.savePlayer(player);
+            }
+        }
+
+        game.setStatus(GameStatus.POSITION2);
+        gameService.saveGame(game);
+    }
+
+    public void statusMove(Game game) {
+        statusPosition2(game);
+
+        for (Player player : game.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                game.getBoard().getFields().get(7).setWorker(player.getWorkers().get(0));
+                player.getWorkers().get(0).setField(game.getBoard().getFields().get(7));
+
+                game.getBoard().getFields().get(23).setWorker(player.getWorkers().get(1));
+                player.getWorkers().get(1).setField(game.getBoard().getFields().get(23));
+                playerService.savePlayer(player);
+            }
+        }
+        game.setStatus(GameStatus.MOVE);
+        nextTurn(game);
+    }
+
+    // not based on previous step anymore
+    public void move(Game game, Field from, Field to) {
+        Worker worker = from.getWorker();
+        worker.setIsCurrentWorker(true);
+        from.setWorker(null);
+        to.setWorker(worker);
+        game.setStatus(GameStatus.BUILD);
+        gameService.saveGame(game);
+    }
+
+    public void build(Game game, Field on) {
+
     }
 
     @Test
@@ -140,7 +247,7 @@ public class GameServiceTest {
     @Test
     public void updateCards2Successfully() {
 
-        updateCards1Successfully();
+        statusCards2();
 
         // select the two cards
         Game updatedGame = SerializationUtils.clone(godGame);
@@ -168,7 +275,7 @@ public class GameServiceTest {
     @Test
     public void updateCards2WrongCard() {
 
-        updateCards1Successfully();
+        statusCards2();
 
         // select the two cards
         Game updatedGame = SerializationUtils.clone(godGame);
@@ -196,7 +303,7 @@ public class GameServiceTest {
     @Test
     public void updateCards2WrongPlayer() {
 
-        updateCards1Successfully();
+        statusCards2();
 
         // select the two cards
         Game updatedGame = SerializationUtils.clone(godGame);
@@ -224,7 +331,7 @@ public class GameServiceTest {
     @Test
     public void updateStartPlayerSuccessfully() {
 
-        updateCards2Successfully();
+        statusStartPlayer();
 
         // select the player
         Game updatedGame = SerializationUtils.clone(godGame);
@@ -248,7 +355,7 @@ public class GameServiceTest {
     @Test
     public void updateStartPlayerNotCurrentPlayer() {
 
-        updateCards2Successfully();
+        statusStartPlayer();
 
         // select the player
         Game updatedGame = SerializationUtils.clone(godGame);
@@ -272,7 +379,7 @@ public class GameServiceTest {
     @Test
     public void updateStartPlayerWrongPlayer() {
 
-        updateCards2Successfully();
+        statusStartPlayer();
 
         // select the player
         Game updatedGame = SerializationUtils.clone(godGame);
@@ -394,7 +501,8 @@ public class GameServiceTest {
     public void updatePosition1Successfully() {
 
         // get to Position1
-        updateColor1Successfully();
+        setup();
+        statusPosition1(simpleGame);
 
         // create game with chosen position
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -446,7 +554,8 @@ public class GameServiceTest {
     public void updatePosition1WrongPlayer() {
 
         // get to Position1
-        updateColor1Successfully();
+        setup();
+        statusPosition1(simpleGame);
 
         // create game with chosen position
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -486,7 +595,8 @@ public class GameServiceTest {
     public void updatePosition1OneField() {
 
         // get to Position1
-        updateColor1Successfully();
+        setup();
+        statusPosition1(simpleGame);
 
         // create game with chosen position
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -523,7 +633,8 @@ public class GameServiceTest {
     public void updatePosition1NoField() {
 
         // get to Position1
-        updateColor1Successfully();
+        setup();
+        statusPosition1(simpleGame);
 
         // create game with chosen position
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -548,7 +659,8 @@ public class GameServiceTest {
     public void updatePosition1SameField() {
 
         // get to Position1
-        updateColor1Successfully();
+        setup();
+        statusPosition1(simpleGame);
 
         // create game with chosen position
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -588,7 +700,8 @@ public class GameServiceTest {
     public void updateColor2Successfully() {
 
         // get to Color2
-        updatePosition1Successfully();
+        setup();
+        statusColor2(simpleGame);
 
         // create game with chosen color
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -629,7 +742,8 @@ public class GameServiceTest {
     public void updateColor2SameColor() {
 
         // get to Color2
-        updatePosition1Successfully();
+        setup();
+        statusColor2(simpleGame);
 
         // create game with chosen color
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -661,7 +775,8 @@ public class GameServiceTest {
     public void updatePosition2Successfully() {
 
         // get to Position2
-        updateColor2Successfully();
+        setup();
+        statusPosition2(simpleGame);
 
         // create game with chosen position
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -717,7 +832,8 @@ public class GameServiceTest {
     public void updatePosition2OccupiedField() {
 
         // get to Position2
-        updateColor2Successfully();
+        setup();
+        statusPosition2(simpleGame);
 
         // create game with chosen position
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -758,7 +874,8 @@ public class GameServiceTest {
     public void updateMoveSuccessfully() {
 
         // get to Move
-        updatePosition2Successfully();
+        setup();
+        statusMove(simpleGame);
 
         // create game with chosen position
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -806,7 +923,10 @@ public class GameServiceTest {
     public void updateBuildSuccessfully() {
 
         // get to Build
-        updateMoveSuccessfully();
+        setup();
+        statusMove(simpleGame);
+        // move a worker
+        move(simpleGame, simpleGame.getBoard().getFields().get(4), simpleGame.getBoard().getFields().get(3));
 
         // create game with chosen position
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -880,6 +1000,19 @@ public class GameServiceTest {
         Player player = new Player();
         player.setIsGodMode(isGodMode);
         return playerService.createPlayer(player,true);
+    }
+
+    /**
+     * switches who's the current Player
+     * @param game
+     */
+    public void nextTurn(Game game) {
+        for (Player player : game.getPlayers()) {
+            // reverse value
+            player.setIsCurrentPlayer(!player.getIsCurrentPlayer());
+        }
+        // save
+        gameService.saveGame(game);
     }
 
 }

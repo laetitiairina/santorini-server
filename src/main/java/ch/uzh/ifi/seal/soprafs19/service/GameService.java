@@ -513,4 +513,12 @@ public class GameService {
         }
         return fieldToUpdate;
     }
+
+    /**
+     * saves game to DB
+     * @param game
+     */
+    public void saveGame (Game game) {
+        gameRepository.save(game);
+    }
 }

@@ -111,4 +111,8 @@ public class PlayerService {
         player.setIsActive(false);
         playerRepository.save(player);
     }
+
+    public void savePlayer (Player player) {
+        playerRepository.save(player);
+    }
 }
