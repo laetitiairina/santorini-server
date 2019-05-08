@@ -156,10 +156,6 @@ public class GameServiceTest {
         gameService.saveGame(game);
     }
 
-    public void build(Game game, Field on) {
-
-    }
-
     @Test
     public void setInitialGameStatus() {
 
@@ -962,6 +958,109 @@ public class GameServiceTest {
         }
 
         Assert.assertEquals(24, count);
+
+    }
+
+    @Test
+    public void win() {
+        // set up
+        setup();
+        statusMove(simpleGame);
+
+        // change game to final step
+        simpleGame.getBoard().getFields().get(4).setBlocks(2);
+        simpleGame.getBoard().getFields().get(9).setBlocks(3);
+        gameService.saveGame(simpleGame);
+
+        // move worker to level 3 tower
+        // create game with chosen position
+        Game updatedGame = SerializationUtils.clone(simpleGame);
+        Board board = updatedGame.getBoard();
+
+        Worker worker = board.getFields().get(4).getWorker();
+        List<Field> fields = new ArrayList<>();
+
+        // new field
+        fields.add(board.getFields().get(9));
+        fields.get(0).setWorker(worker);
+
+        // old field
+        fields.add(board.getFields().get(4));
+        fields.get(1).setWorker(null);
+
+        board.setFields(fields);
+
+        Assert.assertEquals(2, board.getFields().size());
+
+        // update position of Workers
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
+
+        // Asserts
+        Assert.assertTrue(isSuccessful);
+        Assert.assertEquals(GameStatus.END, simpleGame.getStatus());
+        for (Player player : simpleGame.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                Assert.assertEquals(worker.getPlayer().getId(), player.getId());
+            } else {
+                Assert.assertNotEquals(worker.getPlayer().getId(), player.getId());
+            }
+        }
+
+    }
+
+    @Test
+    public void lose() {
+        // set up
+        setup();
+        statusMove(simpleGame);
+
+        List<Field> fields = simpleGame.getBoard().getFields();
+        // Worker  1 isStuck
+        fields.get(3).setBlocks(2);
+        fields.get(8).setHasDome(true);
+        fields.get(9).setBlocks(3);
+        fields.get(9).setHasDome(true);
+
+        // Worker 2 nearly isStuck
+        fields.get(18).setBlocks(2);
+        fields.get(19).setBlocks(3);
+        fields.get(19).setHasDome(true);
+
+        gameService.saveGame(simpleGame);
+
+        // move worker to dead end
+        // create game with chosen position
+        Game updatedGame = SerializationUtils.clone(simpleGame);
+        Board board = updatedGame.getBoard();
+
+        Worker worker = board.getFields().get(18).getWorker();
+        fields = new ArrayList<>();
+
+        // new field
+        fields.add(board.getFields().get(24));
+        fields.get(0).setWorker(worker);
+
+        // old field
+        fields.add(board.getFields().get(18));
+        fields.get(1).setWorker(null);
+
+        board.setFields(fields);
+
+        Assert.assertEquals(2, board.getFields().size());
+
+        // update position of Workers
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
+
+        // Asserts
+        Assert.assertTrue(isSuccessful);
+        Assert.assertEquals(GameStatus.END, simpleGame.getStatus());
+        for (Player player : simpleGame.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                Assert.assertNotEquals(worker.getPlayer().getId(), player.getId());
+            } else {
+                Assert.assertEquals(worker.getPlayer().getId(), player.getId());
+            }
+        }
 
     }
 

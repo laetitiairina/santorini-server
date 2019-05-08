@@ -51,6 +51,7 @@ public class Player implements Serializable {
     private List<Worker> workers;
 
     // default value is false
+    @Column(nullable = false)
     private boolean isCurrentPlayer = false;
 
     public Long getId() {
