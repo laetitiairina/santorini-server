@@ -25,9 +25,6 @@ public class CheckPolling implements Runnable {
     @Autowired
     private GameService gameService;
 
-    @Autowired
-    private MatchMaker matchMaker;
-
     // 10 seconds
     private int POLL_TIME_MAX = 10000;
 
