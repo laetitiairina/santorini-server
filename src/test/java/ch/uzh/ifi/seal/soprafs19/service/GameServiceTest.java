@@ -792,7 +792,7 @@ public class GameServiceTest {
 
         for (Field field : assertFields) {
             Worker updatedWorker = field.getWorker();
-            if (updatedWorker != worker) {
+            if (updatedWorker == null || !updatedWorker.getId().equals(worker.getId())) {
                 count ++;
             }
         }
