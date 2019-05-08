@@ -69,19 +69,21 @@ public class GetGameTest {
         Player player1 = new Player();
         player1.setIsGodMode(false);
 
-        testPlayer1 = playerService.createPlayer(player1);
+        testPlayer1 = playerService.createPlayer(player1,false);
 
         Player player2 = new Player();
         player2.setIsGodMode(false);
 
-        testPlayer2 = playerService.createPlayer(player2);
+        testPlayer2 = playerService.createPlayer(player2,false);
 
         List<Player> players = new ArrayList<>();
-        players.add(player1);
-        players.add(player2);
+        players.add(testPlayer1);
+        players.add(testPlayer2);
 
-        testGame = new Game(players, 25);
+        testGame = new Game(players, 5);
         gameService.createGame(testGame);
+        playerService.updatePlayer(testPlayer1);
+        playerService.updatePlayer(testPlayer2);
     }
 
     @Test
