@@ -410,16 +410,17 @@ public class GameService {
             // update the blocks and has Dome value of the field
             fieldToUpdate.setBlocks(field.getBlocks());
             fieldToUpdate.setHasDome(field.getHasDome());
+        }
 
-            // set both workers to non-current
-            for (Player player : currentGame.getPlayers()) {
-                if (player.getIsCurrentPlayer()) {
-                    for (Worker worker : player.getWorkers()) {
-                        worker.setIsCurrentWorker(false);
-                    }
+        // set both workers to non-current
+        for (Player player : currentGame.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                for (Worker worker : player.getWorkers()) {
+                    worker.setIsCurrentWorker(false);
                 }
             }
         }
+
         nextTurn(currentGame);
         return currentGame;
     }
@@ -521,5 +522,57 @@ public class GameService {
             }
         }
         return fieldToUpdate;
+    }
+
+    // M3: Fast-forward
+    // TODO: Delete after M3
+    /**
+     * Fast-forward current game
+     * @param currentGame
+     * @return
+     */
+    public boolean fastforwardGame(Game currentGame) {
+        System.out.println("fastforward");
+
+        if(currentGame.getStatus() == GameStatus.END) {
+            return false;
+        }
+
+        // Construct a game state that is near the end
+        Integer[] blocksArr = {0,1,2,1,0, 0,2,3,2,1, 0,2,3,3,2, 1,0,0,2,0, 2,1,2,3,0};
+        Boolean[] hasDomeArr = {false,false,false,false,false, false,false,false,false,false, false,false,true,false,false, false,false,false,false,false, false,false,false,true,false,};
+        Integer[] workerPosArr = {2,18,3,11};
+
+        // Set status
+        if(currentGame.getStatus() == GameStatus.MOVE) {
+            currentGame.setStatus(GameStatus.BUILD);
+        } else {
+            currentGame.setStatus(GameStatus.MOVE);
+        }
+
+        // Set fields
+        for (int i = 0; i < currentGame.getBoard().getFields().size(); i++) {
+            currentGame.getBoard().getFields().get(i).setBlocks(blocksArr[i]);
+            currentGame.getBoard().getFields().get(i).setHasDome(hasDomeArr[i]);
+            currentGame.getBoard().getFields().get(i).setWorker(null);
+        }
+
+        // Set workers
+        for (Player player : currentGame.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                player.getWorkers().get(0).setIsCurrentWorker(true);
+                player.getWorkers().get(1).setIsCurrentWorker(false);
+                currentGame.getBoard().getFields().get(workerPosArr[0]).setWorker(player.getWorkers().get(0));
+                currentGame.getBoard().getFields().get(workerPosArr[1]).setWorker(player.getWorkers().get(1));
+            } else {
+                player.getWorkers().get(0).setIsCurrentWorker(false);
+                player.getWorkers().get(1).setIsCurrentWorker(false);
+                currentGame.getBoard().getFields().get(workerPosArr[2]).setWorker(player.getWorkers().get(0));
+                currentGame.getBoard().getFields().get(workerPosArr[3]).setWorker(player.getWorkers().get(1));
+            }
+        }
+
+        gameRepository.save(currentGame);
+        return true;
     }
 }
