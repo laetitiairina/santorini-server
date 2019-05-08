@@ -127,15 +127,24 @@ public class GameService {
 
         // update the status of the game for pinging
         if (successfullyUpdatedGame != null) {
-            // saves updates to database
-            gameRepository.save(successfullyUpdatedGame);
 
             // increment the status
             if (rules.checkWinCondition(successfullyUpdatedGame)) {
+                // Game ends
                 incrementGameStatus(successfullyUpdatedGame, true);
+
+                // Set players to inactive (for CheckPolling)
+                for (Player player : successfullyUpdatedGame.getPlayers()) {
+                    player.setIsActive(false);
+                }
+
             } else {
                 incrementGameStatus(successfullyUpdatedGame, false);
             }
+
+            // saves updates to database
+            gameRepository.save(successfullyUpdatedGame);
+
             return true;
         } else {
             /*
@@ -457,10 +466,10 @@ public class GameService {
 
     public void abortGame(Game game) {
         // let game end inform front-end of abort
-        game.getPlayers().get(0).setIsCurrentPlayer(false);
-        game.getPlayers().get(1).setIsCurrentPlayer(false);
-        game.getPlayers().get(0).setIsActive(false);
-        game.getPlayers().get(1).setIsActive(false);
+        for (Player player : game.getPlayers()) {
+            player.setIsCurrentPlayer(false);
+            player.setIsActive(false);
+        }
         game.setStatus(GameStatus.END);
         gameRepository.save(game);
     }
