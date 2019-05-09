@@ -4,6 +4,10 @@ import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.entity.Worker;
+import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
+import org.aspectj.apache.bcel.util.Play;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -176,7 +180,12 @@ public class SimpleRuleSet implements IRuleSet {
         return isValid;
     }
 
-    public Boolean checkWinCondition(Game game) {
+    /**
+     * returns winning player or null
+     * @param game
+     * @return
+     */
+    public Player checkWinCondition(Game game) {
 
         // checking for both players
         for (Player player : game.getPlayers()) {
@@ -193,8 +202,7 @@ public class SimpleRuleSet implements IRuleSet {
                     // win condition
                     if ((worker.getField().getBlocks() == 3 && !worker.getField().getHasDome())) {
                         // immediately return
-                        worker.getPlayer().setIsCurrentPlayer(true);
-                        return true;
+                        return player;
                     }
                     // lose condition
                     else if (isWorkerStuck(game, worker)) {
@@ -205,15 +213,15 @@ public class SimpleRuleSet implements IRuleSet {
 
             // if both workers are stuck
             if (stuckWorkers == 2) {
-                // set current Player for front-end
                 for (Player p : game.getPlayers()) {
-                    player.setIsCurrentPlayer(!p.getId().equals(player.getId()));
+                    if (!player.getId().equals(p.getId())) {
+                        return p;
+                    }
                 }
-                return true;
             }
 
         }
-        return false;
+        return null;
     }
 
 
