@@ -250,7 +250,7 @@ public class GameService {
 
         boolean isPlayer = false;
         for (Player player : currentGame.getPlayers()) {
-            if (player.getId().equals(currentPlayer.getId()) && player.getIsCurrentPlayer()) {
+            if (player.getId().equals(currentPlayer.getId())) {
                 isPlayer = true;
             }
         }
