@@ -85,9 +85,6 @@ public class GetGameTest {
 
     @Test
     public void getGameCorrect() throws Exception {
-
-       Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
-
         mvc.perform(get("/games/"+testPlayer1.getGame_id())
                 .contentType("application/json;charset=UTF-8")
                 .header("Token", testPlayer1.getToken()))
@@ -106,9 +103,6 @@ public class GetGameTest {
 
     @Test
     public void getGameNotFound() throws Exception {
-
-        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
-
         mvc.perform(get("/games/122343243")
                 .contentType("application/json;charset=UTF-8")
                 .header("Token", testPlayer1.getToken()))
@@ -119,9 +113,6 @@ public class GetGameTest {
 
     @Test
     public void getGameField() throws Exception {
-
-        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
-
         mvc.perform(get("/games/"+testPlayer1.getGame_id()+"?fields=id")
                 .contentType("application/json;charset=UTF-8")
                 .header("Token", testPlayer1.getToken()))
@@ -136,7 +127,7 @@ public class GetGameTest {
     @Test
     public void stopPolling() throws Exception {
 
-        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
+        long lastPolls = testPlayer1.getLastPollMillis();
 
         mvc.perform(get("/games/"+testPlayer1.getGame_id())
                 .contentType("application/json;charset=UTF-8")
@@ -153,17 +144,9 @@ public class GetGameTest {
                 .andExpect(jsonPath("$.hasMovedUp").value(false))
         ;
 
-        Thread.sleep(40000);
-
-        mvc.perform(get("/games/"+testPlayer1.getGame_id())
-                .contentType("application/json;charset=UTF-8")
-                .header("Token", testPlayer1.getToken()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andExpect(jsonPath("$.players").exists())
-                .andExpect(jsonPath("$.status").value(GameStatus.END.toString()))
-        ;
+        long newPolls = testPlayer2.getLastPollMillis();
+        Assert.assertNotEquals(lastPolls, newPolls);
+        Assert.assertTrue(testPlayer1.getIsActive());
     }
 
 }

@@ -1,14 +1,15 @@
 package ch.uzh.ifi.seal.soprafs19.integration;
 
 import ch.uzh.ifi.seal.soprafs19.Application;
+import ch.uzh.ifi.seal.soprafs19.HelperClass.HelperClass;
 import ch.uzh.ifi.seal.soprafs19.constant.Color;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
-import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.*;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,26 +35,21 @@ public class StartingSimpleGame {
     @Autowired
     private PlayerService playerService;
 
-    private Game simpleGame;
+    private HelperClass helperClass;
 
-    /**
-     * create two players and init game
-     */
-    public void setup() {
-        // creating players and adding to queue for matchmaking
-        // simple
-        Player player1 = newPlayer(false);
-        Player player2 = newPlayer(false);
+    @Before
+    public void before() {
+        this.initHelper();
+    }
 
-        // get the games
-        simpleGame = player1.getGame();
+    public void initHelper() {
+        helperClass = new HelperClass(this.gameService, this.playerService);
     }
 
     @Test
     public void startSimpleGameSuccessfully() {
 
-        setup();
-        Assert.assertEquals(GameStatus.COLOR1, simpleGame.getStatus());
+        Game simpleGame = helperClass.setup(false);
 
         // create game with chosen color
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -68,31 +64,18 @@ public class StartingSimpleGame {
                 playerToBeRemoved = player;
             }
         }
-        Assert.assertTrue(players.remove(playerToBeRemoved));
+        players.remove(playerToBeRemoved);
+
         updatedGame.setPlayers(players);
-        Assert.assertEquals(1, updatedGame.getPlayers().size());
 
         // update color of current player
-        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
-
-        // Asserts
-        Assert.assertTrue(isSuccessful);
-
-        Assert.assertEquals(GameStatus.POSITION1, simpleGame.getStatus());
-
-        for (Player player : simpleGame.getPlayers()) {
-            if (player.getIsCurrentPlayer()) {
-                Assert.assertEquals(Color.BLUE, player.getColor());
-            } else {
-                Assert.assertNull(player.getColor());
-            }
-        }
+        gameService.updateGame(simpleGame, updatedGame);
 
         // create game with chosen position
         updatedGame = SerializationUtils.clone(simpleGame);
         Board board = updatedGame.getBoard();
 
-        // create Workers
+        // get Workers
         Worker worker1 = null;
         Worker worker2 = null;
 
@@ -111,26 +94,8 @@ public class StartingSimpleGame {
         fields.add(board.getFields().get(18));
         board.setFields(fields);
 
-        Assert.assertEquals(2, board.getFields().size());
-
         // update position of Workers
-        isSuccessful = gameService.updateGame(simpleGame, updatedGame);
-
-        // Asserts
-        Assert.assertTrue(isSuccessful);
-        Assert.assertEquals(GameStatus.COLOR2, simpleGame.getStatus());
-
-        List<Field> assertFields = simpleGame.getBoard().getFields();
-        Assert.assertEquals(worker1, assertFields.get(4).getWorker());
-        Assert.assertEquals(worker2, assertFields.get(18).getWorker());
-        int count = 0;
-        for (Field field : assertFields) {
-            Worker worker = field.getWorker();
-            if (worker == null) {
-                count++;
-            }
-        }
-        Assert.assertEquals(23, count);
+        gameService.updateGame(simpleGame, updatedGame);
 
         // create game with chosen color
         updatedGame = SerializationUtils.clone(simpleGame);
@@ -145,76 +110,39 @@ public class StartingSimpleGame {
                 playerToBeRemoved = player;
             }
         }
-        Assert.assertTrue(players.remove(playerToBeRemoved));
+        players.remove(playerToBeRemoved);
+
         updatedGame.setPlayers(players);
-        Assert.assertEquals(1, updatedGame.getPlayers().size());
 
         // update color of current player
-        isSuccessful = gameService.updateGame(simpleGame, updatedGame);
-
-        // Asserts
-        Assert.assertTrue(isSuccessful);
-
-        Assert.assertEquals(GameStatus.POSITION2, simpleGame.getStatus());
-
-        for (Player player : simpleGame.getPlayers()) {
-            if (player.getIsCurrentPlayer()) {
-                Assert.assertEquals(Color.WHITE, player.getColor());
-            } else {
-                Assert.assertEquals(Color.BLUE, player.getColor());
-            }
-        }
+        gameService.updateGame(simpleGame, updatedGame);
 
         // create game with chosen position
         updatedGame = SerializationUtils.clone(simpleGame);
         board = updatedGame.getBoard();
 
-        // create Workers
-        worker1 = null;
-        worker2 = null;
+        // get Workers
+        Worker worker3 = null;
+        Worker worker4 = null;
 
         for (Player player : updatedGame.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
-                worker1 = player.getWorkers().get(0);
-                worker2 = player.getWorkers().get(1);
+                worker3 = player.getWorkers().get(0);
+                worker4 = player.getWorkers().get(1);
             }
         }
 
         // place Workers on two random fields
         fields = new ArrayList<>();
-        board.getFields().get(7).setWorker(worker1);
+        board.getFields().get(7).setWorker(worker3);
         fields.add(board.getFields().get(7));
-        board.getFields().get(23).setWorker(worker2);
+        board.getFields().get(23).setWorker(worker4);
         fields.add(board.getFields().get(23));
         board.setFields(fields);
 
-        Assert.assertEquals(2, board.getFields().size());
-
         // update position of Workers
-        isSuccessful = gameService.updateGame(simpleGame, updatedGame);
+        gameService.updateGame(simpleGame, updatedGame);
 
-        // Asserts
-        Assert.assertTrue(isSuccessful);
-        Assert.assertEquals(GameStatus.MOVE, simpleGame.getStatus());
-
-        assertFields = simpleGame.getBoard().getFields();
-        Assert.assertEquals(worker1, assertFields.get(7).getWorker());
-        Assert.assertEquals(worker2, assertFields.get(23).getWorker());
-        int count1 = 0;
-        int count2 = 0;
-        for (Field field : assertFields) {
-            Worker worker = field.getWorker();
-            if (worker == null) {
-                count1++;
-            } else if (!worker.getId().equals(worker1.getId()) && !worker.getId().equals(worker2.getId())) {
-                count2++;
-            }
-        }
-
-        Assert.assertEquals(21, count1);
-        Assert.assertEquals(2, count2);
-
-        // create game with chosen position
         updatedGame = SerializationUtils.clone(simpleGame);
         board = updatedGame.getBoard();
 
@@ -230,31 +158,9 @@ public class StartingSimpleGame {
 
         board.setFields(fields);
 
-        Assert.assertEquals(2, board.getFields().size());
-
         // update position of Workers
-        isSuccessful = gameService.updateGame(simpleGame, updatedGame);
+        gameService.updateGame(simpleGame, updatedGame);
 
-        // Asserts
-        Assert.assertTrue(isSuccessful);
-        Assert.assertEquals(GameStatus.BUILD, simpleGame.getStatus());
-
-        assertFields = simpleGame.getBoard().getFields();
-        Assert.assertEquals(worker, assertFields.get(3).getWorker());
-        Assert.assertNull(assertFields.get(4).getWorker());
-
-        count = 0;
-
-        for (Field field : assertFields) {
-            Worker updatedWorker = field.getWorker();
-            if (updatedWorker == null || !updatedWorker.getId().equals(worker.getId())) {
-                count++;
-            }
-        }
-
-        Assert.assertEquals(24, count);
-
-        // create game with chosen position
         updatedGame = SerializationUtils.clone(simpleGame);
         board = updatedGame.getBoard();
 
@@ -266,40 +172,49 @@ public class StartingSimpleGame {
 
         board.setFields(fields);
 
-        Assert.assertEquals(1, board.getFields().size());
-
         // update blocks
-        isSuccessful = gameService.updateGame(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
         Assert.assertTrue(isSuccessful);
         Assert.assertEquals(GameStatus.MOVE, simpleGame.getStatus());
 
-        assertFields = simpleGame.getBoard().getFields();
+        List<Field> assertFields = simpleGame.getBoard().getFields();
         long blocks = assertFields.get(8).getBlocks();
         Assert.assertEquals((long) 1, blocks);
 
-        count = 0;
-
+        // only one field has a block
+        int count = 0;
         for (Field field : assertFields) {
             if (field.getBlocks() == 0) {
                 count++;
             }
         }
-
         Assert.assertEquals(24, count);
 
-    }
+        // worker positions
+        Assert.assertEquals(worker1, assertFields.get(3).getWorker());
+        Assert.assertEquals(worker2, assertFields.get(18).getWorker());
+        Assert.assertEquals(worker3, assertFields.get(7).getWorker());
+        Assert.assertEquals(worker4, assertFields.get(23).getWorker());
 
-    /**
-     * creates a new player in the playerRepository
-     *
-     * @param isGodMode
-     * @return Player
-     */
-    public Player newPlayer(Boolean isGodMode) {
-        Player player = new Player();
-        player.setIsGodMode(isGodMode);
-        return playerService.createPlayer(player, true);
+        // empty fields
+        count = 0;
+        for (Field field : assertFields) {
+            Worker w = field.getWorker();
+            if (w == null) {
+                count++;
+            }
+        }
+        Assert.assertEquals(21, count);
+
+        // colors
+        for (Player player : simpleGame.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                Assert.assertEquals(Color.WHITE, player.getColor());
+            } else {
+                Assert.assertEquals(Color.BLUE, player.getColor());
+            }
+        }
     }
 }

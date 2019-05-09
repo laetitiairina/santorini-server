@@ -39,12 +39,6 @@ public class CreatePlayerTest {
     private PlayerRepository playerRepository;
 
     @Autowired
-    private PlayerService playerService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
     private WebApplicationContext wac;
 
     private MockMvc mvc;

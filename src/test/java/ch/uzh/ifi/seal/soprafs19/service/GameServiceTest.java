@@ -212,7 +212,7 @@ public class GameServiceTest {
 
         updatedGame.setPlayers(players);
 
-        // update the two cards
+        // update the start player
         Game result = gameService.setStartPlayer(godGame, updatedGame);
 
         // Asserts
@@ -234,7 +234,7 @@ public class GameServiceTest {
 
         updatedGame.setPlayers(players);
 
-        // update the two cards
+        // update start player
         Game result = gameService.setStartPlayer(godGame, updatedGame);
 
         // Asserts
@@ -250,12 +250,12 @@ public class GameServiceTest {
         Game updatedGame = SerializationUtils.clone(godGame);
 
         List<Player> players = new ArrayList<>();
-        players.add(newPlayer(true));
+        players.add(helperClass.newPlayer(true));
         players.get(0).setIsCurrentPlayer(true);
 
         updatedGame.setPlayers(players);
 
-        // update the two cards
+        // update start player
         Game result = gameService.setStartPlayer(godGame, updatedGame);
 
         // Asserts
@@ -280,9 +280,8 @@ public class GameServiceTest {
                 playerToBeRemoved = player;
             }
         }
-        Assert.assertTrue(players.remove(playerToBeRemoved));
+        players.remove(playerToBeRemoved);
         updatedGame.setPlayers(players);
-        Assert.assertEquals(1, updatedGame.getPlayers().size());
 
         // update color of current player
         Game result = gameService.setColor(simpleGame, updatedGame);
@@ -318,13 +317,13 @@ public class GameServiceTest {
                 player.setColor(Color.BLUE);
             }
         }
-        Assert.assertTrue(players.remove(playerToBeRemoved));
+        players.remove(playerToBeRemoved);
         updatedGame.setPlayers(players);
-        Assert.assertEquals(1, updatedGame.getPlayers().size());
 
         // update color of current player
         Game result = gameService.setColor(simpleGame, updatedGame);
 
+        // Assert
         Assert.assertNull(result);
     }
 
@@ -344,13 +343,13 @@ public class GameServiceTest {
                 playerToBeRemoved = player;
             }
         }
-        Assert.assertTrue(players.remove(playerToBeRemoved));
+        players.remove(playerToBeRemoved);
         updatedGame.setPlayers(players);
-        Assert.assertEquals(1, updatedGame.getPlayers().size());
 
         // update color of current player
         Game result = gameService.setColor(simpleGame, updatedGame);
 
+        // Assert
         Assert.assertNull(result);
     }
 
@@ -382,8 +381,6 @@ public class GameServiceTest {
         board.getFields().get(18).setWorker(worker2);
         fields.add(board.getFields().get(18));
         board.setFields(fields);
-
-        Assert.assertEquals(2, board.getFields().size());
 
         // update position of Workers
         Game result = gameService.setPosition(simpleGame, updatedGame);
@@ -434,8 +431,6 @@ public class GameServiceTest {
         fields.add(board.getFields().get(18));
         board.setFields(fields);
 
-        Assert.assertEquals(2, board.getFields().size());
-
         // update position of Workers
         Game result = gameService.setPosition(simpleGame, updatedGame);
 
@@ -469,8 +464,6 @@ public class GameServiceTest {
         fields.add(board.getFields().get(4));
         board.setFields(fields);
 
-        Assert.assertEquals(1, board.getFields().size());
-
         // update position of Workers
         Game result = gameService.setPosition(simpleGame, updatedGame);
 
@@ -491,8 +484,6 @@ public class GameServiceTest {
         // place Workers on two random fields
         List<Field> fields = new ArrayList<>();
         board.setFields(fields);
-
-        Assert.assertEquals(0, board.getFields().size());
 
         // update position of Workers
         Game result = gameService.setPosition(simpleGame, updatedGame);
@@ -530,8 +521,6 @@ public class GameServiceTest {
         fields.add(board.getFields().get(4));
         board.setFields(fields);
 
-        Assert.assertEquals(2, board.getFields().size());
-
         // update position of Workers
         Game result = gameService.setPosition(simpleGame, updatedGame);
 
@@ -558,9 +547,8 @@ public class GameServiceTest {
                 playerToBeRemoved = player;
             }
         }
-        Assert.assertTrue(players.remove(playerToBeRemoved));
+        players.remove(playerToBeRemoved);
         updatedGame.setPlayers(players);
-        Assert.assertEquals(1, updatedGame.getPlayers().size());
 
         // update color of current player
         Game result = gameService.setColor(simpleGame, updatedGame);
@@ -597,9 +585,8 @@ public class GameServiceTest {
                 playerToBeRemoved = player;
             }
         }
-        Assert.assertTrue(players.remove(playerToBeRemoved));
+        players.remove(playerToBeRemoved);
         updatedGame.setPlayers(players);
-        Assert.assertEquals(1, updatedGame.getPlayers().size());
 
         // update color of current player
         Game result = gameService.setColor(simpleGame, updatedGame);
@@ -636,8 +623,6 @@ public class GameServiceTest {
         board.getFields().get(23).setWorker(worker2);
         fields.add(board.getFields().get(23));
         board.setFields(fields);
-
-        Assert.assertEquals(2, board.getFields().size());
 
         // update position of Workers
         Game result = gameService.setPosition(simpleGame, updatedGame);
@@ -693,8 +678,6 @@ public class GameServiceTest {
         fields.add(board.getFields().get(18));
         board.setFields(fields);
 
-        Assert.assertEquals(2, board.getFields().size());
-
         // update position of Workers
         Game result = gameService.setPosition(simpleGame, updatedGame);
 
@@ -723,8 +706,6 @@ public class GameServiceTest {
         fields.get(1).setWorker(null);
 
         board.setFields(fields);
-
-        Assert.assertEquals(2, board.getFields().size());
 
         // update position of Workers
         Game result = gameService.move(simpleGame, updatedGame);
@@ -769,8 +750,6 @@ public class GameServiceTest {
 
         board.setFields(fields);
 
-        Assert.assertEquals(1, board.getFields().size());
-
         // update blocks
         Game result = gameService.move(simpleGame, updatedGame);
 
@@ -781,7 +760,6 @@ public class GameServiceTest {
     @Test
     public void authenticateTokenSuccessfully(){
 
-        //get to end of round
         Game simpleGame = helperClass.setup(false);
 
         //create game with chosen move position
@@ -797,35 +775,27 @@ public class GameServiceTest {
 
         String token1 = currentPlayer.getToken();
         boolean tokenOnCurrentPlayer = gameService.checkPlayerAuthentication(simpleGame, token1);
+
         //Asserts
         Assert.assertNotNull(token1);
         Assert.assertTrue(tokenOnCurrentPlayer);
 
     }
 
-    /**
-     * creates a new player in the playerRepository
-     *
-     * @param isGodMode
-     * @return Player
-     */
-    public Player newPlayer(Boolean isGodMode) {
-        Player player = new Player();
-        player.setIsGodMode(isGodMode);
-        return playerService.createPlayer(player,true);
-    }
+    @Test
+    public void abortGame() {
+        // setup
+        Game simpleGame = helperClass.setup(false);
 
-    /**
-     * switches who's the current Player
-     * @param game
-     */
-    public void nextTurn(Game game) {
-        for (Player player : game.getPlayers()) {
-            // reverse value
-            player.setIsCurrentPlayer(!player.getIsCurrentPlayer());
+        // abort game
+        gameService.abortGame(simpleGame);
+
+        // Asserts
+        Assert.assertEquals(GameStatus.END, simpleGame.getStatus());
+        for (Player player : simpleGame.getPlayers()) {
+            Assert.assertFalse(player.getIsCurrentPlayer());
+            Assert.assertFalse(player.getIsActive());
         }
-        // save
-        gameService.saveGame(game);
     }
 
 }

@@ -1,7 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.integration;
 
 import ch.uzh.ifi.seal.soprafs19.Application;
-import ch.uzh.ifi.seal.soprafs19.constant.Color;
+import ch.uzh.ifi.seal.soprafs19.HelperClass.HelperClass;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.*;
@@ -9,6 +9,7 @@ import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,27 +35,21 @@ public class StartingGodGame {
     @Autowired
     private PlayerService playerService;
 
-    private Game godGame;
+    private HelperClass helperClass;
 
-    /**
-     * create two players and init game
-     */
-    public void setup() {
-        // creating players and adding to queue for matchmaking
-        // god
-        Player player3 = newPlayer(true);
-        Player player4 = newPlayer(true);
+    @Before
+    public void before() {
+        this.initHelper();
+    }
 
-        // get the games
-        godGame = player3.getGame();
+    public void initHelper() {
+        helperClass = new HelperClass(this.gameService, this.playerService);
     }
 
     @Test
     public void startGodGameGameSuccessfully() {
 
-        setup();
-        
-        Assert.assertEquals(GameStatus.CARDS1, godGame.getStatus());
+        Game godGame = helperClass.setup(true);
 
         // select the two cards
         Game updatedGame = SerializationUtils.clone(godGame);
@@ -69,16 +64,9 @@ public class StartingGodGame {
         updatedGame.setCards(cards);
 
         // update the two cards
-        boolean isSuccessful = gameService.updateGame(godGame, updatedGame);
+        gameService.updateGame(godGame, updatedGame);
 
-        // Asserts
-        Assert.assertTrue(isSuccessful);
-
-        Assert.assertEquals(GameStatus.CARDS2, godGame.getStatus());
-        Assert.assertEquals(cards, godGame.getCards());
-
-
-        // select the two cards
+        // select a card
         updatedGame = SerializationUtils.clone(godGame);
         List<Player> players = new ArrayList<>();
 
@@ -91,13 +79,7 @@ public class StartingGodGame {
         updatedGame.setPlayers(players);
 
         // update the two cards
-        isSuccessful = gameService.updateGame(godGame, updatedGame);
-
-        // Asserts
-        Assert.assertTrue(isSuccessful);
-        Assert.assertEquals(GameStatus.STARTPLAYER, godGame.getStatus());
-        Assert.assertEquals(2, godGame.getCards().size());
-        Assert.assertEquals(2, godGame.getPlayers().size());
+        gameService.updateGame(godGame, updatedGame);
 
         // select the player
         updatedGame = SerializationUtils.clone(godGame);
@@ -105,28 +87,26 @@ public class StartingGodGame {
         players = new ArrayList<>();
         players.add(updatedGame.getPlayers().get(0));
         players.get(0).setIsCurrentPlayer(true);
+        long playerId = players.get(0).getId();
 
         updatedGame.setPlayers(players);
 
-        // update the two cards
-        isSuccessful = gameService.updateGame(godGame, updatedGame);
+        // update the player
+        boolean isSuccessful = gameService.updateGame(godGame, updatedGame);
 
         // Asserts
         Assert.assertTrue(isSuccessful);
         Assert.assertEquals(GameStatus.COLOR1, godGame.getStatus());
+        Assert.assertEquals(cards, godGame.getCards());
         Assert.assertEquals(2, godGame.getPlayers().size());
-
-    }
-
-    /**
-     * creates a new player in the playerRepository
-     *
-     * @param isGodMode
-     * @return Player
-     */
-    public Player newPlayer(Boolean isGodMode) {
-        Player player = new Player();
-        player.setIsGodMode(isGodMode);
-        return playerService.createPlayer(player, true);
+        Assert.assertEquals(SimpleGodCard.APOLLO, godGame.getPlayers().get(1).getCard());
+        Assert.assertEquals(SimpleGodCard.ARTEMIS, godGame.getPlayers().get(0).getCard());
+        for (Player player : godGame.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                Assert.assertTrue(playerId == player.getId());
+            } else {
+                Assert.assertFalse(playerId == player.getId());
+            }
+        }
     }
 }

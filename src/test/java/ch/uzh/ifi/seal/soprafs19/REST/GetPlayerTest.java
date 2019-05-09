@@ -48,8 +48,6 @@ public class GetPlayerTest {
 
     private MockMvc mvc;
 
-    private User testUser;
-
     private Player testPlayer;
 
     @Before
@@ -64,7 +62,6 @@ public class GetPlayerTest {
 
     @Test
     public void getPlayerCorrect() throws Exception {
-
         mvc.perform(get("/players/"+testPlayer.getId()))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -74,22 +71,18 @@ public class GetPlayerTest {
                 .andExpect(jsonPath("$.card").isEmpty())
                 .andExpect(jsonPath("$.color").isEmpty())
                 ;
-
     }
 
     @Test
     public void getPlayerNotFound() throws Exception {
-
         mvc.perform(get("/players/1232421"))
                 .andDo(print())
                 .andExpect(status().isNotFound())
         ;
-
     }
 
     @Test
     public void getPlayerField() throws Exception {
-
         mvc.perform(get("/players/"+testPlayer.getId()+"?fields=id"))
                 .andDo(print())
                 .andExpect(status().isOk())

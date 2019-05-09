@@ -86,14 +86,20 @@ public class UpdateGameTest {
     }
 
     @Test
-    public void updateGameCorrect() throws Exception {
-
+    public void setupTest() {
         Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
         Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
 
         Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
 
         Assert.assertTrue(game.getStatus() == GameStatus.CARDS1);
+
+    }
+
+    @Test
+    public void updateGameCorrect() throws Exception {
+
+        Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
 
         mvc.perform(put("/games/" + testPlayer1.getGame_id())
                 .contentType("application/json;charset=UTF-8")
@@ -112,12 +118,7 @@ public class UpdateGameTest {
     @Test
     public void updateGameNotFound() throws Exception {
 
-        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
-        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
-
         Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
-
-        Assert.assertTrue(game.getStatus() == GameStatus.CARDS1);
 
         // wrong Id
         mvc.perform(put("/games/123142")
@@ -131,12 +132,7 @@ public class UpdateGameTest {
     @Test
     public void updateGameBadRequest() throws Exception {
 
-        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
-        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
-
         Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
-
-        Assert.assertTrue(game.getStatus() == GameStatus.CARDS1);
 
         // wrong id in body
         mvc.perform(put("/games/" + testPlayer1.getGame_id())
@@ -158,12 +154,7 @@ public class UpdateGameTest {
     @Test
     public void updateGameForbidden() throws Exception {
 
-        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
-        Assert.assertNotNull(gameRepository.findById(testPlayer2.getGame_id()));
-
         Game game = gameRepository.findById(testPlayer1.getGame_id()).get();
-
-        Assert.assertTrue(game.getStatus() == GameStatus.CARDS1);
 
         mvc.perform(put("/games/" + testPlayer1.getGame_id())
                 .contentType("application/json;charset=UTF-8")
