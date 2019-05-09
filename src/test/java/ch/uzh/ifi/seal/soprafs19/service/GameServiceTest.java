@@ -1029,7 +1029,6 @@ public class GameServiceTest {
         gameService.saveGame(simpleGame);
 
         // move worker to dead end
-        // create game with chosen position
         Game updatedGame = SerializationUtils.clone(simpleGame);
         Board board = updatedGame.getBoard();
 

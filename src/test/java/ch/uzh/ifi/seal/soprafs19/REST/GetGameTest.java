@@ -153,7 +153,7 @@ public class GetGameTest {
                 .andExpect(jsonPath("$.hasMovedUp").value(false))
         ;
 
-        Thread.sleep(15000);
+        Thread.sleep(40000);
 
         mvc.perform(get("/games/"+testPlayer1.getGame_id())
                 .contentType("application/json;charset=UTF-8")
