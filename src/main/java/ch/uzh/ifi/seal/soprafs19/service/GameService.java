@@ -12,6 +12,7 @@ import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs19.rules.IRuleSet;
 import ch.uzh.ifi.seal.soprafs19.rules.RuleFactory;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -247,7 +248,17 @@ public class GameService {
         Player currentPlayer = updatedGame.getPlayers().get(0);
         List<Player> players = currentGame.getPlayers();
 
-        if (currentPlayer.getIsCurrentPlayer()) { // && currentPlayer.getGame().getId() == currentGame.getId()
+        boolean isPlayer = false;
+        for (Player player : currentGame.getPlayers()) {
+            if (player.getId().equals(currentPlayer.getId()) && player.getIsCurrentPlayer()) {
+                isPlayer = true;
+            }
+        }
+        if (!isPlayer) {
+            return null;
+        }
+
+        if (currentPlayer.getIsCurrentPlayer()) {
             long id = currentPlayer.getId();
             currentPlayer = playerRepository.findById(id);
 
@@ -298,6 +309,7 @@ public class GameService {
      * @return
      */
     public Game setPosition(Game currentGame, Game updatedGame) {
+        Game backUp = SerializationUtils.clone(currentGame);
         List<Long> workerIds = new ArrayList<>();
 
         for (Field updatedField : updatedGame.getBoard().getFields()) {
@@ -325,6 +337,7 @@ public class GameService {
             nextTurn(currentGame);
             return currentGame;
         } else {
+            currentGame = backUp;
             return null;
         }
     }

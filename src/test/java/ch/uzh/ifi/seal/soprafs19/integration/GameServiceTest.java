@@ -1,4 +1,4 @@
-package ch.uzh.ifi.seal.soprafs19.service;
+package ch.uzh.ifi.seal.soprafs19.integration;
 
 
 import ch.uzh.ifi.seal.soprafs19.Application;
@@ -7,6 +7,8 @@ import ch.uzh.ifi.seal.soprafs19.constant.Color;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.*;
+import ch.uzh.ifi.seal.soprafs19.service.GameService;
+import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,16 +51,6 @@ public class GameServiceTest {
     }
 
     @Test
-    public void setInitialGameStatus() {
-
-        Game simpleGame = helperClass.setup(false);
-        Game godGame = helperClass.setup(true);
-
-        Assert.assertEquals(GameStatus.COLOR1, simpleGame.getStatus());
-        Assert.assertEquals(GameStatus.CARDS1, godGame.getStatus());
-    }
-
-    @Test
     public void updateCards1Successfully() {
 
         Game godGame = helperClass.setup(true);
@@ -76,11 +68,14 @@ public class GameServiceTest {
         updatedGame.setCards(cards);
 
         // update the two cards
-        Game result = gameService.setCards1(godGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(godGame, updatedGame);
 
         // Asserts
-        Assert.assertNotNull(result);
-        Assert.assertEquals(cards, result.getCards());
+        Assert.assertTrue(isSuccessful);
+
+        Assert.assertEquals(GameStatus.CARDS2, godGame.getStatus());
+        Assert.assertEquals(cards, godGame.getCards());
+
     }
 
     @Test
@@ -98,10 +93,13 @@ public class GameServiceTest {
         updatedGame.setCards(cards);
 
         // update the two cards
-        Game result = gameService.setCards1(godGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(godGame, updatedGame);
 
         // Asserts
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.CARDS1, godGame.getStatus());
+        Assert.assertNull(godGame.getCards());
+
     }
 
     @Test
@@ -118,10 +116,13 @@ public class GameServiceTest {
         updatedGame.setCards(cards);
 
         // update the two cards
-        Game result = gameService.setCards1(godGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(godGame, updatedGame);
 
         // Asserts
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.CARDS1, godGame.getStatus());
+        Assert.assertNull(godGame.getCards());
+
     }
 
     @Test
@@ -142,12 +143,14 @@ public class GameServiceTest {
         updatedGame.setPlayers(players);
 
         // update the two cards
-        Game result = gameService.setCards2(godGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(godGame, updatedGame);
 
         // Asserts
-        Assert.assertNotNull(result);
-        Assert.assertEquals(2, result.getCards().size());
-        Assert.assertEquals(2, result.getPlayers().size());
+        Assert.assertTrue(isSuccessful);
+        Assert.assertEquals(GameStatus.STARTPLAYER, godGame.getStatus());
+        Assert.assertEquals(2, godGame.getCards().size());
+        Assert.assertEquals(2, godGame.getPlayers().size());
+
     }
 
     @Test
@@ -168,10 +171,14 @@ public class GameServiceTest {
         updatedGame.setPlayers(players);
 
         // update the two cards
-        Game result = gameService.setCards2(godGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(godGame, updatedGame);
 
         // Asserts
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.CARDS2, godGame.getStatus());
+        Assert.assertNull(godGame.getPlayers().get(0).getCard());
+        Assert.assertNull(godGame.getPlayers().get(1).getCard());
+
     }
 
     @Test
@@ -192,10 +199,14 @@ public class GameServiceTest {
         updatedGame.setPlayers(players);
 
         // update the two cards
-        Game result = gameService.setCards2(godGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(godGame, updatedGame);
 
         // Asserts
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.CARDS2, godGame.getStatus());
+        Assert.assertNull(godGame.getPlayers().get(0).getCard());
+        Assert.assertNull(godGame.getPlayers().get(1).getCard());
+
     }
 
     @Test
@@ -213,11 +224,13 @@ public class GameServiceTest {
         updatedGame.setPlayers(players);
 
         // update the two cards
-        Game result = gameService.setStartPlayer(godGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(godGame, updatedGame);
 
         // Asserts
-        Assert.assertNotNull(result);
-        Assert.assertEquals(2, result.getPlayers().size());
+        Assert.assertTrue(isSuccessful);
+        Assert.assertEquals(GameStatus.COLOR1, godGame.getStatus());
+        Assert.assertEquals(2, godGame.getPlayers().size());
+
     }
 
     @Test
@@ -235,10 +248,13 @@ public class GameServiceTest {
         updatedGame.setPlayers(players);
 
         // update the two cards
-        Game result = gameService.setStartPlayer(godGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(godGame, updatedGame);
 
         // Asserts
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.STARTPLAYER, godGame.getStatus());
+        Assert.assertEquals(2, godGame.getPlayers().size());
+
     }
 
     @Test
@@ -256,10 +272,12 @@ public class GameServiceTest {
         updatedGame.setPlayers(players);
 
         // update the two cards
-        Game result = gameService.setStartPlayer(godGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(godGame, updatedGame);
 
         // Asserts
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.STARTPLAYER, godGame.getStatus());
+        Assert.assertEquals(2, godGame.getPlayers().size());
     }
 
     @Test
@@ -285,10 +303,12 @@ public class GameServiceTest {
         Assert.assertEquals(1, updatedGame.getPlayers().size());
 
         // update color of current player
-        Game result = gameService.setColor(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
-        Assert.assertNotNull(result);
+        Assert.assertTrue(isSuccessful);
+
+        Assert.assertEquals(GameStatus.POSITION1, simpleGame.getStatus());
 
         for (Player player : simpleGame.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
@@ -323,9 +343,10 @@ public class GameServiceTest {
         Assert.assertEquals(1, updatedGame.getPlayers().size());
 
         // update color of current player
-        Game result = gameService.setColor(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.COLOR1, simpleGame.getStatus());
     }
 
     @Test
@@ -349,9 +370,10 @@ public class GameServiceTest {
         Assert.assertEquals(1, updatedGame.getPlayers().size());
 
         // update color of current player
-        Game result = gameService.setColor(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.COLOR1, simpleGame.getStatus());
     }
 
     @Test
@@ -386,10 +408,11 @@ public class GameServiceTest {
         Assert.assertEquals(2, board.getFields().size());
 
         // update position of Workers
-        Game result = gameService.setPosition(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
-        Assert.assertNotNull(result);
+        Assert.assertTrue(isSuccessful);
+        Assert.assertEquals(GameStatus.COLOR2, simpleGame.getStatus());
 
         List<Field> assertFields = simpleGame.getBoard().getFields();
         Assert.assertEquals(worker1, assertFields.get(4).getWorker());
@@ -437,10 +460,12 @@ public class GameServiceTest {
         Assert.assertEquals(2, board.getFields().size());
 
         // update position of Workers
-        Game result = gameService.setPosition(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.POSITION1, simpleGame.getStatus());
+
     }
 
     @Test
@@ -472,10 +497,12 @@ public class GameServiceTest {
         Assert.assertEquals(1, board.getFields().size());
 
         // update position of Workers
-        Game result = gameService.setPosition(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.POSITION1, simpleGame.getStatus());
+
     }
 
     @Test
@@ -495,10 +522,12 @@ public class GameServiceTest {
         Assert.assertEquals(0, board.getFields().size());
 
         // update position of Workers
-        Game result = gameService.setPosition(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.POSITION1, simpleGame.getStatus());
+
     }
 
     @Test
@@ -533,10 +562,25 @@ public class GameServiceTest {
         Assert.assertEquals(2, board.getFields().size());
 
         // update position of Workers
-        Game result = gameService.setPosition(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.POSITION1, simpleGame.getStatus());
+        List<Long> checkFields = new ArrayList<>();
+        for (Player player : simpleGame.getPlayers()) {
+            for (Worker worker : player.getWorkers()) {
+                if (worker.getField() == null) {
+                    checkFields.add((long) fields.size() * -1);
+                }
+                else if (!checkFields.contains(worker.getField().getId())) {
+                    checkFields.add(worker.getField().getId());
+                    System.out.println(worker.getField().getId());
+                }
+            }
+        }
+        Assert.assertEquals(4, checkFields.size());
+
     }
 
     @Test
@@ -563,12 +607,14 @@ public class GameServiceTest {
         Assert.assertEquals(1, updatedGame.getPlayers().size());
 
         // update color of current player
-        Game result = gameService.setColor(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
-        Assert.assertNotNull(result);
+        Assert.assertTrue(isSuccessful);
 
-        for (Player player : result.getPlayers()) {
+        Assert.assertEquals(GameStatus.POSITION2, simpleGame.getStatus());
+
+        for (Player player : simpleGame.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
                 Assert.assertEquals(Color.WHITE, player.getColor());
             } else {
@@ -602,10 +648,12 @@ public class GameServiceTest {
         Assert.assertEquals(1, updatedGame.getPlayers().size());
 
         // update color of current player
-        Game result = gameService.setColor(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.COLOR2, simpleGame.getStatus());
+
     }
 
     @Test
@@ -640,10 +688,11 @@ public class GameServiceTest {
         Assert.assertEquals(2, board.getFields().size());
 
         // update position of Workers
-        Game result = gameService.setPosition(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
-        Assert.assertNotNull(result);
+        Assert.assertTrue(isSuccessful);
+        Assert.assertEquals(GameStatus.MOVE, simpleGame.getStatus());
 
         List<Field> assertFields = simpleGame.getBoard().getFields();
         Assert.assertEquals(worker1, assertFields.get(7).getWorker());
@@ -696,10 +745,12 @@ public class GameServiceTest {
         Assert.assertEquals(2, board.getFields().size());
 
         // update position of Workers
-        Game result = gameService.setPosition(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
-        Assert.assertNull(result);
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(GameStatus.POSITION2, simpleGame.getStatus());
+
     }
 
     @Test
@@ -727,12 +778,13 @@ public class GameServiceTest {
         Assert.assertEquals(2, board.getFields().size());
 
         // update position of Workers
-        Game result = gameService.move(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
-        Assert.assertNotNull(result);
+        Assert.assertTrue(isSuccessful);
+        Assert.assertEquals(GameStatus.BUILD, simpleGame.getStatus());
 
-        List<Field> assertFields = result.getBoard().getFields();
+        List<Field> assertFields = simpleGame.getBoard().getFields();
         Assert.assertEquals(worker, assertFields.get(3).getWorker());
         Assert.assertNull(assertFields.get(4).getWorker());
 
@@ -772,10 +824,126 @@ public class GameServiceTest {
         Assert.assertEquals(1, board.getFields().size());
 
         // update blocks
-        Game result = gameService.move(simpleGame, updatedGame);
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
 
         // Asserts
-        Assert.assertNull(result);
+        Assert.assertTrue(isSuccessful);
+        Assert.assertEquals(GameStatus.MOVE, simpleGame.getStatus());
+
+        List<Field> assertFields = simpleGame.getBoard().getFields();
+        long blocks = assertFields.get(8).getBlocks();
+        Assert.assertEquals((long) 1, blocks);
+
+        int count = 0;
+
+        for (Field field : assertFields) {
+            if (field.getBlocks() == 0) {
+                count ++;
+            }
+        }
+
+        Assert.assertEquals(24, count);
+
+    }
+
+    @Test
+    public void win() {
+        // set up
+        Game simpleGame = helperClass.statusMove(false);
+
+        // change game to final step
+        simpleGame.getBoard().getFields().get(4).setBlocks(2);
+        simpleGame.getBoard().getFields().get(9).setBlocks(3);
+        gameService.saveGame(simpleGame);
+
+        // move worker to level 3 tower
+        // create game with chosen position
+        Game updatedGame = SerializationUtils.clone(simpleGame);
+        Board board = updatedGame.getBoard();
+
+        Worker worker = board.getFields().get(4).getWorker();
+        List<Field> fields = new ArrayList<>();
+
+        // new field
+        fields.add(board.getFields().get(9));
+        fields.get(0).setWorker(worker);
+
+        // old field
+        fields.add(board.getFields().get(4));
+        fields.get(1).setWorker(null);
+
+        board.setFields(fields);
+
+        Assert.assertEquals(2, board.getFields().size());
+
+        // update position of Workers
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
+
+        // Asserts
+        Assert.assertTrue(isSuccessful);
+        Assert.assertEquals(GameStatus.END, simpleGame.getStatus());
+        for (Player player : simpleGame.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                Assert.assertEquals(worker.getPlayer().getId(), player.getId());
+            } else {
+                Assert.assertNotEquals(worker.getPlayer().getId(), player.getId());
+            }
+        }
+
+    }
+
+    @Test
+    public void lose() {
+        // set up
+        Game simpleGame = helperClass.statusMove(false);
+
+        List<Field> fields = simpleGame.getBoard().getFields();
+        // Worker  1 isStuck
+        fields.get(3).setBlocks(2);
+        fields.get(8).setHasDome(true);
+        fields.get(9).setBlocks(3);
+        fields.get(9).setHasDome(true);
+
+        // Worker 2 nearly isStuck
+        fields.get(18).setBlocks(2);
+        fields.get(19).setBlocks(3);
+        fields.get(19).setHasDome(true);
+
+        gameService.saveGame(simpleGame);
+
+        // move worker to dead end
+        Game updatedGame = SerializationUtils.clone(simpleGame);
+        Board board = updatedGame.getBoard();
+
+        Worker worker = board.getFields().get(18).getWorker();
+        fields = new ArrayList<>();
+
+        // new field
+        fields.add(board.getFields().get(24));
+        fields.get(0).setWorker(worker);
+
+        // old field
+        fields.add(board.getFields().get(18));
+        fields.get(1).setWorker(null);
+
+        board.setFields(fields);
+
+        Assert.assertEquals(2, board.getFields().size());
+
+        // update position of Workers
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
+
+        // Asserts
+        Assert.assertTrue(isSuccessful);
+        Assert.assertEquals(GameStatus.END, simpleGame.getStatus());
+        for (Player player : simpleGame.getPlayers()) {
+            if (player.getIsCurrentPlayer()) {
+                Assert.assertNotEquals(worker.getPlayer().getId(), player.getId());
+            } else {
+                Assert.assertEquals(worker.getPlayer().getId(), player.getId());
+            }
+        }
+
     }
 
     @Test
@@ -829,4 +997,3 @@ public class GameServiceTest {
     }
 
 }
-
