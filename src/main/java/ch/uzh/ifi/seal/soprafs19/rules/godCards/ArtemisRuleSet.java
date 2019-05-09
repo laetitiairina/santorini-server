@@ -136,7 +136,7 @@ public class ArtemisRuleSet extends SimpleRuleSet {
                                 if (blockAfter >= 0 && blockAfter <= 3) {
 
                                     //check if blocks in after field is maximum 1 higher
-                                    if ((blockAfter <= blockBefore + 1)) {
+                                    if ((blockAfter <= blockBefore + 2)) {
                                         isValid = true;
                                     }
                                 }
