@@ -156,10 +156,6 @@ public class GameServiceTest {
         gameService.saveGame(game);
     }
 
-    public void build(Game game, Field on) {
-
-    }
-
     @Test
     public void setInitialGameStatus() {
 

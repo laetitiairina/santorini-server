@@ -50,9 +50,6 @@ public class GetGameTest {
     private PlayerService playerService;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private WebApplicationContext wac;
 
     private MockMvc mvc;
@@ -134,6 +131,39 @@ public class GetGameTest {
                 .andExpect(jsonPath("$.id").value(testPlayer1.getGame_id()))
                 .andExpect(jsonPath("$.board").doesNotExist())
         ;
+    }
+
+    @Test
+    public void stopPolling() throws Exception {
+
+        Assert.assertNotNull(gameRepository.findById(testPlayer1.getGame_id()));
+
+        mvc.perform(get("/games/"+testPlayer1.getGame_id())
+                .contentType("application/json;charset=UTF-8")
+                .header("Token", testPlayer1.getToken()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.id").value(testPlayer1.getGame_id()))
+                .andExpect(jsonPath("$.board").exists())
+                .andExpect(jsonPath("$.players").exists())
+                .andExpect(jsonPath("$.cards").isEmpty())
+                .andExpect(jsonPath("$.isGodMode").value(testPlayer1.getIsGodMode()))
+                .andExpect(jsonPath("$.status").value(GameStatus.COLOR1.toString()))
+                .andExpect(jsonPath("$.hasMovedUp").value(false))
+        ;
+
+        Thread.sleep(15000);
+
+        mvc.perform(get("/games/"+testPlayer1.getGame_id())
+                .contentType("application/json;charset=UTF-8")
+                .header("Token", testPlayer1.getToken()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"))
+                .andExpect(jsonPath("$.players").exists())
+                .andExpect(jsonPath("$.status").value(GameStatus.END.toString()))
         ;
     }
+
 }

@@ -53,7 +53,7 @@ public class Board implements Serializable {
 
 		this.game = game;
 
-		this.fields = new ArrayList<Field>();
+		this.fields = new ArrayList<>();
 
 		for (int i = 0; i < numberOfRows; i++) {
 			for (int j = 0; j < numberOfRows; j++)
