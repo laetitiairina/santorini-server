@@ -309,35 +309,42 @@ public class GameService {
      * @return
      */
     public Game setPosition(Game currentGame, Game updatedGame) {
-        Game backUp = SerializationUtils.clone(currentGame);
-        List<Long> workerIds = new ArrayList<>();
+
+        List<Worker> workers = new ArrayList<>();
+        List<Field> fields = new ArrayList<>();
 
         for (Field updatedField : updatedGame.getBoard().getFields()) {
 
             // find field in back-end game
             Field currentField = getFieldToUpdate(currentGame, updatedField);
 
-            if (currentField != null && currentField.getWorker() == null) {
+            // field is valid & empty
+            if (currentField != null && currentField.getWorker() == null
+                    // not same field
+                    && (fields.size() == 0 || !fields.get(0).equals(currentField))) {
 
-                // only works if it's the current Player
                 for (Player player : currentGame.getPlayers()) {
+                    // only works if it's the current Player
                     if (player.getIsCurrentPlayer()) {
                         for (Worker worker : player.getWorkers()) {
                             if (worker.getId().equals(updatedField.getWorker().getId())) {
-                                currentField.setWorker(worker);
-                                workerIds.add(worker.getId());
+                                fields.add(currentField);
+                                workers.add(worker);
                             }
                         }
                     }
                 }
             }
         }
+
         // both fields need to be valid and two different workers have to be placed on them
-        if (workerIds.size() == 2 && !workerIds.get(0).equals(workerIds.get(1))) {
+        if (workers.size() == 2 && !workers.get(0).getId().equals(workers.get(1).getId())
+                && fields.size() == 2 && !fields.get(0).getId().equals(fields.get(1).getId())) {
+            fields.get(0).setWorker(workers.get(0));
+            fields.get(1).setWorker(workers.get(1));
             nextTurn(currentGame);
             return currentGame;
         } else {
-            currentGame = backUp;
             return null;
         }
     }
