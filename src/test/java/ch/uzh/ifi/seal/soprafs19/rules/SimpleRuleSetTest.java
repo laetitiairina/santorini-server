@@ -3,17 +3,15 @@ package ch.uzh.ifi.seal.soprafs19.rules;
 import ch.uzh.ifi.seal.soprafs19.Application;
 import ch.uzh.ifi.seal.soprafs19.constant.Color;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
-import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.*;
-import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
-import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.internal.util.reflection.Fields;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -32,16 +30,27 @@ import java.util.List;
 @SpringBootTest(classes = Application.class)
 public class SimpleRuleSetTest {
 
+    public SimpleRuleSetTest() {
+        this.ruleSet = new SimpleRuleSet();
+    }
+
     @Autowired
     private GameService gameService;
 
-    @Autowired
-    private SimpleRuleSet simpleRuleSet;
+    protected SimpleRuleSet ruleSet;
 
     @Autowired
     private PlayerService playerService;
 
-    private Game simpleGame;
+    protected Game game;
+
+
+    @Before
+    public void before() {
+        setup();
+        statusMove(game);
+    }
+
 
     @Test
     public void moveWorkerSuccessfully() {
@@ -49,10 +58,10 @@ public class SimpleRuleSetTest {
         int[] indexes = {3, 8, 9};
         for (int i : indexes) {
             setup();
-            statusMove(simpleGame);
+            statusMove(game);
 
             // create game with chosen position
-            Game updatedGame = SerializationUtils.clone(simpleGame);
+            Game updatedGame = SerializationUtils.clone(game);
             Board board = updatedGame.getBoard();
 
             Worker worker = board.getFields().get(4).getWorker();
@@ -73,7 +82,7 @@ public class SimpleRuleSetTest {
             Assert.assertEquals(2, board.getFields().size());
 
             // update position of Workers
-            boolean isSuccessful = simpleRuleSet.checkMovePhase(simpleGame, updatedGame);
+            boolean isSuccessful = ruleSet.checkMovePhase(game, updatedGame);
 
             // Asserts
             Assert.assertTrue(isSuccessful);
@@ -83,11 +92,8 @@ public class SimpleRuleSetTest {
     @Test
     public void moveWorker2Fields() {
 
-        setup();
-        statusMove(simpleGame);
-
         // create game with chosen position
-        Game updatedGame = SerializationUtils.clone(simpleGame);
+        Game updatedGame = SerializationUtils.clone(game);
         Board board = updatedGame.getBoard();
 
         Worker worker = board.getFields().get(4).getWorker();
@@ -108,7 +114,7 @@ public class SimpleRuleSetTest {
         Assert.assertEquals(2, board.getFields().size());
 
         // update position of Workers
-        boolean isSuccessful = simpleRuleSet.checkMovePhase(simpleGame, updatedGame);
+        boolean isSuccessful = ruleSet.checkMovePhase(game, updatedGame);
 
         // Asserts
         Assert.assertFalse(isSuccessful);
@@ -117,11 +123,8 @@ public class SimpleRuleSetTest {
     @Test
     public void moveWorkerInvalidField() {
 
-        setup();
-        statusMove(simpleGame);
-
         // create game with chosen position
-        Game updatedGame = SerializationUtils.clone(simpleGame);
+        Game updatedGame = SerializationUtils.clone(game);
         Board board = updatedGame.getBoard();
 
         Worker worker = board.getFields().get(4).getWorker();
@@ -143,7 +146,7 @@ public class SimpleRuleSetTest {
         Assert.assertEquals(2, board.getFields().size());
 
         // update position of Workers
-        boolean isSuccessful = simpleRuleSet.checkMovePhase(simpleGame, updatedGame);
+        boolean isSuccessful = ruleSet.checkMovePhase(game, updatedGame);
 
         // Asserts
         Assert.assertFalse(isSuccessful);
@@ -153,14 +156,12 @@ public class SimpleRuleSetTest {
     public void buildBlockSuccessfully() {
 
         // set up and move worker
-        setup();
-        statusMove(simpleGame);
-        move(simpleGame, simpleGame.getBoard().getFields().get(4), simpleGame.getBoard().getFields().get(4));
+        move(game, game.getBoard().getFields().get(4), game.getBoard().getFields().get(4));
         //move(4, 3);
-        Assert.assertTrue(simpleGame.getPlayers().get(0).getWorkers().get(0).getIsCurrentWorker());
+        Assert.assertTrue(game.getPlayers().get(0).getWorkers().get(0).getIsCurrentWorker());
 
         // create game with chosen position
-        Game updatedGame = SerializationUtils.clone(simpleGame);
+        Game updatedGame = SerializationUtils.clone(game);
         Board board = updatedGame.getBoard();
 
         // build a block
@@ -174,7 +175,7 @@ public class SimpleRuleSetTest {
         Assert.assertEquals(1, board.getFields().size());
 
         // update position of Workers
-        boolean isSuccessful = simpleRuleSet.checkBuildPhase(simpleGame, updatedGame);
+        boolean isSuccessful = ruleSet.checkBuildPhase(game, updatedGame);
 
         // Asserts
         Assert.assertTrue(isSuccessful);
@@ -184,13 +185,11 @@ public class SimpleRuleSetTest {
     public void buildBlockOnWorker() {
 
         // set up and move worker
-        setup();
-        statusMove(simpleGame);
-        move(simpleGame, simpleGame.getBoard().getFields().get(4), simpleGame.getBoard().getFields().get(4));
-        Assert.assertTrue(simpleGame.getPlayers().get(0).getWorkers().get(0).getIsCurrentWorker());
+        move(game, game.getBoard().getFields().get(4), game.getBoard().getFields().get(4));
+        Assert.assertTrue(game.getPlayers().get(0).getWorkers().get(0).getIsCurrentWorker());
 
         // create game with chosen position
-        Game updatedGame = SerializationUtils.clone(simpleGame);
+        Game updatedGame = SerializationUtils.clone(game);
         Board board = updatedGame.getBoard();
 
         // build a block
@@ -204,7 +203,7 @@ public class SimpleRuleSetTest {
         Assert.assertEquals(1, board.getFields().size());
 
         // update position of Workers
-        boolean isSuccessful = simpleRuleSet.checkBuildPhase(simpleGame, updatedGame);
+        boolean isSuccessful = ruleSet.checkBuildPhase(game, updatedGame);
 
         // Asserts
         Assert.assertFalse(isSuccessful);
@@ -212,20 +211,17 @@ public class SimpleRuleSetTest {
 
     @Test
     public void win() {
-        // set up
-        setup();
-        statusMove(simpleGame);
 
         // change game to final step
-        simpleGame.getBoard().getFields().get(4).setBlocks(2);
-        simpleGame.getBoard().getFields().get(9).setBlocks(3);
-        gameService.saveGame(simpleGame);
+        game.getBoard().getFields().get(4).setBlocks(2);
+        game.getBoard().getFields().get(9).setBlocks(3);
+        gameService.saveGame(game);
 
         // move worker to level 3 tower
-        move(simpleGame, simpleGame.getBoard().getFields().get(4),  simpleGame.getBoard().getFields().get(9));
+        move(game, game.getBoard().getFields().get(4),  game.getBoard().getFields().get(9));
 
         // update position of Workers
-        Player isSuccessful = simpleRuleSet.checkWinCondition(simpleGame);
+        Player isSuccessful = ruleSet.checkWinCondition(game);
 
         // Asserts
         Assert.assertNotNull(isSuccessful);
@@ -233,19 +229,16 @@ public class SimpleRuleSetTest {
 
     @Test
     public void notWin() {
-        // set up
-        setup();
-        statusMove(simpleGame);
 
         // change game to final step
-        simpleGame.getBoard().getFields().get(4).setBlocks(2);
-        gameService.saveGame(simpleGame);
+        game.getBoard().getFields().get(4).setBlocks(2);
+        gameService.saveGame(game);
 
         // move worker to level 3 tower
-        move(simpleGame, simpleGame.getBoard().getFields().get(4),  simpleGame.getBoard().getFields().get(9));
+        move(game, game.getBoard().getFields().get(4),  game.getBoard().getFields().get(9));
 
         // update position of Workers
-        Player isSuccessful = simpleRuleSet.checkWinCondition(simpleGame);
+        Player isSuccessful = ruleSet.checkWinCondition(game);
 
         // Asserts
         Assert.assertNull(isSuccessful);
@@ -253,20 +246,17 @@ public class SimpleRuleSetTest {
 
     @Test
     public void oneWorkerIsStuck() {
-        // set up
-        setup();
-        statusMove(simpleGame);
 
         // make worker stuck
-        simpleGame.getBoard().getFields().get(3).setBlocks(2);
-        simpleGame.getBoard().getFields().get(8).setHasDome(true);
-        simpleGame.getBoard().getFields().get(9).setBlocks(3);
-        simpleGame.getBoard().getFields().get(9).setHasDome(true);
-        gameService.saveGame(simpleGame);
+        game.getBoard().getFields().get(3).setBlocks(2);
+        game.getBoard().getFields().get(8).setHasDome(true);
+        game.getBoard().getFields().get(9).setBlocks(3);
+        game.getBoard().getFields().get(9).setHasDome(true);
+        gameService.saveGame(game);
 
         // check
-        boolean isStuck = simpleRuleSet.isWorkerStuck(simpleGame, simpleGame.getBoard().getFields().get(4).getWorker());
-        Player hasLost = simpleRuleSet.checkWinCondition(simpleGame);
+        boolean isStuck = ruleSet.isWorkerStuck(game, game.getBoard().getFields().get(4).getWorker());
+        Player hasLost = ruleSet.checkWinCondition(game);
 
         // Asserts
         Assert.assertNull(hasLost);
@@ -275,11 +265,8 @@ public class SimpleRuleSetTest {
 
     @Test
     public void lose() {
-        // set up
-        setup();
-        statusMove(simpleGame);
 
-        List<Field> fields = simpleGame.getBoard().getFields();
+        List<Field> fields = game.getBoard().getFields();
         // Worker  1 isStuck
         fields.get(3).setBlocks(2);
         fields.get(8).setHasDome(true);
@@ -298,12 +285,12 @@ public class SimpleRuleSetTest {
         fields.get(24).setBlocks(2);
         fields.get(24).setHasDome(true);
 
-        gameService.saveGame(simpleGame);
+        gameService.saveGame(game);
 
         Assert.assertNotNull(fields.get(23).getWorker());
 
         // check
-        Player hasLost = simpleRuleSet.checkWinCondition(simpleGame);
+        Player hasLost = ruleSet.checkWinCondition(game);
 
         // Asserts
         Assert.assertNotNull(hasLost);
@@ -326,7 +313,7 @@ public class SimpleRuleSetTest {
 
     public void buildBlock(int field) {
         // create game with chosen position
-        Game updatedGame = SerializationUtils.clone(simpleGame);
+        Game updatedGame = SerializationUtils.clone(game);
         Board board = updatedGame.getBoard();
 
         // build a block
@@ -338,12 +325,12 @@ public class SimpleRuleSetTest {
         board.setFields(fields);
 
         // update blocks
-        gameService.updateGame(simpleGame, updatedGame);
+        gameService.updateGame(game, updatedGame);
     }
 
     public void buildDome(int field) {
         // create game with chosen position
-        Game updatedGame = SerializationUtils.clone(simpleGame);
+        Game updatedGame = SerializationUtils.clone(game);
         Board board = updatedGame.getBoard();
 
         // build a block
@@ -355,7 +342,7 @@ public class SimpleRuleSetTest {
         board.setFields(fields);
 
         // update blocks
-        gameService.updateGame(simpleGame, updatedGame);
+        gameService.updateGame(game, updatedGame);
     }
 
     /**
@@ -367,7 +354,7 @@ public class SimpleRuleSetTest {
         Player player2 = newPlayer(false);
 
         // get the game
-        simpleGame = player1.getGame();
+        game = player1.getGame();
     }
 
     public void statusPosition1(Game game) {
