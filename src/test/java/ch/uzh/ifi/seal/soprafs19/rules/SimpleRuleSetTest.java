@@ -2,13 +2,18 @@ package ch.uzh.ifi.seal.soprafs19.rules;
 
 import ch.uzh.ifi.seal.soprafs19.Application;
 import ch.uzh.ifi.seal.soprafs19.constant.Color;
+import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
+import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.*;
+import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.internal.util.reflection.Fields;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -44,6 +49,7 @@ public class SimpleRuleSetTest {
         int[] indexes = {3, 8, 9};
         for (int i : indexes) {
             setup();
+            statusMove(simpleGame);
 
             // create game with chosen position
             Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -78,6 +84,7 @@ public class SimpleRuleSetTest {
     public void moveWorker2Fields() {
 
         setup();
+        statusMove(simpleGame);
 
         // create game with chosen position
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -111,6 +118,7 @@ public class SimpleRuleSetTest {
     public void moveWorkerInvalidField() {
 
         setup();
+        statusMove(simpleGame);
 
         // create game with chosen position
         Game updatedGame = SerializationUtils.clone(simpleGame);
@@ -146,7 +154,9 @@ public class SimpleRuleSetTest {
 
         // set up and move worker
         setup();
-        move(4, 3);
+        statusMove(simpleGame);
+        move(simpleGame, simpleGame.getBoard().getFields().get(4), simpleGame.getBoard().getFields().get(4));
+        //move(4, 3);
         Assert.assertTrue(simpleGame.getPlayers().get(0).getWorkers().get(0).getIsCurrentWorker());
 
         // create game with chosen position
@@ -175,7 +185,8 @@ public class SimpleRuleSetTest {
 
         // set up and move worker
         setup();
-        move(4, 3);
+        statusMove(simpleGame);
+        move(simpleGame, simpleGame.getBoard().getFields().get(4), simpleGame.getBoard().getFields().get(4));
         Assert.assertTrue(simpleGame.getPlayers().get(0).getWorkers().get(0).getIsCurrentWorker());
 
         // create game with chosen position
@@ -199,33 +210,118 @@ public class SimpleRuleSetTest {
         Assert.assertFalse(isSuccessful);
     }
 
+    @Test
+    public void win() {
+        // set up
+        setup();
+        statusMove(simpleGame);
+
+        // change game to final step
+        simpleGame.getBoard().getFields().get(4).setBlocks(2);
+        simpleGame.getBoard().getFields().get(9).setBlocks(3);
+        gameService.saveGame(simpleGame);
+
+        // move worker to level 3 tower
+        move(simpleGame, simpleGame.getBoard().getFields().get(4),  simpleGame.getBoard().getFields().get(9));
+
+        // update position of Workers
+        Player isSuccessful = simpleRuleSet.checkWinCondition(simpleGame);
+
+        // Asserts
+        Assert.assertNotNull(isSuccessful);
+    }
+
+    @Test
+    public void notWin() {
+        // set up
+        setup();
+        statusMove(simpleGame);
+
+        // change game to final step
+        simpleGame.getBoard().getFields().get(4).setBlocks(2);
+        gameService.saveGame(simpleGame);
+
+        // move worker to level 3 tower
+        move(simpleGame, simpleGame.getBoard().getFields().get(4),  simpleGame.getBoard().getFields().get(9));
+
+        // update position of Workers
+        Player isSuccessful = simpleRuleSet.checkWinCondition(simpleGame);
+
+        // Asserts
+        Assert.assertNull(isSuccessful);
+    }
+
+    @Test
+    public void oneWorkerIsStuck() {
+        // set up
+        setup();
+        statusMove(simpleGame);
+
+        // make worker stuck
+        simpleGame.getBoard().getFields().get(3).setBlocks(2);
+        simpleGame.getBoard().getFields().get(8).setHasDome(true);
+        simpleGame.getBoard().getFields().get(9).setBlocks(3);
+        simpleGame.getBoard().getFields().get(9).setHasDome(true);
+        gameService.saveGame(simpleGame);
+
+        // check
+        boolean isStuck = simpleRuleSet.isWorkerStuck(simpleGame, simpleGame.getBoard().getFields().get(4).getWorker());
+        Player hasLost = simpleRuleSet.checkWinCondition(simpleGame);
+
+        // Asserts
+        Assert.assertNull(hasLost);
+        Assert.assertTrue(isStuck);
+    }
+
+    @Test
+    public void lose() {
+        // set up
+        setup();
+        statusMove(simpleGame);
+
+        List<Field> fields = simpleGame.getBoard().getFields();
+        // Worker  1 isStuck
+        fields.get(3).setBlocks(2);
+        fields.get(8).setHasDome(true);
+        fields.get(9).setBlocks(3);
+        fields.get(9).setHasDome(true);
+
+        // Worker 2 isStuck
+        fields.get(12).setBlocks(3);
+        fields.get(13).setBlocks(3);
+        fields.get(14).setBlocks(1);
+        fields.get(14).setHasDome(true);
+        fields.get(17).setHasDome(true);
+        fields.get(19).setBlocks(3);
+        fields.get(19).setHasDome(true);
+        fields.get(22).setBlocks(3);
+        fields.get(24).setBlocks(2);
+        fields.get(24).setHasDome(true);
+
+        gameService.saveGame(simpleGame);
+
+        Assert.assertNotNull(fields.get(23).getWorker());
+
+        // check
+        Player hasLost = simpleRuleSet.checkWinCondition(simpleGame);
+
+        // Asserts
+        Assert.assertNotNull(hasLost);
+    }
+
     /**
      * method to move a worker
      * @param from
      * @param to
      */
-    public void move(int from, int to) {
-        // create game with chosen position
-        Game updatedGame = SerializationUtils.clone(simpleGame);
-        Board board = updatedGame.getBoard();
-
-        Worker worker = board.getFields().get(from).getWorker();
-
-        // move a worker
-        List<Field> fields = new ArrayList<>();
-
-        // new field
-        fields.add(board.getFields().get(to));
-        fields.get(0).setWorker(worker);
-
-        // old field
-        fields.add(board.getFields().get(from));
-        fields.get(1).setWorker(null);
-
-        board.setFields(fields);
-
-        // update position
-        gameService.updateGame(simpleGame, updatedGame);
+    // not based on previous step anymore
+    public void move(Game game, Field from, Field to) {
+        Worker worker = from.getWorker();
+        worker.setIsCurrentWorker(true);
+        from.setWorker(null);
+        to.setWorker(worker);
+        game.setStatus(GameStatus.BUILD);
+        gameService.saveGame(game);
     }
 
     public void buildBlock(int field) {
@@ -272,109 +368,67 @@ public class SimpleRuleSetTest {
 
         // get the game
         simpleGame = player1.getGame();
-
-        color1();
-        position1();
-        color2();
-        position2();
     }
 
-    public void color1() {
-        // create game with chosen color
-        Game updatedGame = SerializationUtils.clone(simpleGame);
-        List<Player> players = updatedGame.getPlayers();
-        Player playerToBeRemoved = null;
-
-        // set current player's color to blue and remove other player
-        for (Player player : players) {
+    public void statusPosition1(Game game) {
+        for (Player player : game.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
                 player.setColor(Color.BLUE);
-            } else {
-                playerToBeRemoved = player;
+                playerService.savePlayer(player);
             }
         }
-        players.remove(playerToBeRemoved);
-        updatedGame.setPlayers(players);
 
-        // update color of current player
-        gameService.updateGame(simpleGame, updatedGame);
+        game.setStatus(GameStatus.POSITION1);
+        gameService.saveGame(game);
     }
 
-    public void position1() {
-        // create game with chosen position
-        Game updatedGame = SerializationUtils.clone(simpleGame);
-        Board board = updatedGame.getBoard();
+    public void statusColor2(Game game) {
+        statusPosition1(game);
 
-        // create Workers
-        Worker worker1 = null;
-        Worker worker2 = null;
-
-        for (Player player : updatedGame.getPlayers()) {
+        for (Player player : game.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
-                worker1 = player.getWorkers().get(0);
-                worker2 = player.getWorkers().get(1);
+                game.getBoard().getFields().get(4).setWorker(player.getWorkers().get(0));
+                player.getWorkers().get(0).setField(game.getBoard().getFields().get(4));
+
+                game.getBoard().getFields().get(18).setWorker(player.getWorkers().get(1));
+                player.getWorkers().get(1).setField(game.getBoard().getFields().get(18));
+                playerService.savePlayer(player);
             }
         }
-
-        // place Workers on two random fields
-        List<Field> fields = new ArrayList<>();
-        board.getFields().get(4).setWorker(worker1);
-        fields.add(board.getFields().get(4));
-        board.getFields().get(18).setWorker(worker2);
-        fields.add(board.getFields().get(18));
-        board.setFields(fields);
-
-        // update position of Workers
-        gameService.updateGame(simpleGame, updatedGame);
+        game.setStatus(GameStatus.COLOR2);
+        nextTurn(game);
     }
 
-    public void color2() {
-        // create game with chosen color
-        Game updatedGame = SerializationUtils.clone(simpleGame);
-        List<Player> players = updatedGame.getPlayers();
-        Player playerToBeRemoved = null;
+    public void statusPosition2(Game game) {
 
-        // set current player's color to red and remove other player
-        for (Player player : players) {
+        statusColor2(game);
+
+        for (Player player : game.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
                 player.setColor(Color.WHITE);
-            } else {
-                playerToBeRemoved = player;
+                playerService.savePlayer(player);
             }
         }
-        players.remove(playerToBeRemoved);
-        updatedGame.setPlayers(players);
 
-        // update color of current player
-        gameService.updateGame(simpleGame, updatedGame);
+        game.setStatus(GameStatus.POSITION2);
+        gameService.saveGame(game);
     }
 
-    public void position2() {
-        // create game with chosen position
-        Game updatedGame = SerializationUtils.clone(simpleGame);
-        Board board = updatedGame.getBoard();
+    public void statusMove(Game game) {
+        statusPosition2(game);
 
-        // create Workers
-        Worker worker1 = null;
-        Worker worker2 = null;
-
-        for (Player player : updatedGame.getPlayers()) {
+        for (Player player : game.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
-                worker1 = player.getWorkers().get(0);
-                worker2 = player.getWorkers().get(1);
+                game.getBoard().getFields().get(7).setWorker(player.getWorkers().get(0));
+                player.getWorkers().get(0).setField(game.getBoard().getFields().get(7));
+
+                game.getBoard().getFields().get(23).setWorker(player.getWorkers().get(1));
+                player.getWorkers().get(1).setField(game.getBoard().getFields().get(23));
+                playerService.savePlayer(player);
             }
         }
-
-        // place Workers on two random fields
-        List<Field> fields = new ArrayList<>();
-        board.getFields().get(7).setWorker(worker1);
-        fields.add(board.getFields().get(7));
-        board.getFields().get(23).setWorker(worker2);
-        fields.add(board.getFields().get(23));
-        board.setFields(fields);
-
-        // update position of Workers
-        gameService.updateGame(simpleGame, updatedGame);
+        game.setStatus(GameStatus.MOVE);
+        nextTurn(game);
     }
 
     /**
@@ -387,6 +441,19 @@ public class SimpleRuleSetTest {
         Player player = new Player();
         player.setIsGodMode(isGodMode);
         return playerService.createPlayer(player,true);
+    }
+
+    /**
+     * switches who's the current Player
+     * @param game
+     */
+    public void nextTurn(Game game) {
+        for (Player player : game.getPlayers()) {
+            // reverse value
+            player.setIsCurrentPlayer(!player.getIsCurrentPlayer());
+        }
+        // save
+        gameService.saveGame(game);
     }
 
 }

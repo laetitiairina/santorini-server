@@ -84,7 +84,6 @@ public class GameService {
 
         // react to update depending on status
         Game successfullyUpdatedGame = null; // set to true later, if update is valid
-        boolean isBadRequest = true; // true if the move / build valid but JSON, etc. was incorrect
         IRuleSet rules = null;
 
         // get rules
@@ -127,19 +126,24 @@ public class GameService {
 
         // update the status of the game for pinging
         if (successfullyUpdatedGame != null) {
-
-            // increment the status
-            if (rules.checkWinCondition(successfullyUpdatedGame)) {
-                // Game ends
-                incrementGameStatus(successfullyUpdatedGame, true);
-
-                // Set players to inactive (for CheckPolling)
-                for (Player player : successfullyUpdatedGame.getPlayers()) {
-                    player.setIsActive(false);
-                }
-
-            } else {
+            // check if a player has won
+            Player winner = rules.checkWinCondition(successfullyUpdatedGame);
+            if (winner == null) {
+                // increment the status normally
                 incrementGameStatus(successfullyUpdatedGame, false);
+            } else {
+                // indicate winner and loser
+                for (Player p : successfullyUpdatedGame.getPlayers()) {
+                    if (p.getId().equals(winner.getId())) {
+                        p.setIsCurrentPlayer(true);
+                    } else {
+                        p.setIsCurrentPlayer(false);
+                    }
+                    // Set players to inactive (for CheckPolling)
+                    p.setIsActive(false);
+                }
+                // increment the status to END
+                incrementGameStatus(successfullyUpdatedGame, true);
             }
 
             // saves updates to database
@@ -147,12 +151,7 @@ public class GameService {
 
             return true;
         } else {
-            /*
-             * TODO:
-             * Only return false if request itself was bad (e.g. updatedGame contained invalid JSON),
-             * return true even if the turn was invalid but request/updatedGame was ok
-             */
-            return !isBadRequest;
+            return false;
         }
     }
 
@@ -615,5 +614,13 @@ public class GameService {
 
         gameRepository.save(currentGame);
         return true;
+    }
+
+    /**
+     * saves game to DB
+     * @param game
+     */
+    public void saveGame (Game game) {
+        gameRepository.save(game);
     }
 }
