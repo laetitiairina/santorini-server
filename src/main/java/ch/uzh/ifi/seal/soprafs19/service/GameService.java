@@ -542,6 +542,47 @@ public class GameService {
         Integer[] blocksArr = {0,1,2,1,0, 0,2,3,2,1, 0,2,3,3,2, 1,0,0,2,0, 2,1,2,3,0};
         Boolean[] hasDomeArr = {false,false,false,false,false, false,false,false,false,false, false,false,true,false,false, false,false,false,false,false, false,false,false,true,false,};
         Integer[] workerPosArr = {2,18,3,11};
+        List<Color> colorsArr = new ArrayList<Color>();
+        colorsArr.add(Color.BLUE);
+        colorsArr.add(Color.GREY);
+        List<SimpleGodCard> cardsArr = new ArrayList<SimpleGodCard>();
+        cardsArr.add(SimpleGodCard.APOLLO);
+        cardsArr.add(SimpleGodCard.ARTEMIS);
+
+        // If god mode, make sure cards are set
+        if (currentGame.getIsGodMode()) {
+            if (currentGame.getCards() == null) {
+                currentGame.setCards(cardsArr);
+            }
+            for (Player player : currentGame.getPlayers()) {
+                if (player.getCard() != null) {
+                    if (cardsArr.contains(player.getCard())) {
+                        cardsArr.remove(player.getCard());
+                    }
+                }
+            }
+            for (int i = 0; i < currentGame.getPlayers().size(); i++) {
+                if (currentGame.getPlayers().get(i).getCard() == null) {
+                    currentGame.getPlayers().get(i).setCard(cardsArr.get(0));
+                    cardsArr.remove(0);
+                }
+            }
+        }
+
+        // Make sure colors are set
+        for (Player player : currentGame.getPlayers()) {
+            if (player.getColor() != null) {
+                if (colorsArr.contains(player.getColor())) {
+                    colorsArr.remove(player.getColor());
+                }
+            }
+        }
+        for (int i = 0; i < currentGame.getPlayers().size(); i++) {
+            if (currentGame.getPlayers().get(i).getColor() == null) {
+                currentGame.getPlayers().get(i).setColor(colorsArr.get(0));
+                colorsArr.remove(0);
+            }
+        }
 
         // Set status
         if(currentGame.getStatus() == GameStatus.MOVE) {
