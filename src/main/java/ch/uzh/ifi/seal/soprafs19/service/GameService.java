@@ -32,22 +32,18 @@ public class GameService {
 
     private final Logger log = LoggerFactory.getLogger(GameService.class);
 
-    @Autowired
     private GameRepository gameRepository;
 
-    @Autowired
     private PlayerRepository playerRepository;
 
-    @Autowired
     private RuleFactory ruleFactory;
 
-    /*
     @Autowired
-    public GameService(GameRepository gameRepository, PlayerRepository playerRepository) {
+    public GameService(GameRepository gameRepository, PlayerRepository playerRepository, RuleFactory ruleFactory) {
         this.gameRepository = gameRepository;
         this.playerRepository = playerRepository;
+        this.ruleFactory = ruleFactory;
     }
-    */
 
     /*
     public Iterable<Game> getGames() {
