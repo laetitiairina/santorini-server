@@ -23,9 +23,6 @@ public class SimpleRuleSet implements IRuleSet {
     protected Field fieldBeforeBackEnd = null;
     protected Field fieldAfterBackEnd = null;
 
-    protected int blockBefore = -1;
-    protected int blockAfter = -1;
-
     protected int xBefore = -1, yBefore = -1, xAfter = -1, yAfter = -1;
 
     // build
@@ -111,14 +108,16 @@ public class SimpleRuleSet implements IRuleSet {
     public Boolean checkMovePhase(Game before, Game after) {
 
         if (setFieldsAfterMovePhase(after) && setFieldsBeforeMovePhase(before)) {
-            blockBefore = fieldBefore.getBlocks();
-            blockAfter = fieldAfter.getBlocks();
-
             // check if it can move
-            for (Field field : neighbouringFields(before, fieldAfter.getPosX(), fieldAfter.getPosY())) {
-                if (xBefore == field.getPosX() && yBefore == field.getPosY() && isValidMove(1)) {
-                    return true;
-                }
+            return isFieldFree(before, fieldBeforeBackEnd, fieldAfterBackEnd, false);
+        }
+        return false;
+    }
+
+    public Boolean isFieldFree(Game game, Field fieldBefore, Field fieldAfter, boolean isSecondMove) {
+        for (Field field : neighbouringFields(game, fieldAfter.getPosX(), fieldAfter.getPosY())) {
+            if (xBefore == field.getPosX() && yBefore == field.getPosY() && isValidMove(isSecondMove, fieldBefore, fieldAfter)) {
+                return true;
             }
         }
         return false;
@@ -234,21 +233,15 @@ public class SimpleRuleSet implements IRuleSet {
         return true;
     }
 
-    protected Boolean isValidMove(int difference) {
-        // origin field had a worker
-        if ((fieldBeforeBackEnd.getWorker() != null)
+    protected Boolean isValidMove(boolean isSecondMove, Field fieldBefore, Field fieldAfter) {
+        // origin field had a worker or it's the second move of a worker
+        if ((fieldBefore.getWorker() != null) || isSecondMove
                 // destination field is unoccupied
-                && (fieldAfterBackEnd.getWorker() == null)
+                && (fieldAfter.getWorker() == null)
                 // destination field has no dome
-                && (!fieldAfterBackEnd.getHasDome())
-                && (fieldBeforeBackEnd.getBlocks() == blockBefore)
-                && (fieldAfterBackEnd.getBlocks() == blockAfter)) {
-            // checks if number of blocks is within the game's limitations
-            if (blockAfter >= 0 && blockAfter <= 3) {
-
-                //check if blocks in after field is maximum 1 higher
-                return (blockAfter <= blockBefore + difference);
-            }
+                && (!fieldAfter.getHasDome())) {
+            //check if blocks in after field is maximum 1 higher
+            return (fieldAfter.getBlocks() <= fieldBefore.getBlocks() + 1);
         }
         return false;
     }

@@ -19,19 +19,22 @@ public class ArtemisRuleSet extends SimpleRuleSet {
     public Boolean checkMovePhase(Game before, Game after) {
 
         if (setFieldsAfterMovePhase(after) && setFieldsBeforeMovePhase(before)) {
-            blockBefore = fieldBefore.getBlocks();
-            blockAfter = fieldAfter.getBlocks();
-
             // check if it can move
-            for (Field field : neighbouringFields(before, fieldAfter.getPosX(), fieldAfter.getPosY())) {
-                // normal move
-                if (xBefore == field.getPosX() && yBefore == field.getPosY() && isValidMove(1)) {
-                    return true;
-                } else {
-                    // two fields
-                    for (Field field2 : neighbouringFields(before, field.getPosX(), field.getPosY())) {
-                        if (xBefore == field2.getPosX() && yBefore == field2.getPosY() && isValidMove(2)) {
-                            return true;
+            for (Field field : neighbouringFields(before, fieldBefore.getPosX(), fieldBefore.getPosY())) {
+                // first move
+                if (isValidMove(false, fieldBeforeBackEnd, field)) {
+                    if (xAfter == field.getPosX() && yAfter == field.getPosY()) {
+                        return true;
+                    }
+                    // it was valid to step on first field, check for second field
+                    else {
+                        // second move
+                        for (Field field2 : neighbouringFields(before, field.getPosX(), field.getPosY())) {
+                            if (xAfter == field2.getPosX() && yAfter == field2.getPosY() && isValidMove(true, field, fieldAfterBackEnd)
+                                    // not back to same field
+                                    && !(field2.getPosX().equals(fieldBefore.getPosX()) && field2.getPosY().equals(fieldBefore.getPosY()))) {
+                                return true;
+                            }
                         }
                     }
                 }
@@ -40,3 +43,4 @@ public class ArtemisRuleSet extends SimpleRuleSet {
         return false;
     }
 }
+
