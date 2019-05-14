@@ -433,7 +433,8 @@ public class GameService {
                 }
             }
         }
-
+        //initialize timesBuilt
+        currentGame.getCurrentPlayer().getCurrentWorker().setTimesBuiltCurrentTurn(0);
         return currentGame;
     }
 
@@ -462,18 +463,27 @@ public class GameService {
             // update the blocks and has Dome value of the field
             fieldToUpdate.setBlocks(field.getBlocks());
             fieldToUpdate.setHasDome(field.getHasDome());
-        }
-
-        // set both workers to non-current
-        for (Player player : currentGame.getPlayers()) {
-            if (player.getIsCurrentPlayer()) {
-                for (Worker worker : player.getWorkers()) {
-                    worker.setIsCurrentWorker(false);
-                }
+            if (updatedGame.getBoard().getFields().size() == 1) {
+                currentGame.getCurrentPlayer().getCurrentWorker().setLastBuildLocation(fieldToUpdate);
             }
         }
+        int timesBuilt = currentGame.getCurrentPlayer().getCurrentWorker().incrementTimesBuiltCurrentTurn();
 
-        nextTurn(currentGame);
+        // special conditional for demeter to check if second build phase happened
+        if (!(currentGame.getCurrentPlayer().getCard() == SimpleGodCard.DEMETER) ||
+                (currentGame.getCurrentPlayer().getCard() == SimpleGodCard.DEMETER &&
+                        timesBuilt == 2)) {
+            // set both workers to non-current
+            for (Player player : currentGame.getPlayers()) {
+                if (player.getIsCurrentPlayer()) {
+                    for (Worker worker : player.getWorkers()) {
+                        worker.setIsCurrentWorker(false);
+                    }
+                }
+            }
+
+            nextTurn(currentGame);
+        }
         return currentGame;
     }
 
@@ -486,6 +496,12 @@ public class GameService {
     public void incrementGameStatus(Game game, Boolean isEnd) {
         // convert type GameStatus to type Integer
         int status = game.getGameStatusInt(game.getStatus());
+
+        // do not increment game status if demeter has not had 2 build phases
+        if (status == GameStatus.BUILD.ordinal() && game.getCurrentPlayer().getCard() == SimpleGodCard.DEMETER &&
+                game.getCurrentPlayer().getCurrentWorker().getTimesBuiltCurrentTurn() < 2) {
+            return;
+        }
 
         // increment the status
         if (isEnd) {

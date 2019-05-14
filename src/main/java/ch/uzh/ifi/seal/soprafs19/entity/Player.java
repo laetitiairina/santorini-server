@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Player implements Serializable {
@@ -185,5 +186,13 @@ public class Player implements Serializable {
 
     public Long lastPoll() {
         return System.currentTimeMillis() - getLastPollMillis();
+    }
+
+    public Worker getCurrentWorker() {
+        List<Worker> currentWorkers = getWorkers().stream().filter(worker -> worker.getIsCurrentWorker()).collect(Collectors.toList());
+        if (currentWorkers.size() == 1){
+            return currentWorkers.get(0);
+        }
+        return null;
     }
 }

@@ -10,8 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class DemeterRuleSet extends SimpleRuleSet {
 
     @Override
-    public Boolean checkBuildPhase(Game before, Game after) {
-        return false;
+    protected Boolean isValidBuild() {
+        Boolean isValid = super.isValidBuild();
+        // TODO check if when second build phase not same field
+        return isValid;
     }
 
 }

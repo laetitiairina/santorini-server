@@ -25,6 +25,13 @@ public class Worker implements Serializable {
 	@Column
 	private boolean isCurrentWorker;
 
+	@Column
+	private int timesBuiltCurrentTurn;
+
+	@Column
+	@OneToOne
+	private Field lastBuildLocation;
+
 	public Long getId() {
 		return id;
 	}
@@ -56,6 +63,27 @@ public class Worker implements Serializable {
 	public Boolean getIsCurrentWorker() {return isCurrentWorker;}
 
 	public void setIsCurrentWorker(Boolean isCurrentWorker) {this.isCurrentWorker = isCurrentWorker;}
+
+	public int getTimesBuiltCurrentTurn() {
+		return this.timesBuiltCurrentTurn;
+	}
+
+	public void setTimesBuiltCurrentTurn(int timesBuiltCurrentTurn) {
+		this.timesBuiltCurrentTurn = timesBuiltCurrentTurn;
+	}
+
+	public int incrementTimesBuiltCurrentTurn() {
+		this.timesBuiltCurrentTurn++;
+		return this.timesBuiltCurrentTurn;
+	}
+
+	public Field getLastBuildLocation() {
+		return lastBuildLocation;
+	}
+
+	public void setLastBuildLocation(Field lastBuildLocation) {
+		this.lastBuildLocation = lastBuildLocation;
+	}
 
 	public Worker() {}
 

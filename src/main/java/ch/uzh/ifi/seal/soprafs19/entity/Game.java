@@ -150,7 +150,7 @@ public class Game implements Serializable {
         return GameStatus.values()[status];
     }
 
-	public Player getCurrentPlayer() {
+    public Player getCurrentPlayer() {
 		List<Player> currentPlayers = players.stream().filter(player -> player.getIsCurrentPlayer()).collect(Collectors.toList());
 		if (currentPlayers.size() == 1) {
 			return currentPlayers.get(0);
