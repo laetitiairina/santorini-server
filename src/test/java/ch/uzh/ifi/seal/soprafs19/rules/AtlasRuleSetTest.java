@@ -78,6 +78,12 @@ public class AtlasRuleSetTest extends SimpleRuleSetTest {
         Assert.assertTrue(isSuccessful);
     }
 
+    @Test
+    @Override
+    public void buildDomeOnWrongLevel() {
+        // do nothing
+    }
+
     public void initGodGame() {
 
         // select the two cards
