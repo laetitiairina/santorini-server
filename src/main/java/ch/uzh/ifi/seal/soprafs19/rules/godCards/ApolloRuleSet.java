@@ -45,7 +45,7 @@ public class ApolloRuleSet extends SimpleRuleSet {
         return false;
     }
 
-    //Worker is not Stuck when a opponent worker is on a neighboring field
+    //Worker is not anymore Stuck when a opponent worker is on a neighboring field
     @Override
     public Boolean isWorkerStuck(Game game, Worker worker) {
         List<Long> workers = new ArrayList<>();
