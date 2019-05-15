@@ -78,6 +78,10 @@ public class GameService {
         Game successfullyUpdatedGame = null; // set to true later, if update is valid
         IRuleSet rules = null;
 
+        //reset message on game
+        currentGame.setMessage(null);
+        saveGame(currentGame);
+
         // rematch if requested
         if (currentGame.getStatus() == GameStatus.END && updatedGame.getWantsRematch()) {
             rematch(currentGame);
