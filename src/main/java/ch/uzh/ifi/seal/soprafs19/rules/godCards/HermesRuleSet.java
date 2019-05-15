@@ -38,14 +38,11 @@ public class HermesRuleSet extends SimpleRuleSet {
             else
                 for(Field field : neighbouringFields(before,fieldBefore.getPosX(),fieldBefore.getPosY())){
                         if(isValidMoveHermes(false, fieldBefore, field)){
-                            field = fieldBefore;
-                            if(field == fieldAfter){
+                            fieldBefore = field;
+                            if(fieldBefore.getId() == fieldAfter.getId())
                                 return true;
-                            }
                         }
                 }
-
-
 
         }
         return false;
