@@ -153,6 +153,28 @@ public class SimpleRuleSetTest {
     }
 
     @Test
+    public void dontMoveWorkerFails() {
+        // create game with chosen position
+        Game updatedGame = SerializationUtils.clone(game);
+        Board board = updatedGame.getBoard();
+
+        List<Field> fields = new ArrayList<>();
+
+        fields.add(board.getFields().get(4));
+        fields.add(board.getFields().get(4));
+
+        board.setFields(fields);
+
+        Assert.assertEquals(2, board.getFields().size());
+
+        // update position of Workers
+        boolean isSuccessful = ruleSet.checkMovePhase(game, updatedGame);
+
+        // Asserts
+        Assert.assertFalse(isSuccessful);
+    }
+
+    @Test
     public void buildBlockSuccessfully() {
 
         // set up and move worker

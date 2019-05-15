@@ -9,7 +9,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Primary
 @Component
@@ -26,11 +29,9 @@ public class SimpleRuleSet implements IRuleSet {
     protected int xBefore = -1, yBefore = -1, xAfter = -1, yAfter = -1;
 
     // build
-    protected Field fieldBuiltFrontEnd = null;
-    protected Field fieldBuiltOnBackEnd = null;
+    protected Map<Field, Field> frontendFieldToBackendField;
 
     protected int posWorkerX = -1, posWorkerY = -1;
-    protected int posBuiltFieldX = -1, posBuiltFieldY = -1;
 
     protected Boolean setFieldsBeforeMovePhase(Game before) {
         for (Field field : before.getBoard().getFields()) {
@@ -65,30 +66,21 @@ public class SimpleRuleSet implements IRuleSet {
         return !(fieldAfter == null || fieldBefore == null);
     }
 
-    protected Boolean setFieldBeforeBuildPhase(Game before) {
-        for (Field field : before.getBoard().getFields()) {
-            if (field.getPosX() == posBuiltFieldX && field.getPosY() == posBuiltFieldY) {
-                fieldBuiltOnBackEnd = field;
-            }
-        }
-
-        // faulty information by front-end
-        return (fieldBuiltOnBackEnd != null);
-    }
-
-    protected Boolean setFieldAfterBuildPhase(Game after) {
-        //adds the position of the Field that has been sent from the front-end
+    protected Boolean setFieldsBuildPhase(Game before, Game after) {
+        frontendFieldToBackendField = new HashMap<>();
         for (Field field : after.getBoard().getFields()) {
-            if (field != null) {
-                fieldBuiltFrontEnd = field;
-                posBuiltFieldX = fieldBuiltFrontEnd.getPosX();
-                posBuiltFieldY = fieldBuiltFrontEnd.getPosY();
+            if (field != null){
+                if (field.getPosX() < 0 || field.getPosX() > 4 || field.getPosY() <0 || field.getPosY() > 4){
+                    return false;
+                }
+                List<Field> backendFields = before.getBoard().getFields().stream().filter(backendField -> backendField.getId().compareTo(field.getId()) == 0).collect(Collectors.toList());
+                if (backendFields.size() == 1){
+                    frontendFieldToBackendField.put(field, backendFields.get(0));
+                }
+                else return false;
             }
         }
-
-        // if front-end sent no field at all, or faulty one
-        return !(fieldBuiltFrontEnd == null
-                || (posBuiltFieldX < 0) || (posBuiltFieldX > 4) || (posBuiltFieldY < 0) || (posBuiltFieldY > 4));
+        return true;
     }
 
     protected void setPosWorkerBuildPhase(Game before) {
@@ -125,15 +117,14 @@ public class SimpleRuleSet implements IRuleSet {
 
     public Boolean checkBuildPhase(Game before, Game after) {
 
-        if (setFieldAfterBuildPhase(after) && setFieldBeforeBuildPhase(before)) {
+        if (setFieldsBuildPhase(before, after)) {
             setPosWorkerBuildPhase(before);
 
             // check if can build
-            for (Field field : neighbouringFields(after, posWorkerX, posWorkerY)) {
-                if (posBuiltFieldX ==field.getPosX() && posBuiltFieldY == field.getPosY() && isValidBuild()) {
-                    return true;
-                }
-            }
+            Boolean canBuild = frontendFieldToBackendField.keySet().stream().allMatch(f -> {
+                return neighbouringFields(after, posWorkerX, posWorkerY).stream().anyMatch(n -> n.getPosX() == f.getPosX() && n.getPosY() == f.getPosY());
+            });
+            return canBuild && isValidBuild();
         }
         return false;
     }
@@ -247,13 +238,18 @@ public class SimpleRuleSet implements IRuleSet {
     }
 
     protected Boolean isValidBuild() {
-        // the field does not have a worker and no dome
-        return  (((fieldBuiltOnBackEnd.getWorker() == null) && !(fieldBuiltOnBackEnd.getHasDome())) &&
-                // either the player added only a block
-                ((fieldBuiltOnBackEnd.getBlocks() == fieldBuiltFrontEnd.getBlocks() - 1) && (fieldBuiltFrontEnd.getBlocks() <= 3)
-                        && !fieldBuiltFrontEnd.getHasDome())
-                ||
-                // or the player added a dome
-                ((fieldBuiltOnBackEnd.getBlocks() == 3) && fieldBuiltFrontEnd.getHasDome()));
+        return  getAmountOfBuildingFieldsCondition() && frontendFieldToBackendField.entrySet().stream().allMatch(entry -> {
+           return (entry.getValue().getWorker() == null || !entry.getValue().getHasDome()) &&
+                   (getAmountOfBuildingsPerFieldCondition(entry) && entry.getKey().getBlocks() <= 3 && !entry.getKey().getHasDome() ||
+                   (entry.getValue().getBlocks() == 3 && entry.getKey().getHasDome() == true));
+        });
+    }
+
+    protected Boolean getAmountOfBuildingFieldsCondition() {
+        return frontendFieldToBackendField.size() == 1;
+    }
+
+    protected Boolean getAmountOfBuildingsPerFieldCondition(Map.Entry<Field, Field> entry) {
+        return (entry.getValue().getBlocks() == entry.getKey().getBlocks() - 1);
     }
 }

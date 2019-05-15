@@ -25,12 +25,12 @@ public class Worker implements Serializable {
 	@Column
 	private boolean isCurrentWorker;
 
-	@Column
+	/*@Column
 	private int timesBuiltCurrentTurn;
 
 	@Column
 	@OneToOne
-	private Field lastBuildLocation;
+	private Field lastBuildLocation;*/
 
 	public Long getId() {
 		return id;
@@ -64,7 +64,7 @@ public class Worker implements Serializable {
 
 	public void setIsCurrentWorker(Boolean isCurrentWorker) {this.isCurrentWorker = isCurrentWorker;}
 
-	public int getTimesBuiltCurrentTurn() {
+	/*public int getTimesBuiltCurrentTurn() {
 		return this.timesBuiltCurrentTurn;
 	}
 
@@ -83,7 +83,7 @@ public class Worker implements Serializable {
 
 	public void setLastBuildLocation(Field lastBuildLocation) {
 		this.lastBuildLocation = lastBuildLocation;
-	}
+	}*/
 
 	public Worker() {}
 

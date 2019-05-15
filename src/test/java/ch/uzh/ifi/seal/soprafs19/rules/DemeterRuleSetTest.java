@@ -7,7 +7,7 @@ import ch.uzh.ifi.seal.soprafs19.entity.Board;
 import ch.uzh.ifi.seal.soprafs19.entity.Field;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
-import ch.uzh.ifi.seal.soprafs19.rules.godCards.AtlasRuleSet;
+import ch.uzh.ifi.seal.soprafs19.rules.godCards.DemeterRuleSet;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
 import org.apache.commons.lang3.SerializationUtils;
@@ -25,10 +25,10 @@ import java.util.List;
 @WebAppConfiguration
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
-public class AtlasRuleSetTest extends SimpleRuleSetTest {
+public class DemeterRuleSetTest extends SimpleRuleSetTest {
 
-    public AtlasRuleSetTest() {
-        this.ruleSet = new AtlasRuleSet();
+    public DemeterRuleSetTest() {
+        this.ruleSet = new DemeterRuleSet();
     }
 
     @Autowired
@@ -50,7 +50,7 @@ public class AtlasRuleSetTest extends SimpleRuleSetTest {
     }
 
     @Test
-    public void buildDomeOnEmptyFieldSuccessfully() {
+    public void buildOnTwoFieldsSuccessfully() {
 
         // set up and move worker
         move(game, game.getBoard().getFields().get(4), game.getBoard().getFields().get(9));
@@ -65,11 +65,13 @@ public class AtlasRuleSetTest extends SimpleRuleSetTest {
         List<Field> fields = new ArrayList<>();
 
         fields.add(board.getFields().get(8));
-        fields.get(0).setHasDome(true);
+        fields.add(board.getFields().get(14));
+        fields.get(0).setBlocks(1);
+        fields.get(1).setBlocks(1);
 
         board.setFields(fields);
 
-        Assert.assertEquals(1, board.getFields().size());
+        Assert.assertEquals(2, board.getFields().size());
 
         // update position of Workers
         boolean isSuccessful = ruleSet.checkBuildPhase(game, updatedGame);
@@ -78,18 +80,12 @@ public class AtlasRuleSetTest extends SimpleRuleSetTest {
         Assert.assertTrue(isSuccessful);
     }
 
-    @Test
-    @Override
-    public void buildDomeOnWrongLevel() {
-        // do nothing
-    }
-
     public void initGodGame() {
 
         // select the two cards
         List<SimpleGodCard> cards = new ArrayList<>();
 
-        SimpleGodCard card1 = SimpleGodCard.ATLAS;
+        SimpleGodCard card1 = SimpleGodCard.DEMETER;
         cards.add(card1);
 
         SimpleGodCard card2 = SimpleGodCard.APOLLO;

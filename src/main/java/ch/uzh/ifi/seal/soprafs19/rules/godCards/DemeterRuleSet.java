@@ -10,10 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DemeterRuleSet extends SimpleRuleSet {
 
     @Override
-    protected Boolean isValidBuild() {
-        Boolean isValid = super.isValidBuild();
-        // TODO check if when second build phase not same field
-        return isValid;
+    protected Boolean getAmountOfBuildingFieldsCondition() {
+        return frontendFieldToBackendField.size() <= 2 && frontendFieldToBackendField.size() > 0;
     }
-
 }
