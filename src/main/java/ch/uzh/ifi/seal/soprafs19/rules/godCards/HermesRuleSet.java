@@ -10,15 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class HermesRuleSet extends SimpleRuleSet {
 
-    public Boolean isFieldFreeHermes(Game game, Field fieldBefore, Field fieldAfter, boolean isSecondMove) {
-        for (Field field : game.getBoard().getFields()) {
-            if (xBefore == field.getPosX() && yBefore == field.getPosY() && isValidMoveHermes(isSecondMove, fieldBefore, fieldAfter)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public Boolean isValidMoveHermes(boolean isSecondMove, Field fieldBefore, Field fieldAfter) {
         // origin field had a worker or it's the second move of a worker
         if ((fieldBefore.getWorker() != null) || isSecondMove
@@ -45,7 +36,15 @@ public class HermesRuleSet extends SimpleRuleSet {
 
             //special hermes Move-> on the same level, worker can move as much as he wants and can also stay on same place
             else
-                return isFieldFreeHermes(before,fieldBeforeBackEnd,fieldAfterBackEnd,false);
+                for(Field field : neighbouringFields(before,fieldBefore.getPosX(),fieldBefore.getPosY())){
+                        if(isValidMoveHermes(false, fieldBefore, field)){
+                            field = fieldBefore;
+                            if(field == fieldAfter){
+                                return true;
+                            }
+                        }
+                }
+
 
 
         }
