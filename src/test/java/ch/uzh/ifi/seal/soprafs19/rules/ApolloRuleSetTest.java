@@ -121,33 +121,6 @@ public class ApolloRuleSetTest extends SimpleRuleSetTest {
         // get the game
         game = player1.getGame();
 
-        initGodGame();
-    }
-
-    public void initGodGame() {
-
-        // select the two cards
-        List<SimpleGodCard> cards = new ArrayList<>();
-
-        SimpleGodCard card1 = SimpleGodCard.APOLLO;
-        cards.add(card1);
-
-        SimpleGodCard card2 = SimpleGodCard.ARTEMIS;
-        cards.add(card2);
-
-        game.setCards(cards);
-
-        Player player1 = game.getPlayers().get(0);
-        player1.setCard(card1);
-        player1.setIsCurrentPlayer(true);
-        playerService.savePlayer(player1);
-        Player player2 = game.getPlayers().get(1);
-        player2.setCard(card2);
-        player2.setIsCurrentPlayer(false);
-        playerService.savePlayer(player2);
-
-        game.setStatus(GameStatus.COLOR1);
-        gameService.saveGame(game);
-
+        initGodGame(SimpleGodCard.APOLLO, SimpleGodCard.ARTEMIS);
     }
 }

@@ -3,6 +3,7 @@ package ch.uzh.ifi.seal.soprafs19.rules;
 import ch.uzh.ifi.seal.soprafs19.Application;
 import ch.uzh.ifi.seal.soprafs19.constant.Color;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
+import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.*;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
@@ -516,6 +517,33 @@ public class SimpleRuleSetTest {
         }
         // save
         gameService.saveGame(game);
+    }
+
+    public void initGodGame(SimpleGodCard cardOne, SimpleGodCard cardTwo) {
+
+        // select the two cards
+        List<SimpleGodCard> cards = new ArrayList<>();
+
+        SimpleGodCard card1 = cardOne;
+        cards.add(card1);
+
+        SimpleGodCard card2 = cardTwo;
+        cards.add(card2);
+
+        game.setCards(cards);
+
+        Player player1 = game.getPlayers().get(0);
+        player1.setCard(card1);
+        player1.setIsCurrentPlayer(true);
+        playerService.savePlayer(player1);
+        Player player2 = game.getPlayers().get(1);
+        player2.setCard(card2);
+        player2.setIsCurrentPlayer(false);
+        playerService.savePlayer(player2);
+
+        game.setStatus(GameStatus.COLOR1);
+        gameService.saveGame(game);
+
     }
 
 }
