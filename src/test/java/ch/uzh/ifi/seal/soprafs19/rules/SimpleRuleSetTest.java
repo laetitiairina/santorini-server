@@ -156,7 +156,7 @@ public class SimpleRuleSetTest {
     public void buildBlockSuccessfully() {
 
         // set up and move worker
-        move(game, game.getBoard().getFields().get(4), game.getBoard().getFields().get(4));
+        move(game, game.getBoard().getFields().get(4), game.getBoard().getFields().get(9));
         //move(4, 3);
         Assert.assertTrue(game.getPlayers().get(0).getWorkers().get(0).getIsCurrentWorker());
 
@@ -167,7 +167,7 @@ public class SimpleRuleSetTest {
         // build a block
         List<Field> fields = new ArrayList<>();
 
-        fields.add(board.getFields().get(8));
+        fields.add(board.getFields().get(13));
         fields.get(0).setBlocks(1);
 
         board.setFields(fields);
@@ -183,9 +183,8 @@ public class SimpleRuleSetTest {
 
     @Test
     public void buildBlockOnWorker() {
-
         // set up and move worker
-        move(game, game.getBoard().getFields().get(4), game.getBoard().getFields().get(4));
+        move(game, game.getBoard().getFields().get(4), game.getBoard().getFields().get(8));
         Assert.assertTrue(game.getPlayers().get(0).getWorkers().get(0).getIsCurrentWorker());
 
         // create game with chosen position
@@ -196,6 +195,60 @@ public class SimpleRuleSetTest {
         List<Field> fields = new ArrayList<>();
 
         fields.add(board.getFields().get(7));
+        fields.get(0).setBlocks(1);
+
+        board.setFields(fields);
+
+        Assert.assertEquals(1, board.getFields().size());
+
+        // update position of Workers
+        boolean isSuccessful = ruleSet.checkBuildPhase(game, updatedGame);
+
+        // Asserts
+        Assert.assertFalse(isSuccessful);
+    }
+
+    @Test
+    public void buildDomeOnWrongLevel() {
+        // set up and move worker
+        move(game, game.getBoard().getFields().get(4), game.getBoard().getFields().get(9));
+        Assert.assertTrue(game.getPlayers().get(0).getWorkers().get(0).getIsCurrentWorker());
+
+        // create game with chosen position
+        Game updatedGame = SerializationUtils.clone(game);
+        Board board = updatedGame.getBoard();
+
+        // build a block
+        List<Field> fields = new ArrayList<>();
+
+        fields.add(board.getFields().get(8));
+        fields.get(0).setHasDome(true);
+
+        board.setFields(fields);
+
+        Assert.assertEquals(1, board.getFields().size());
+
+        // update position of Workers
+        boolean isSuccessful = ruleSet.checkBuildPhase(game, updatedGame);
+
+        // Asserts
+        Assert.assertFalse(isSuccessful);
+    }
+
+    @Test
+    public void buildToFarRemoved() {
+        // set up and move worker
+        move(game, game.getBoard().getFields().get(4), game.getBoard().getFields().get(9));
+        Assert.assertTrue(game.getPlayers().get(0).getWorkers().get(0).getIsCurrentWorker());
+
+        // create game with chosen position
+        Game updatedGame = SerializationUtils.clone(game);
+        Board board = updatedGame.getBoard();
+
+        // build a block
+        List<Field> fields = new ArrayList<>();
+
+        fields.add(board.getFields().get(2));
         fields.get(0).setBlocks(1);
 
         board.setFields(fields);
