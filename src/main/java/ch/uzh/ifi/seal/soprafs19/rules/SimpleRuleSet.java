@@ -239,7 +239,7 @@ public class SimpleRuleSet implements IRuleSet {
 
     protected Boolean isValidBuild() {
         return  getAmountOfBuildingFieldsCondition() && frontendFieldToBackendField.entrySet().stream().allMatch(entry -> {
-           return (entry.getValue().getWorker() == null || !entry.getValue().getHasDome()) &&
+           return (entry.getValue().getWorker() == null && !entry.getValue().getHasDome()) &&
                    (getAmountOfBuildingsPerFieldCondition(entry) && entry.getKey().getBlocks() <= 3 && !entry.getKey().getHasDome() ||
                    (entry.getValue().getBlocks() == 3 && entry.getKey().getHasDome() == true));
         });

@@ -12,7 +12,7 @@ public class AtlasRuleSet extends SimpleRuleSet {
     protected Boolean isValidBuild() {
         // the field does not have a worker and no dome
         return frontendFieldToBackendField.entrySet().stream().allMatch(entry -> {
-            return (entry.getValue().getWorker() == null || !entry.getValue().getHasDome()) &&
+            return (entry.getValue().getWorker() == null && !entry.getValue().getHasDome()) &&
                     ((entry.getValue().getBlocks() == entry.getKey().getBlocks() - 1) && entry.getKey().getBlocks() <= 3 && !entry.getKey().getHasDome() ||
                             (entry.getValue().getBlocks() <= 3 && entry.getKey().getHasDome() == true));
         });
