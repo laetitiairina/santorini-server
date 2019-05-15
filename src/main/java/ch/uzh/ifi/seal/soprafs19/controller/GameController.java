@@ -139,4 +139,5 @@ public class GameController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad request!");
         }
     }
+
 }

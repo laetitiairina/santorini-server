@@ -40,6 +40,9 @@ public class Game implements Serializable {
 	@Column
 	private boolean hasMovedUp;
 
+	@Column
+	private boolean wantsRematch = false;
+
 	public Long getId() {
 		return id;
 	}
@@ -88,13 +91,17 @@ public class Game implements Serializable {
 		this.status = status;
 	}
 
-	public boolean isHasMovedUp() {
+	public Boolean getHasMovedUp() {
 		return hasMovedUp;
 	}
 
 	public void setHasMovedUp(boolean hasMovedUp) {
 		this.hasMovedUp = hasMovedUp;
 	}
+
+	public Boolean getWantsRematch() { return wantsRematch; }
+
+	public void setWantsRematch(boolean wantsRematch) { this.wantsRematch = wantsRematch; }
 
 	public Game() {}
 

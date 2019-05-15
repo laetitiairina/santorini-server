@@ -952,4 +952,45 @@ public class GameServiceTest {
         Assert.assertTrue(tokenOnCurrentPlayer);
 
     }
+
+    @Test
+    public void rematch() {
+        // get to move
+        Game simpleGame = helperClass.statusMove(false);
+
+        // change game
+        simpleGame.getBoard().getFields().get(4).setBlocks(2);
+        simpleGame.getBoard().getFields().get(9).setBlocks(3);
+        Worker worker = simpleGame.getBoard().getFields().get(4).getWorker();
+        worker.setIsCurrentWorker(true);
+        simpleGame.getBoard().getFields().get(4).setWorker(null);
+        simpleGame.getBoard().getFields().get(9).setWorker(worker);
+        simpleGame.setStatus(GameStatus.END);
+        gameService.saveGame(simpleGame);
+
+        // choose to rematch
+        Game updatedGame = SerializationUtils.clone(simpleGame);
+        updatedGame.setWantsRematch(true);
+
+        // rematch
+        boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
+
+        // Asserts
+        Assert.assertTrue(isSuccessful);
+        Assert. assertEquals(GameStatus.COLOR1, simpleGame.getStatus());
+        Assert.assertFalse(simpleGame.getWantsRematch());
+        Assert.assertFalse(simpleGame.getHasMovedUp());
+
+        for (Field field : simpleGame.getBoard().getFields()) {
+            Assert.assertNull(field.getWorker());
+            Assert.assertFalse(field.getHasDome());
+            Assert.assertTrue(0 == field.getBlocks());
+        }
+
+        for (Player player : simpleGame.getPlayers()) {
+            Assert.assertNull(player.getColor());
+            Assert.assertNull(player.getWorkers().get(0).getField());
+            Assert.assertNull(player.getWorkers().get(1).getField());
+        }
+    }
 }

@@ -733,7 +733,7 @@ public class GameServiceTest {
     @Test
     public void updateBuildSuccessfully() {
 
-        // get to Build
+        // get to Move
         Game simpleGame = helperClass.statusMove(false);
         // move a worker
         simpleGame = helperClass.move(simpleGame, simpleGame.getBoard().getFields().get(4), simpleGame.getBoard().getFields().get(3));
@@ -795,6 +795,45 @@ public class GameServiceTest {
         for (Player player : simpleGame.getPlayers()) {
             Assert.assertFalse(player.getIsCurrentPlayer());
             Assert.assertFalse(player.getIsActive());
+        }
+    }
+
+    @Test
+    public void rematch() {
+        // get to move
+        Game godGame = helperClass.statusMove(true);
+
+        // change game
+        godGame.getBoard().getFields().get(4).setBlocks(2);
+        godGame.getBoard().getFields().get(9).setBlocks(3);
+        Worker worker = godGame.getBoard().getFields().get(4).getWorker();
+        worker.setIsCurrentWorker(true);
+        godGame.getBoard().getFields().get(4).setWorker(null);
+        godGame.getBoard().getFields().get(9).setWorker(worker);
+        godGame.setStatus(GameStatus.END);
+        godGame.setWantsRematch(true);
+        gameService.saveGame(godGame);
+
+        // rematch
+        gameService.rematch(godGame);
+
+        // Asserts
+        Assert. assertEquals(GameStatus.CARDS1, godGame.getStatus());
+        Assert.assertNull(godGame.getCards());
+        Assert.assertFalse(godGame.getWantsRematch());
+        Assert.assertFalse(godGame.getHasMovedUp());
+
+        for (Field field : godGame.getBoard().getFields()) {
+            Assert.assertNull(field.getWorker());
+            Assert.assertFalse(field.getHasDome());
+            Assert.assertTrue(0 == field.getBlocks());
+        }
+
+        for (Player player : godGame.getPlayers()) {
+            Assert.assertNull(player.getColor());
+            Assert.assertNull(player.getWorkers().get(0).getField());
+            Assert.assertNull(player.getWorkers().get(1).getField());
+            Assert.assertNull(player.getCard());
         }
     }
 

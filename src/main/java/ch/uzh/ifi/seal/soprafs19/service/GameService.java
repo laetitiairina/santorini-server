@@ -3,16 +3,11 @@ package ch.uzh.ifi.seal.soprafs19.service;
 import ch.uzh.ifi.seal.soprafs19.constant.Color;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
-import ch.uzh.ifi.seal.soprafs19.entity.Field;
-import ch.uzh.ifi.seal.soprafs19.entity.Game;
-import ch.uzh.ifi.seal.soprafs19.entity.Player;
-import ch.uzh.ifi.seal.soprafs19.entity.Worker;
+import ch.uzh.ifi.seal.soprafs19.entity.*;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
 import ch.uzh.ifi.seal.soprafs19.rules.IRuleSet;
 import ch.uzh.ifi.seal.soprafs19.rules.RuleFactory;
-import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
-import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +77,12 @@ public class GameService {
         // react to update depending on status
         Game successfullyUpdatedGame = null; // set to true later, if update is valid
         IRuleSet rules = null;
+
+        // rematch if requested
+        if (currentGame.getStatus() == GameStatus.END && updatedGame.getWantsRematch()) {
+            rematch(currentGame);
+            return true;
+        }
 
         // get rules
         for (Player player : currentGame.getPlayers()) {
@@ -537,6 +538,31 @@ public class GameService {
             }
         }
         return fieldToUpdate;
+    }
+
+    /**
+     * reinitialize game
+     * @param game
+     */
+    public void rematch (Game game) {
+        game.setStatus(game.getIsGodMode() ? GameStatus.CARDS1 : GameStatus.COLOR1);
+        game.setCards(null);
+        game.setHasMovedUp(false);
+        game.setBoard(new Board(game, 5));
+        game.setWantsRematch(false);
+
+        for (Player player : game.getPlayers()) {
+            player.setIsCurrentPlayer(false);
+            player.setCard(null);
+            player.setColor(null);
+            for (Worker worker : player.getWorkers()) {
+                worker.setIsCurrentWorker(false);
+                worker.setField(null);
+            }
+        }
+        // Start Player / Challenger
+        game.getPlayers().get(0).setIsCurrentPlayer(true);
+        saveGame(game);
     }
 
     // M3: Fast-forward
