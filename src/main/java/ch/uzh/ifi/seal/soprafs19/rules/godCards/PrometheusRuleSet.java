@@ -9,9 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PrometheusRuleSet extends SimpleRuleSet {
 
-    @Override
-    public Boolean checkMovePhase(Game before, Game after) {
-        return false;
-    }
+    //if worker does not move up, you may build before AND after moving phase
+
 
 }
