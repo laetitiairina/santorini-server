@@ -391,11 +391,17 @@ public class GameService {
                     if (worker.getId().equals(currentWorker.getId())) {
                         worker.setIsCurrentWorker(true);
 
-                        // switch of worker is happening
-                        if(fieldAfter.getWorker() != null) {
+                        // switch of worker is happening, only with Apollo card
+                        if(fieldAfter.getWorker() != null && currentGame.getCurrentPlayer().getCard() == SimpleGodCard.APOLLO) {
                             Worker w = fieldAfter.getWorker();
                             w.setField(fieldBefore);
                             fieldBefore.setWorker(w);
+                        }
+                        //push opponent worker one field, only with Minotaur card
+                        if(fieldAfter.getWorker() != null && currentGame.getCurrentPlayer().getCard() == SimpleGodCard.MINOTAUR){
+                            Worker w = fieldAfter.getWorker();
+                            //TODO: set worker w at 1 field away in the same direction that currentWorker moved
+                            fieldBefore.setWorker(null);
                         }
                         // field was empty
                         else {

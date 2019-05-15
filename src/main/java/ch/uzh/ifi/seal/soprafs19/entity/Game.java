@@ -6,6 +6,7 @@ import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Game implements Serializable {
@@ -148,5 +149,13 @@ public class Game implements Serializable {
 	public GameStatus getGameStatusEnum (int status) {
         return GameStatus.values()[status];
     }
+
+	public Player getCurrentPlayer() {
+		List<Player> currentPlayers = players.stream().filter(player -> player.getIsCurrentPlayer()).collect(Collectors.toList());
+		if (currentPlayers.size() == 1) {
+			return currentPlayers.get(0);
+		}
+		return null;
+	}
 
 }
