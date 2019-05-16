@@ -2,10 +2,8 @@ package ch.uzh.ifi.seal.soprafs19.entity;
 
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
-import org.hibernate.annotations.Proxy;
 
 import javax.persistence.*;
-import java.beans.SimpleBeanInfo;
 import java.io.Serializable;
 import java.util.List;
 
@@ -39,6 +37,9 @@ public class Game implements Serializable {
 
 	@Column
 	private int blockDifference = 0;
+
+	@Column
+	private String message;
 
 	public Long getId() {
 		return id;
@@ -94,6 +95,14 @@ public class Game implements Serializable {
 
 	public void setBlockDifference(int blockDifference) {
 		this.blockDifference = blockDifference;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 
 	public Game() {}

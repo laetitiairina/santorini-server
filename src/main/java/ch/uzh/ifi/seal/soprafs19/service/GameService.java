@@ -83,6 +83,10 @@ public class GameService {
         Game successfullyUpdatedGame = null; // set to true later, if update is valid
         IRuleSet rules = null;
 
+        //reset message on game
+        currentGame.setMessage(null);
+        saveGame(currentGame);
+
         // get rules
         for (Player player : currentGame.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
