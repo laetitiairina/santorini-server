@@ -29,6 +29,9 @@ public class SimpleRuleSet implements IRuleSet {
     protected int xBefore = -1, yBefore = -1, xAfter = -1, yAfter = -1;
 
     // build
+    /**
+     *  Data Structure that maps the fields sent from the frontend (updated game) to the corresponding field on the backend (current state)
+     */
     protected Map<Field, Field> frontendFieldToBackendField;
 
     protected int posWorkerX = -1, posWorkerY = -1;
@@ -115,6 +118,11 @@ public class SimpleRuleSet implements IRuleSet {
         return false;
     }
 
+    @Override
+    public Boolean checkMovePhaseOpponent(Game before, Game after) {
+        return true;
+    }
+
     public Boolean checkBuildPhase(Game before, Game after) {
 
         if (setFieldsBuildPhase(before, after)) {
@@ -174,10 +182,6 @@ public class SimpleRuleSet implements IRuleSet {
         return null;
     }
 
-
-    public Boolean hasRuleForOpponentsTurn() {
-        return false;
-    }
 
     protected Boolean hasWon(Worker worker) {
         return (worker.getField().getBlocks() == 3 && !worker.getField().getHasDome());
@@ -245,11 +249,22 @@ public class SimpleRuleSet implements IRuleSet {
         });
     }
 
+    /**
+     *
+     * @return Boolean Condition for the amount of Fields that can be built on in this phase
+     */
     protected Boolean getAmountOfBuildingFieldsCondition() {
         return frontendFieldToBackendField.size() == 1;
     }
 
+    /**
+     *
+     * @param entry: an entry in the hashmap frontendToBackendField
+     *             entry.getKey() gets the key(frontend Field), and entry.getValue() gets the corresponding value (backend Field)
+     * @return Boolean condition for the amount of blocks that can be built on each field
+     */
     protected Boolean getAmountOfBuildingsPerFieldCondition(Map.Entry<Field, Field> entry) {
         return (entry.getValue().getBlocks() == entry.getKey().getBlocks() - 1);
     }
+
 }

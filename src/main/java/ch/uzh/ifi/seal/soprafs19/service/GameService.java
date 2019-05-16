@@ -81,7 +81,8 @@ public class GameService {
 
         // react to update depending on status
         Game successfullyUpdatedGame = null; // set to true later, if update is valid
-        IRuleSet rules = null;
+        IRuleSet currentPlayerRules = null;
+        IRuleSet opponentPlayerRules = null;
 
         //reset message on game
         currentGame.setMessage(null);
@@ -90,8 +91,9 @@ public class GameService {
         // get rules
         for (Player player : currentGame.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
-                rules = ruleFactory.getRuleSet(player);
+                currentPlayerRules = ruleFactory.getRuleSet(player);
             }
+            else opponentPlayerRules = ruleFactory.getRuleSet(player);
         }
 
         // only checks the first 3 states, if isGodMode is true
@@ -112,14 +114,14 @@ public class GameService {
             case MOVE:
                 // TODO: include isBadRequest handling, add check logic (low priority)
                 // check if it's a valid move
-                if (rules.checkMovePhase(currentGame, updatedGame)) {
+                if (currentPlayerRules.checkMovePhase(currentGame, updatedGame) && opponentPlayerRules.checkMovePhaseOpponent(currentGame, updatedGame)) {
                 successfullyUpdatedGame = move(currentGame, updatedGame);
                 }
                 break;
             case BUILD:
                 // TODO: include isBadRequest handling, add check logic (low priority)
                 // check if it's a valid build
-                if (rules.checkBuildPhase(currentGame, updatedGame)) {
+                if (currentPlayerRules.checkBuildPhase(currentGame, updatedGame)) {
                 successfullyUpdatedGame = build(currentGame, updatedGame);
                 }
                 break;
@@ -128,7 +130,7 @@ public class GameService {
         // update the status of the game for pinging
         if (successfullyUpdatedGame != null) {
             // check if a player has won
-            Player winner = rules.checkWinCondition(successfullyUpdatedGame);
+            Player winner = currentPlayerRules.checkWinCondition(successfullyUpdatedGame);
             if (winner == null) {
                 // increment the status normally
                 incrementGameStatus(successfullyUpdatedGame, false);

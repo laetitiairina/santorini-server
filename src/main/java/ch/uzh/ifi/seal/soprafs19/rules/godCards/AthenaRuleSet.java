@@ -10,13 +10,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class AthenaRuleSet extends SimpleRuleSet {
 
     @Override
-    public Boolean checkMovePhase(Game before, Game after) {
-        return false;
+    public Boolean checkMovePhaseOpponent(Game before, Game after) {
+        Boolean isValidMove = false;
+        if (before.getBlockDifference() > 0) {
+            isValidMove = checkMovePhase(before, after);
+            isValidMove = isValidMove && fieldAfter.getBlocks() - fieldBefore.getBlocks() <= 0;
+        }
+        return isValidMove;
     }
 
-    @Override
-    public Boolean hasRuleForOpponentsTurn () {
-        return true;
-    }
+
 
 }

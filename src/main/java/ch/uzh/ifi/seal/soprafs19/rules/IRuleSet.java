@@ -10,6 +10,6 @@ public interface IRuleSet {
     public Boolean checkBuildPhase(Game before, Game after);
     public Player checkWinCondition(Game game);
     public Boolean isWorkerStuck(Game game, Worker worker);
-    public Boolean hasRuleForOpponentsTurn();
+    public Boolean checkMovePhaseOpponent(Game before, Game after);
 
 }
