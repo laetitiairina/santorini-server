@@ -1,10 +1,8 @@
 package ch.uzh.ifi.seal.soprafs19.rules;
 
 import ch.uzh.ifi.seal.soprafs19.Application;
-import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.*;
-import ch.uzh.ifi.seal.soprafs19.rules.godCards.ApolloRuleSet;
 import ch.uzh.ifi.seal.soprafs19.rules.godCards.ArtemisRuleSet;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.PlayerService;

@@ -544,11 +544,7 @@ public class GameService {
     public boolean checkPlayerAuthentication(Game currentGame, String token) {
         for (Player player : currentGame.getPlayers()) {
             if (player.getToken().equals(token)) {
-                if (player.getIsCurrentPlayer()) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return player.getIsCurrentPlayer();
             }
         }
         return false;
@@ -668,9 +664,7 @@ public class GameService {
             }
             for (Player player : currentGame.getPlayers()) {
                 if (player.getCard() != null) {
-                    if (cardsArr.contains(player.getCard())) {
-                        cardsArr.remove(player.getCard());
-                    }
+                    cardsArr.remove(player.getCard());
                 }
             }
             for (int i = 0; i < currentGame.getPlayers().size(); i++) {
@@ -684,9 +678,7 @@ public class GameService {
         // Make sure colors are set
         for (Player player : currentGame.getPlayers()) {
             if (player.getColor() != null) {
-                if (colorsArr.contains(player.getColor())) {
-                    colorsArr.remove(player.getColor());
-                }
+                colorsArr.remove(player.getColor());
             }
         }
         for (int i = 0; i < currentGame.getPlayers().size(); i++) {

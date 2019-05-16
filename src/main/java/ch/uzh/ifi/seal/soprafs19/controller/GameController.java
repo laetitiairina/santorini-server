@@ -1,11 +1,8 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 
-import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
-import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.helper.JsonHelper;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
-import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

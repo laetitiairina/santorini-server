@@ -1,7 +1,5 @@
 package ch.uzh.ifi.seal.soprafs19.helper;
 
-import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
-import ch.uzh.ifi.seal.soprafs19.entity.Board;
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
@@ -9,7 +7,6 @@ import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
