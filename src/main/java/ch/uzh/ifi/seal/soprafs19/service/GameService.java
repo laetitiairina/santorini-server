@@ -402,6 +402,12 @@ public class GameService {
                             Worker w = fieldAfter.getWorker();
                             //TODO: set worker w at 1 field away in the same direction that currentWorker moved
                             fieldBefore.setWorker(null);
+                            if(w.getField().getPosY() == worker.getField().getPosY()){
+                                if(w.getField().getPosX() < worker.getField().getPosX()){
+                                    fieldAfter = w.getField();  //does this make sense?
+
+                                }
+                            }
                         }
                         // field was empty
                         else {
