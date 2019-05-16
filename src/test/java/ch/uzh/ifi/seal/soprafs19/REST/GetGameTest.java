@@ -97,7 +97,7 @@ public class GetGameTest {
                 .andExpect(jsonPath("$.cards").isEmpty())
                 .andExpect(jsonPath("$.isGodMode").value(testPlayer1.getIsGodMode()))
                 .andExpect(jsonPath("$.status").value(GameStatus.COLOR1.toString()))
-                .andExpect(jsonPath("$.hasMovedUp").value(false))
+                .andExpect(jsonPath("$.blockDifference").value(0))
                 ;
     }
 
@@ -141,7 +141,7 @@ public class GetGameTest {
                 .andExpect(jsonPath("$.cards").isEmpty())
                 .andExpect(jsonPath("$.isGodMode").value(testPlayer1.getIsGodMode()))
                 .andExpect(jsonPath("$.status").value(GameStatus.COLOR1.toString()))
-                .andExpect(jsonPath("$.hasMovedUp").value(false))
+                .andExpect(jsonPath("$.blockDifference").value(0))
         ;
 
         long newPolls = testPlayer2.getLastPollMillis();

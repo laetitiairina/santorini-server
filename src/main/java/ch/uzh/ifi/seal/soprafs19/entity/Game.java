@@ -38,10 +38,7 @@ public class Game implements Serializable {
 	private GameStatus status;
 
 	@Column
-	private boolean hasMovedUp;
-
-	@Column
-	private boolean wantsRematch = false;
+	private int blockDifference = 0;
 
 	public Long getId() {
 		return id;
@@ -91,17 +88,13 @@ public class Game implements Serializable {
 		this.status = status;
 	}
 
-	public Boolean getHasMovedUp() {
-		return hasMovedUp;
+	public Integer getBlockDifference() {
+		return blockDifference;
 	}
 
-	public void setHasMovedUp(boolean hasMovedUp) {
-		this.hasMovedUp = hasMovedUp;
+	public void setBlockDifference(int blockDifference) {
+		this.blockDifference = blockDifference;
 	}
-
-	public Boolean getWantsRematch() { return wantsRematch; }
-
-	public void setWantsRematch(boolean wantsRematch) { this.wantsRematch = wantsRematch; }
 
 	public Game() {}
 

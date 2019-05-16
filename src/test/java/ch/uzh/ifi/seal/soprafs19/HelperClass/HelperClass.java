@@ -74,7 +74,7 @@ public class HelperClass {
     }
 
     public Game statusPosition1(boolean isGodGame) {
-        Game game = setup(isGodGame);
+        Game game = (isGodGame ?  statusStartPlayer(isGodGame) : setup(isGodGame));
 
         for (Player player : game.getPlayers()) {
             if (player.getIsCurrentPlayer()) {

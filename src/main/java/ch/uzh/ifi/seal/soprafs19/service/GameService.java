@@ -74,15 +74,14 @@ public class GameService {
      */
     public boolean updateGame(Game currentGame, Game updatedGame) {
 
+        // if they want to rematch
+        if (currentGame.getStatus() == GameStatus.END && rematch(currentGame, updatedGame)) {
+            return true;
+        }
+
         // react to update depending on status
         Game successfullyUpdatedGame = null; // set to true later, if update is valid
         IRuleSet rules = null;
-
-        // rematch if requested
-        if (currentGame.getStatus() == GameStatus.END && updatedGame.getWantsRematch()) {
-            rematch(currentGame);
-            return true;
-        }
 
         // get rules
         for (Player player : currentGame.getPlayers()) {
@@ -379,7 +378,7 @@ public class GameService {
             return null;
         }
 
-        currentGame.setHasMovedUp((blocksBefore < blocksAfter));
+        currentGame.setBlockDifference((blocksAfter - blocksBefore));
 
         //  set the right worker as isCurrentWorker for build phase
         for (Player player : currentGame.getPlayers()) {
@@ -542,27 +541,55 @@ public class GameService {
 
     /**
      * reinitialize game
-     * @param game
+     * @param currentGame, updatedGame
      */
-    public void rematch (Game game) {
-        game.setStatus(game.getIsGodMode() ? GameStatus.CARDS1 : GameStatus.COLOR1);
-        game.setCards(null);
-        game.setHasMovedUp(false);
-        game.setBoard(new Board(game, 5));
-        game.setWantsRematch(false);
+    public Boolean rematch(Game currentGame, Game updatedGame) {
 
-        for (Player player : game.getPlayers()) {
-            player.setIsCurrentPlayer(false);
-            player.setCard(null);
-            player.setColor(null);
-            for (Worker worker : player.getWorkers()) {
-                worker.setIsCurrentWorker(false);
-                worker.setField(null);
+        // update the  player's wantsRematch variable
+        for (Player player : updatedGame.getPlayers()) {
+            if (player.getWantsRematch()) {
+                for (Player p : currentGame.getPlayers()) {
+                    if (p.getId().equals(player.getId()) && player.getWantsRematch()) {
+                        p.setWantsRematch(true);
+                    }
+                }
             }
         }
-        // Start Player / Challenger
-        game.getPlayers().get(0).setIsCurrentPlayer(true);
-        saveGame(game);
+        saveGame(currentGame);
+
+        // if both players want to rematch
+        if (currentGame.getPlayers().get(0).getWantsRematch() && currentGame.getPlayers().get(1).getWantsRematch()) {
+
+            // reset game variables
+            currentGame.setStatus(currentGame.getIsGodMode() ? GameStatus.CARDS1 : GameStatus.COLOR1);
+            currentGame.setCards(null);
+            currentGame.setBlockDifference(0);
+            currentGame.setBoard(new Board(currentGame, 5));
+
+            // reset player & worker variables
+            for (Player player : currentGame.getPlayers()) {
+                player.setIsCurrentPlayer(false);
+                player.setCard(null);
+                player.setColor(null);
+                player.setWantsRematch(false);
+
+                // for polling
+                player.setIsActive(true);
+                player.didPoll();
+
+                // worker
+                for (Worker worker : player.getWorkers()) {
+                    worker.setIsCurrentWorker(false);
+                    worker.setField(null);
+                }
+            }
+
+            // Start Player / Challenger
+            currentGame.getPlayers().get(0).setIsCurrentPlayer(true);
+            saveGame(currentGame);
+            return true;
+        }
+        return false;
     }
 
     // M3: Fast-forward

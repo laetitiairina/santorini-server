@@ -811,17 +811,20 @@ public class GameServiceTest {
         godGame.getBoard().getFields().get(4).setWorker(null);
         godGame.getBoard().getFields().get(9).setWorker(worker);
         godGame.setStatus(GameStatus.END);
-        godGame.setWantsRematch(true);
+        godGame.getPlayers().get(0).setWantsRematch(true);
         gameService.saveGame(godGame);
 
+        Game updatedGame = SerializationUtils.clone(godGame);
+        updatedGame.getPlayers().get(1).setWantsRematch(true);
+
         // rematch
-        gameService.rematch(godGame);
+        boolean isSuccessful = gameService.rematch(godGame, updatedGame);
 
         // Asserts
+        Assert.assertTrue(isSuccessful);
         Assert. assertEquals(GameStatus.CARDS1, godGame.getStatus());
         Assert.assertNull(godGame.getCards());
-        Assert.assertFalse(godGame.getWantsRematch());
-        Assert.assertFalse(godGame.getHasMovedUp());
+        Assert.assertTrue(godGame.getBlockDifference() <= 0);
 
         for (Field field : godGame.getBoard().getFields()) {
             Assert.assertNull(field.getWorker());
@@ -830,6 +833,7 @@ public class GameServiceTest {
         }
 
         for (Player player : godGame.getPlayers()) {
+            Assert.assertFalse(player.getWantsRematch());
             Assert.assertNull(player.getColor());
             Assert.assertNull(player.getWorkers().get(0).getField());
             Assert.assertNull(player.getWorkers().get(1).getField());
@@ -837,5 +841,31 @@ public class GameServiceTest {
         }
     }
 
+    @Test
+    public void rematchOnlyOnePlayer() {
+        // get to move
+        Game godGame = helperClass.statusMove(true);
+
+        // change game
+        godGame.getBoard().getFields().get(4).setBlocks(2);
+        godGame.getBoard().getFields().get(9).setBlocks(3);
+        Worker worker = godGame.getBoard().getFields().get(4).getWorker();
+        worker.setIsCurrentWorker(true);
+        godGame.getBoard().getFields().get(4).setWorker(null);
+        godGame.getBoard().getFields().get(9).setWorker(worker);
+        godGame.setStatus(GameStatus.END);
+        godGame.getPlayers().get(0).setWantsRematch(true);
+        gameService.saveGame(godGame);
+
+        Game updatedGame = SerializationUtils.clone(godGame);
+
+        // rematch
+        boolean isSuccessful = gameService.rematch(godGame, updatedGame);
+
+        // Asserts
+        Assert.assertFalse(isSuccessful);
+        Assert.assertEquals(2, godGame.getCards().size());
+        Assert. assertNotEquals(GameStatus.CARDS1, godGame.getStatus());
+    }
 }
 

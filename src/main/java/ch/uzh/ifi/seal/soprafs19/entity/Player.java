@@ -53,6 +53,8 @@ public class Player implements Serializable {
     // default value is false
     private boolean isCurrentPlayer = false;
 
+    private boolean wantsRematch = false;
+
     public Long getId() {
         return id;
     }
@@ -153,6 +155,10 @@ public class Player implements Serializable {
     public void setLastPollMillis(Long lastPollMillis) {
         this.lastPollMillis = lastPollMillis;
     }
+
+    public Boolean getWantsRematch() { return wantsRematch; }
+
+    public void setWantsRematch(boolean wantsRematch) { this.wantsRematch = wantsRematch; }
 
 	public Player() {
         this.workers = new ArrayList<>();

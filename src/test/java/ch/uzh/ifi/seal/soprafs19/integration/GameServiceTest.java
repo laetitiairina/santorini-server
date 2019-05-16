@@ -966,11 +966,12 @@ public class GameServiceTest {
         simpleGame.getBoard().getFields().get(4).setWorker(null);
         simpleGame.getBoard().getFields().get(9).setWorker(worker);
         simpleGame.setStatus(GameStatus.END);
+        simpleGame.getPlayers().get(0).setWantsRematch(true);
         gameService.saveGame(simpleGame);
 
         // choose to rematch
         Game updatedGame = SerializationUtils.clone(simpleGame);
-        updatedGame.setWantsRematch(true);
+        updatedGame.getPlayers().get(1).setWantsRematch(true);
 
         // rematch
         boolean isSuccessful = gameService.updateGame(simpleGame, updatedGame);
@@ -978,8 +979,7 @@ public class GameServiceTest {
         // Asserts
         Assert.assertTrue(isSuccessful);
         Assert. assertEquals(GameStatus.COLOR1, simpleGame.getStatus());
-        Assert.assertFalse(simpleGame.getWantsRematch());
-        Assert.assertFalse(simpleGame.getHasMovedUp());
+        Assert.assertTrue(simpleGame.getBlockDifference() <= 0);
 
         for (Field field : simpleGame.getBoard().getFields()) {
             Assert.assertNull(field.getWorker());
@@ -988,6 +988,7 @@ public class GameServiceTest {
         }
 
         for (Player player : simpleGame.getPlayers()) {
+            Assert.assertFalse(player.getWantsRematch());
             Assert.assertNull(player.getColor());
             Assert.assertNull(player.getWorkers().get(0).getField());
             Assert.assertNull(player.getWorkers().get(1).getField());
