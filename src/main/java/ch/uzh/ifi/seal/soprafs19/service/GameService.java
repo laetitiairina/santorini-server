@@ -114,8 +114,15 @@ public class GameService {
             case MOVE:
                 // TODO: include isBadRequest handling, add check logic (low priority)
                 // check if it's a valid move
-                if (currentPlayerRules.checkMovePhase(currentGame, updatedGame) && opponentPlayerRules.checkMovePhaseOpponent(currentGame, updatedGame)) {
-                successfullyUpdatedGame = move(currentGame, updatedGame);
+                if (currentPlayerRules.checkMovePhase(currentGame, updatedGame)) {
+                    if (opponentPlayerRules.checkMovePhaseOpponent(currentGame, updatedGame)) {
+                        successfullyUpdatedGame = move(currentGame, updatedGame);
+                    }
+                    else {
+                        currentGame.setMessage("Move invalid because of opponents god power. Try again!");
+                        saveGame(currentGame);
+                    }
+
                 }
                 break;
             case BUILD:
