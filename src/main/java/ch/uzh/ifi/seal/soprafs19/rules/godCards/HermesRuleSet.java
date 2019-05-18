@@ -10,8 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Transactional
 public class HermesRuleSet extends SimpleRuleSet {
+    @Override
+    public Boolean checkMovePhase(Game before, Game after) {
+        //TODO implement with helper methods and refactorings of other branch
+        return true;
+    }
 
-    //Rekursiv gemäss laeti
+    /* //Rekursiv gemäss laeti
     public boolean hermesPath(Game before, int blockLevel, long destinationId, Field field) {
         for (Field neighbour : neighbouringFields(before, field.getPosX(), field.getPosY())) {
             if (neighbour.getBlocks() == blockLevel) {
@@ -41,4 +46,24 @@ public class HermesRuleSet extends SimpleRuleSet {
 
         return false;
     }
+
+    @Override
+    public Boolean isFieldFree(Game game, Field fieldBefore, Field fieldAfter, boolean isSecondMove) {
+        return isValidMove(false, fieldBefore, fieldAfter);
+    }
+
+    @Override
+    protected Boolean isValidMove(boolean isSecondMove, Field fieldBefore, Field fieldAfter) {
+
+        // origin field had a worker or it's the second move of a worker
+        if ((fieldBefore.getWorker() != null) || isSecondMove
+                // destination field is unoccupied
+                && (fieldAfter.getWorker() == null)
+                // destination field has no dome
+                && (!fieldAfter.getHasDome())) {
+            //check if blocks in after field is maximum 1 higher if woker
+            return (fieldAfter.getBlocks() <= fieldBefore.getBlocks() + 1);
+        }
+        return false;
+    }*/
 }

@@ -41,12 +41,8 @@ public class HermesRuleSetTest extends SimpleRuleSetTest {
     @Autowired
     private PlayerService playerService;
 
-
-    @Override
-    public void moveWorkerSuccessfully(){
-
-            setup();
-            statusMove(game);
+    @Test
+    public void moveWorkerMoreThanOneFieldOnSameLevelSuccessfully(){
 
             // create game with chosen position
             Game updatedGame = SerializationUtils.clone(game);
@@ -54,19 +50,25 @@ public class HermesRuleSetTest extends SimpleRuleSetTest {
 
             Worker worker = board.getFields().get(4).getWorker();
 
-            //set all fields
-            List<Field> fields = updatedGame.getBoard().getFields();
+            // move a worker by one field in any direction
+            List<Field> fields = new ArrayList<>();
 
-            //Move Worker from one Corner to the other
-            fields.get(4).setWorker(null);
-            fields.get(16).setWorker(worker);
+            // new field
+            fields.add(board.getFields().get(16));
+            fields.get(0).setWorker(worker);
+
+            // old field
+            fields.add(board.getFields().get(4));
+            fields.get(1).setWorker(null);
+
+            board.setFields(fields);
 
             //set some blocks
-            fields.get(0).setBlocks(1);
-            fields.get(1).setBlocks(1);
-            fields.get(2).setBlocks(2);
-            fields.get(24).setBlocks(2);
-            fields.get(23).setBlocks(1);
+            game.getBoard().getFields().get(0).setBlocks(1);
+            game.getBoard().getFields().get(1).setBlocks(1);
+            game.getBoard().getFields().get(2).setBlocks(2);
+            game.getBoard().getFields().get(24).setBlocks(2);
+            game.getBoard().getFields().get(13).setBlocks(1);
 
 
             // update position of Workers
