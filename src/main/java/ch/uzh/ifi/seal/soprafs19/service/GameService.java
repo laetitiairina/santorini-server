@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -376,14 +377,20 @@ public class GameService {
             Field fieldToUpdate = getFieldToUpdate(currentGame, field);
 
             // update the worker value of the field and remember current Worker
+            try {
 
-            if (field.getWorker() != null) {
-                currentWorker = field.getWorker();
-                blocksAfter = fieldToUpdate.getBlocks();
-                fieldAfter = fieldToUpdate;
-            } else {
-                fieldBefore = fieldToUpdate;
-                blocksBefore = fieldToUpdate.getBlocks();
+                if (field.getWorker() != null) {
+                    currentWorker = field.getWorker();
+                    blocksAfter = fieldToUpdate.getBlocks();
+                    fieldAfter = fieldToUpdate;
+                } else {
+                    fieldBefore = fieldToUpdate;
+                    blocksBefore = fieldToUpdate.getBlocks();
+                }
+            }
+            catch (NullPointerException e){
+                log.error("fieldToUpdate not found on backend");
+                return null;
             }
         }
 
