@@ -57,11 +57,13 @@ public class HephaestusRuleSetTest extends SimpleRuleSetTest {
         List<Field> fields = new ArrayList<>();
 
         fields.add(board.getFields().get(13));
+        fields.add(board.getFields().get(13));
         fields.get(0).setBlocks(2);
+        fields.get(1).setBlocks(2);
 
         board.setFields(fields);
 
-        Assert.assertEquals(1, board.getFields().size());
+        Assert.assertEquals(2, board.getFields().size());
 
         // update position of Workers
         boolean isSuccessful = ruleSet.checkBuildPhase(game, updatedGame);

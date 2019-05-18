@@ -89,6 +89,11 @@ public class HermesRuleSetTest extends SimpleRuleSetTest {
         
     }
 
+    @Override
+    public void dontMoveWorkerFails() {
+
+    }
+
     @Test
     public void correctlyInitialized() {
         Player player1 = game.getPlayers().get(0);
