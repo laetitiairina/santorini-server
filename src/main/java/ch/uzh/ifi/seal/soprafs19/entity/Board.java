@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Board implements Serializable {
@@ -60,6 +61,14 @@ public class Board implements Serializable {
 			this.fields.add(new Field(this,i, j));
 		}
 
+	}
+
+	public Field getFieldByCoordinates(int x, int y) {
+		List<Field> coordinateFields = fields.stream().filter(field -> field.getPosX() == x && field.getPosY() == y).collect(Collectors.toList());
+		if (coordinateFields.size() == 1) {
+			return coordinateFields.get(0);
+		}
+		else return null;
 	}
 
 	@Override

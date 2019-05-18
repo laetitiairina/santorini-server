@@ -15,38 +15,7 @@ import java.util.List;
 @Transactional
 public class MinotaurRuleSet extends SimpleRuleSet {
 
-    //extra
-    private Worker ownWorker;
 
-    //can only not move on fields, which are occupied with own worker
-    //following method may be duplicate from ApolloRuleSet.java
-    @Override
-    public Boolean checkMovePhase(Game before, Game after) {
-
-        if(setFieldsBeforeMovePhase(before) && setFieldsAfterMovePhase(after)){
-            //get Worker of current player which is not being moved
-            for (Player p : before.getPlayers()) {
-                if (p.getIsCurrentPlayer()) {
-                    for (Worker w : p.getWorkers()) {
-                        //
-                        if (w != null && !fieldBeforeBackEnd.getWorker().getId().equals(w.getId())) {
-                            ownWorker = w;
-                        }
-                    }
-                }
-            }
-
-            //faulty info from front-end
-            if(ownWorker == null){
-                return false;
-            }
-
-            //check if worker can move
-            return isFieldFree(before, fieldBeforeBackEnd, fieldAfterBackEnd, false);
-        }
-        return false;
-
-    }
     //Worker is not anymore Stuck when a opponent worker is on a neighboring field
     @Override
     public Boolean isWorkerStuck(Game game, Worker worker) {
@@ -78,8 +47,10 @@ public class MinotaurRuleSet extends SimpleRuleSet {
     protected Boolean isValidMove(boolean isSecondMove, Field fieldBefore, Field fieldAfter) {
         // origin field had a worker
         if ((fieldBefore.getWorker() != null) || isSecondMove
-                //destination field has not your own worker
-                && (fieldAfter.getWorker() == null || !fieldAfter.getWorker().getId().equals(ownWorker.getId()))
+                //destination field has not your own worker and this opponent worker is not being pushed off the edge
+                && (fieldAfter.getWorker() == null || (!fieldAfter.getWorker().getPlayer().getIsCurrentPlayer() &&
+                (!(fieldAfter.getPosX() == 0 && fieldBefore.getPosX() == 1) || !(fieldAfter.getPosX() == 4 && fieldBefore.getPosX() == 3)
+                    || !(fieldAfter.getPosY() == 0 && fieldBefore.getPosY() == 1) || !(fieldAfter.getPosY() == 4 && fieldBefore.getPosY() == 3))))
                 // destination field has no dome
                 && (!fieldAfterBackEnd.getHasDome())) {
             //check if blocks in after field is maximum 1 higher

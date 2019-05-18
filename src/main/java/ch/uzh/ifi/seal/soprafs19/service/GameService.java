@@ -393,24 +393,35 @@ public class GameService {
 
                         // switch of worker is happening, only with Apollo card
                         if(fieldAfter.getWorker() != null && currentGame.getCurrentPlayer().getCard() == SimpleGodCard.APOLLO) {
-                            Worker w = fieldAfter.getWorker();
-                            w.setField(fieldBefore);
-                            fieldBefore.setWorker(w);
+                            Worker opponentWorker = fieldAfter.getWorker();
+                            opponentWorker.setField(fieldBefore);
+                            fieldBefore.setWorker(opponentWorker);
                         }
                         //push opponent worker one field, only with Minotaur card
-                        if(fieldAfter.getWorker() != null && currentGame.getCurrentPlayer().getCard() == SimpleGodCard.MINOTAUR){
-                            Worker w = fieldAfter.getWorker();
-                            //TODO: set worker w at 1 field away in the same direction that currentWorker moved
+                        else if(fieldAfter.getWorker() != null && currentGame.getCurrentPlayer().getCard() == SimpleGodCard.MINOTAUR){
+                            Worker opponentWorker = fieldAfter.getWorker();
                             fieldBefore.setWorker(null);
-                            if(w.getField().getPosY() == worker.getField().getPosY()){
-                                if(w.getField().getPosX() < worker.getField().getPosX()){
-                                    fieldAfter = w.getField();  //does this make sense?
-
-                                }
+                            int deltaX = 0;
+                            int deltaY = 0;
+                            //move left
+                            if(opponentWorker.getField().getPosX() < worker.getField().getPosX()){
+                                deltaX = -1;
                             }
+                            //move right
+                            else if(opponentWorker.getField().getPosX() > worker.getField().getPosX()) {
+                                deltaX = 1;
+                            }
+                            // move down
+                            if (opponentWorker.getField().getPosY() < worker.getField().getPosY()) {
+                                deltaY = -1;
+                            }// move up
+                            if (opponentWorker.getField().getPosY() > worker.getField().getPosY()) {
+                                deltaY = 1;
+                            }
+                            moveWorker(currentGame, opponentWorker, deltaX, deltaY);
                         }
                         // field was empty
-                        else {
+                        else if(fieldAfter.getWorker() == null) {
                             fieldBefore.setWorker(null);
                         }
 
@@ -424,6 +435,16 @@ public class GameService {
         }
 
         return currentGame;
+    }
+
+    public boolean moveWorker(Game currentGame, Worker worker, int deltaX, int deltaY) {
+        Field targetField = currentGame.getBoard().getFieldByCoordinates(worker.getField().getPosX() + deltaX, worker.getField().getPosY() + deltaY);
+        if (targetField != null) {
+            worker.setField(targetField);
+            targetField.setWorker(worker);
+            return true;
+        }
+        return false;
     }
 
     /**
