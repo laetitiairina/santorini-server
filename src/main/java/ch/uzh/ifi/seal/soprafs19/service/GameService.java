@@ -381,6 +381,14 @@ public class GameService {
      * @return updated game
      */
     public Game move(Game currentGame, Game updatedGame) {
+
+        // Prometheus build first if necessary
+        if (currentGame.getCurrentPlayer().getCard() == SimpleGodCard.PROMETHEUS && updatedGame.getBoard().getFields().size() == 3) {
+            currentGame.getBoard().getFieldByCoordinates(updatedGame.getBoard().getFields().get(0).getPosX(), updatedGame.getBoard().getFields().get(0).getPosY())
+                    .setBlocks(updatedGame.getBoard().getFields().get(0).getBlocks());
+            updatedGame.getBoard().getFields().remove(0);
+        }
+
         Worker currentWorker = null;
         int blocksBefore = -1, blocksAfter = -1;
         Field fieldBefore = null, fieldAfter = null;
