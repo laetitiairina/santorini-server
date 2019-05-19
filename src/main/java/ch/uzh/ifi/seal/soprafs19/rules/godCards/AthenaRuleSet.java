@@ -11,7 +11,7 @@ public class AthenaRuleSet extends SimpleRuleSet {
 
     @Override
     public Boolean checkMovePhaseOpponent(Game before, Game after) {
-        Boolean isValidMove = false;
+        Boolean isValidMove = true;
         if (before.getBlockDifference() > 0) {
             checkMovePhase(before, after);
             isValidMove = fieldAfter.getBlocks() - fieldBefore.getBlocks() <= 0;

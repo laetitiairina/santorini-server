@@ -121,12 +121,12 @@ public class GameService {
                         // special logic for hermes input
                         if (currentGame.getCurrentPlayer().getCard() == SimpleGodCard.HERMES) {
                             List<Field> inputFields = updatedGame.getBoard().getFields();
-                            updatedGame.getBoard().setFields(inputFields.subList(0, 1));
+                            updatedGame.getBoard().setFields(inputFields.subList(0, 2));
                             successfullyUpdatedGame = move(currentGame, updatedGame);
-                            updatedGame.getBoard().setFields(inputFields.subList(2, 3));
+                            updatedGame.getBoard().setFields(inputFields.subList(2, 4));
                             successfullyUpdatedGame = successfullyUpdatedGame == null ? null : move(successfullyUpdatedGame, updatedGame);
                             if (successfullyUpdatedGame != null) {
-                                successfullyUpdatedGame.getCurrentPlayer().getWorkers().forEach(worker -> worker.setIsCurrentWorker(false));
+                                currentGame.getCurrentPlayer().getWorkers().forEach(worker -> worker.setIsCurrentWorker(false));
                             }
                         }
                         else {
@@ -384,6 +384,11 @@ public class GameService {
         Worker currentWorker = null;
         int blocksBefore = -1, blocksAfter = -1;
         Field fieldBefore = null, fieldAfter = null;
+
+        // In case of Hermes: If worker didn't move, do nothing
+        if (currentGame.getCurrentPlayer().getCard() == SimpleGodCard.HERMES && updatedGame.getBoard().getFields().get(0).equals(updatedGame.getBoard().getFields().get(1))) {
+            return currentGame;
+        }
 
         for (Field field : updatedGame.getBoard().getFields()) {
 

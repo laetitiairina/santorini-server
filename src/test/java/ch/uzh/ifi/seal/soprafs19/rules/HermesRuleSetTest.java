@@ -44,48 +44,94 @@ public class HermesRuleSetTest extends SimpleRuleSetTest {
     @Test
     public void moveOneWorkerMoreThanOneFieldOnSameLevelSuccessfully(){
 
-            // create game with chosen position
-            Game updatedGame = SerializationUtils.clone(game);
-            Board board = updatedGame.getBoard();
+        // create game with chosen position
+        Game updatedGame = SerializationUtils.clone(game);
+        Board board = updatedGame.getBoard();
 
-            Worker worker1 = board.getFields().get(4).getWorker();
-            Worker worker2 = board.getFields().get(18).getWorker();
+        Worker worker1 = board.getFields().get(4).getWorker();
+        Worker worker2 = board.getFields().get(18).getWorker();
 
-            // move a worker by one field in any direction
-            List<Field> fields = new ArrayList<>();
+        // move a worker by one field in any direction
+        List<Field> fields = new ArrayList<>();
 
-            // old field 1
-            fields.add(board.getFields().get(4));
-            fields.get(0).setWorker(null);
+        // old field 1
+        fields.add(board.getFields().get(4));
+        fields.get(0).setWorker(null);
 
-            // new field 1
-            fields.add(board.getFields().get(16));
-            fields.get(1).setWorker(worker1);
+        // new field 1
+        fields.add(board.getFields().get(16));
+        fields.get(1).setWorker(worker1);
 
-            // old field 2
-            fields.add(board.getFields().get(18));
-            fields.get(2).setWorker(worker2);
+        // old field 2
+        fields.add(board.getFields().get(18));
+        fields.get(2).setWorker(worker2);
 
-            //new field 2
-            fields.add(board.getFields().get(18));
-            fields.get(3).setWorker(worker2);
+        //new field 2
+        fields.add(board.getFields().get(18));
+        fields.get(3).setWorker(worker2);
 
-            board.setFields(fields);
+        board.setFields(fields);
 
-            //set some blocks
-            game.getBoard().getFields().get(0).setBlocks(1);
-            game.getBoard().getFields().get(1).setBlocks(1);
-            game.getBoard().getFields().get(2).setBlocks(2);
-            game.getBoard().getFields().get(24).setBlocks(2);
-            game.getBoard().getFields().get(13).setBlocks(1);
+        //set some blocks
+        game.getBoard().getFields().get(0).setBlocks(1);
+        game.getBoard().getFields().get(1).setBlocks(1);
+        game.getBoard().getFields().get(2).setBlocks(2);
+        game.getBoard().getFields().get(24).setBlocks(2);
+        game.getBoard().getFields().get(13).setBlocks(1);
 
 
-            // update position of Workers
-            boolean isSuccessful = ruleSet.checkMovePhase(game, updatedGame);
+        // update position of Workers
+        boolean isSuccessful = ruleSet.checkMovePhase(game, updatedGame);
 
-            // Asserts
-            Assert.assertTrue(isSuccessful);
-        }
+        // Asserts
+        Assert.assertTrue(isSuccessful);
+    }
+
+    @Test
+    public void checkBuildPhaseWithoutCurrentWorker() {
+        // create game with chosen position
+        Game updatedGame = SerializationUtils.clone(game);
+        Board board = updatedGame.getBoard();
+
+        Worker worker1 = board.getFields().get(4).getWorker();
+        Worker worker2 = board.getFields().get(18).getWorker();
+
+        // move a worker by one field in any direction
+        List<Field> fields = new ArrayList<>();
+
+        // old field 1
+        fields.add(board.getFields().get(4));
+        fields.get(0).setWorker(null);
+
+        // new field 1
+        fields.add(board.getFields().get(16));
+        fields.get(1).setWorker(worker1);
+
+        // old field 2
+        fields.add(board.getFields().get(18));
+        fields.get(2).setWorker(worker2);
+
+        //new field 2
+        fields.add(board.getFields().get(18));
+        fields.get(3).setWorker(worker2);
+
+        board.setFields(fields);
+
+        // Asserts
+        Assert.assertTrue(gameService.updateGame(game, updatedGame));
+
+        updatedGame = SerializationUtils.clone(game);
+        board = updatedGame.getBoard();
+
+        board.getFields().get(17).setBlocks(1);
+
+        fields.clear();
+        fields.add(board.getFields().get(17));
+        updatedGame.getBoard().setFields(fields);
+
+        Assert.assertTrue(gameService.updateGame(game, updatedGame));
+
+    }
 
 
     @Override

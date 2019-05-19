@@ -77,18 +77,35 @@ public class AthenaRuleSetTest extends SimpleRuleSetTest {
         updatedGame = SerializationUtils.clone(game);
         board = updatedGame.getBoard();
 
-        move(game, game.getBoard().getFields().get(7), game.getBoard().getFields().get(8));
+        //move(game, game.getBoard().getFields().get(7), game.getBoard().getFields().get(8));
+
 
         Worker worker = board.getFields().get(7).getWorker();
         worker.setIsCurrentWorker(true);
         board.getFields().get(7).setWorker(null);
         board.getFields().get(8).setWorker(worker);
 
-        List<Field> fields1 = new ArrayList<>();
-        fields1.add(board.getFields().get(7));
-        fields1.add(board.getFields().get(8));
+        fields.clear();
+        fields.add(board.getFields().get(7));
+        fields.add(board.getFields().get(8));
+
+        board.setFields(fields);
 
         gameService.updateGame(game, updatedGame);
+
+        updatedGame = SerializationUtils.clone(game);
+        board = updatedGame.getBoard();
+
+        fields.clear();
+
+        fields.add(board.getFields().get(13));
+        fields.get(0).setBlocks(1);
+
+        board.setFields(fields);
+
+        gameService.updateGame(game, updatedGame);
+
+        Assert.assertTrue(game.getCurrentPlayer().getCard().ordinal() == SimpleGodCard.DEMETER.ordinal());
 
         updatedGame = SerializationUtils.clone(game);
         board = updatedGame.getBoard();
@@ -98,11 +115,10 @@ public class AthenaRuleSetTest extends SimpleRuleSetTest {
         board.getFields().get(9).setWorker(null);
         board.getFields().get(14).setWorker(worker);
 
-        // move a worker by one field in any direction
-        List<Field> fields2 = new ArrayList<>();
+        fields.clear();
 
-        fields1.add(board.getFields().get(9));
-        fields1.add(board.getFields().get(14));
+        fields.add(board.getFields().get(9));
+        fields.add(board.getFields().get(14));
 
         board.setFields(fields);
 

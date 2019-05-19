@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.rules.godCards;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
+import ch.uzh.ifi.seal.soprafs19.entity.Worker;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
 import ch.uzh.ifi.seal.soprafs19.entity.Field; 
 import org.springframework.stereotype.Component;
@@ -19,9 +20,11 @@ public class HermesRuleSet extends SimpleRuleSet {
 
     @Override
     public Boolean checkMovePhase(Game before, Game after) {
-        //TODO implement with helper methods and refactorings of other branch
         List<Field> frontEndFields = after.getBoard().getFields();
         gameBefore = before;
+        boolean worker1MovedUp = false;
+        boolean worker2MovedUp = false;
+
         if (!mapFrontendToBackendFields(before, after)) {
             return false;
         }
@@ -42,6 +45,13 @@ public class HermesRuleSet extends SimpleRuleSet {
         if (!isValidMove(false, frontendFieldToBackendField.get(frontEndFields.get(2)), frontendFieldToBackendField.get(frontEndFields.get(3)))) {
             return false;
         }
+        // if one worker moves up only one can move
+        if(worker1MovedUp && !frontEndFields.get(2).equals(frontEndFields.get(3))) {
+            return false;
+        }
+        if (worker2MovedUp && ! frontEndFields.get(0).equals(frontEndFields.get(1))){
+            return false;
+        }
         return true;
     }
 
@@ -55,7 +65,7 @@ public class HermesRuleSet extends SimpleRuleSet {
                 (fieldBefore.equals(fieldAfter)))
                 // destination field has no dome
                 && (!fieldAfter.getHasDome())) {
-            //check if blocks in after field is maximum 1 higher if woker only moves one field
+            //check if blocks in after field is maximum 1 higher if worker only moves one field
             if (isNeighbouringField(gameBefore, fieldAfter)) {
                 return (fieldAfter.getBlocks() <= fieldBefore.getBlocks() + 1);
             }
@@ -83,5 +93,24 @@ public class HermesRuleSet extends SimpleRuleSet {
         }
         return false;*/
         return true;
+    }
+
+    @Override
+    public Boolean checkBuildPhase(Game before, Game after) {
+        if (mapFrontendToBackendFields(before, after)) {
+            List<Worker> workers = before.getCurrentPlayer().getWorkers();
+
+            List<Field> neighbouringFields = neighbouringFields(after, workers.get(0).getField().getPosX(), workers.get(0).getField().getPosY());
+            if (!neighbouringFields.addAll(neighbouringFields(after, workers.get(1).getField().getPosX(), workers.get(1).getField().getPosY()))) {
+                return false;
+            }
+
+            // check if can build
+            Boolean canBuild = frontendFieldToBackendField.keySet().stream().allMatch(f -> {
+                return  neighbouringFields.stream().anyMatch(n -> n.getPosX() == f.getPosX() && n.getPosY() == f.getPosY());
+            });
+            return canBuild && isValidBuild();
+        }
+        return false;
     }
 }
