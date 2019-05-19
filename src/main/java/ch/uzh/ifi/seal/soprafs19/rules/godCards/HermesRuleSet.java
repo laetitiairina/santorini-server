@@ -22,8 +22,6 @@ public class HermesRuleSet extends SimpleRuleSet {
     public Boolean checkMovePhase(Game before, Game after) {
         List<Field> frontEndFields = after.getBoard().getFields();
         gameBefore = before;
-        boolean worker1MovedUp = false;
-        boolean worker2MovedUp = false;
 
         if (!mapFrontendToBackendFields(before, after)) {
             return false;
@@ -46,10 +44,10 @@ public class HermesRuleSet extends SimpleRuleSet {
             return false;
         }
         // if one worker moves up only one can move
-        if(worker1MovedUp && !frontEndFields.get(2).equals(frontEndFields.get(3))) {
+        if(frontEndFields.get(1).getBlocks() - frontEndFields.get(0).getBlocks() == 1 && !frontEndFields.get(2).equals(frontEndFields.get(3))) {
             return false;
         }
-        if (worker2MovedUp && ! frontEndFields.get(0).equals(frontEndFields.get(1))){
+        if (frontEndFields.get(3).getBlocks() - frontEndFields.get(2).getBlocks() == 1 && !frontEndFields.get(0).equals(frontEndFields.get(1))){
             return false;
         }
         return true;
