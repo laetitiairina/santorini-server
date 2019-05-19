@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.validation.constraints.Null;
 import java.util.ArrayList;
@@ -117,7 +118,20 @@ public class GameService {
                 // check if it's a valid move
                 if (currentPlayerRules.checkMovePhase(currentGame, updatedGame)) {
                     if (opponentPlayerRules.checkMovePhaseOpponent(currentGame, updatedGame)) {
-                        successfullyUpdatedGame = move(currentGame, updatedGame);
+                        // special logic for hermes input
+                        if (currentGame.getCurrentPlayer().getCard() == SimpleGodCard.HERMES) {
+                            List<Field> inputFields = updatedGame.getBoard().getFields();
+                            updatedGame.getBoard().setFields(inputFields.subList(0, 1));
+                            successfullyUpdatedGame = move(currentGame, updatedGame);
+                            updatedGame.getBoard().setFields(inputFields.subList(2, 3));
+                            successfullyUpdatedGame = successfullyUpdatedGame == null ? null : move(successfullyUpdatedGame, updatedGame);
+                            if (successfullyUpdatedGame != null) {
+                                successfullyUpdatedGame.getCurrentPlayer().getWorkers().forEach(worker -> worker.setIsCurrentWorker(false));
+                            }
+                        }
+                        else {
+                            successfullyUpdatedGame = move(currentGame, updatedGame);
+                        }
                     }
                     else {
                         currentGame.setMessage("Move invalid because of opponents god power. Try again!");

@@ -5,51 +5,44 @@ import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
 import ch.uzh.ifi.seal.soprafs19.entity.Field; 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Component
 @Transactional
 public class HermesRuleSet extends SimpleRuleSet {
+
+    private Game gameBefore;
+
     @Override
     public Boolean checkMovePhase(Game before, Game after) {
         //TODO implement with helper methods and refactorings of other branch
+        List<Field> frontEndFields = after.getBoard().getFields();
+        gameBefore = before;
+        if (!mapFrontendToBackendFields(before, after)) {
+            return false;
+        }
+        //check if no player moved
+        if ((frontEndFields.get(0).getId() == frontEndFields.get(1).getId() &&
+                frontEndFields.get(2).getId() == frontEndFields.get(3).getId()) &&
+                frontEndFields.stream().allMatch(field -> field.getWorker() != null)){
+            return true;
+        }
+        // check if fields are sent in correct order
+        if (!(frontendFieldToBackendField.get(frontEndFields.get(0)).getWorker().equals(frontEndFields.get(1).getWorker()) &&
+            frontendFieldToBackendField.get(frontEndFields.get(2)).getWorker().equals(frontEndFields.get(3).getWorker()))) {
+            return false;
+        }
+        if (!isValidMove(false, frontendFieldToBackendField.get(frontEndFields.get(0)), frontendFieldToBackendField.get(frontEndFields.get(1)))){
+            return false;
+        }
+        if (!isValidMove(false, frontendFieldToBackendField.get(frontEndFields.get(2)), frontendFieldToBackendField.get(frontEndFields.get(3)))) {
+            return false;
+        }
         return true;
-    }
-
-    /* //Rekursiv gemäss laeti
-    public boolean hermesPath(Game before, int blockLevel, long destinationId, Field field) {
-        for (Field neighbour : neighbouringFields(before, field.getPosX(), field.getPosY())) {
-            if (neighbour.getBlocks() == blockLevel) {
-                if (neighbour.getId() == destinationId) {
-                    return true;
-                } else {
-                    return hermesPath(before, blockLevel, destinationId, neighbour);
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public Boolean checkMovePhase(Game before, Game after) {
-
-        //when player wants to move up or down with worker-> normal move
-        if (setFieldsAfterMovePhase(before) && setFieldsBeforeMovePhase(after)) {
-            if (fieldAfter.getBlocks() != fieldBefore.getBlocks()) {
-                return isFieldFree(before, fieldBeforeBackEnd, fieldAfterBackEnd, false);
-
-            }
-
-            //special hermes Move-> on the same level, worker can move as much as he wants and can also stay on same place
-            else return hermesPath(before, fieldBefore.getBlocks(), fieldAfter.getId(), fieldBefore);
-        }
-
-        return false;
-    }
-
-    @Override
-    public Boolean isFieldFree(Game game, Field fieldBefore, Field fieldAfter, boolean isSecondMove) {
-        return isValidMove(false, fieldBefore, fieldAfter);
     }
 
     @Override
@@ -58,12 +51,37 @@ public class HermesRuleSet extends SimpleRuleSet {
         // origin field had a worker or it's the second move of a worker
         if ((fieldBefore.getWorker() != null) || isSecondMove
                 // destination field is unoccupied
-                && (fieldAfter.getWorker() == null)
+                && ((fieldAfter.getWorker() == null && !fieldBefore.equals(fieldAfter)) ||
+                (fieldBefore.equals(fieldAfter)))
                 // destination field has no dome
                 && (!fieldAfter.getHasDome())) {
-            //check if blocks in after field is maximum 1 higher if woker
-            return (fieldAfter.getBlocks() <= fieldBefore.getBlocks() + 1);
+            //check if blocks in after field is maximum 1 higher if woker only moves one field
+            if (isNeighbouringField(gameBefore, fieldAfter)) {
+                return (fieldAfter.getBlocks() <= fieldBefore.getBlocks() + 1);
+            }
+            else return hasValidPath(fieldBefore, fieldAfter) && fieldAfter.getBlocks() == fieldBefore.getBlocks();
         }
         return false;
-    }*/
+    }
+
+    private Boolean isNeighbouringField(Game game, Field fieldAfter) {
+        return neighbouringFields(game, fieldAfter.getPosX(), fieldAfter.getPosY()).stream().anyMatch(field -> field.equals(fieldAfter));
+    }
+
+    private Boolean hasValidPath(Field origin, Field target) {
+        // TODO replace this with dynamic programming solution because of stack overflow error
+        /*int blockLevel = origin.getBlocks();
+        for (Field neighbour : neighbouringFields(gameBefore, origin.getPosX(), origin.getPosY())) {
+            if (neighbour.getBlocks() == blockLevel) {
+                if (neighbour.equals(target)){
+                    return true;
+                }
+                else {
+                    return hasValidPath(neighbour, target);
+                }
+            }
+        }
+        return false;*/
+        return true;
+    }
 }

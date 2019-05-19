@@ -69,7 +69,7 @@ public class SimpleRuleSet implements IRuleSet {
         return !(fieldAfter == null || fieldBefore == null);
     }
 
-    protected Boolean setFieldsBuildPhase(Game before, Game after) {
+    protected Boolean mapFrontendToBackendFields(Game before, Game after) {
         frontendFieldToBackendField = new HashMap<>();
         for (Field field : after.getBoard().getFields()) {
             if (field != null){
@@ -125,7 +125,7 @@ public class SimpleRuleSet implements IRuleSet {
 
     public Boolean checkBuildPhase(Game before, Game after) {
 
-        if (setFieldsBuildPhase(before, after)) {
+        if (mapFrontendToBackendFields(before, after)) {
             setPosWorkerBuildPhase(before);
 
             // check if can build

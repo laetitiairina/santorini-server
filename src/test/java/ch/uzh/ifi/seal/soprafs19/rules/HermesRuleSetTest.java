@@ -42,24 +42,33 @@ public class HermesRuleSetTest extends SimpleRuleSetTest {
     private PlayerService playerService;
 
     @Test
-    public void moveWorkerMoreThanOneFieldOnSameLevelSuccessfully(){
+    public void moveOneWorkerMoreThanOneFieldOnSameLevelSuccessfully(){
 
             // create game with chosen position
             Game updatedGame = SerializationUtils.clone(game);
             Board board = updatedGame.getBoard();
 
-            Worker worker = board.getFields().get(4).getWorker();
+            Worker worker1 = board.getFields().get(4).getWorker();
+            Worker worker2 = board.getFields().get(18).getWorker();
 
             // move a worker by one field in any direction
             List<Field> fields = new ArrayList<>();
 
-            // new field
-            fields.add(board.getFields().get(16));
-            fields.get(0).setWorker(worker);
-
-            // old field
+            // old field 1
             fields.add(board.getFields().get(4));
-            fields.get(1).setWorker(null);
+            fields.get(0).setWorker(null);
+
+            // new field 1
+            fields.add(board.getFields().get(16));
+            fields.get(1).setWorker(worker1);
+
+            // old field 2
+            fields.add(board.getFields().get(18));
+            fields.get(2).setWorker(worker2);
+
+            //new field 2
+            fields.add(board.getFields().get(18));
+            fields.get(3).setWorker(worker2);
 
             board.setFields(fields);
 
@@ -81,17 +90,22 @@ public class HermesRuleSetTest extends SimpleRuleSetTest {
 
     @Override
     public void moveWorkerInvalidField(){
-
+        // do nothing
     }
 
     @Override
     public void moveWorker2Fields() {
-        
+        // do nothing
     }
 
     @Override
     public void dontMoveWorkerFails() {
+        // do nothing
+    }
 
+    @Override
+    public void moveWorkerSuccessfully() {
+        // do nothing
     }
 
     @Test
