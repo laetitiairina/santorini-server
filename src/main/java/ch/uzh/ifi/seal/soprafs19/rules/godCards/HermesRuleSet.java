@@ -101,8 +101,8 @@ public class HermesRuleSet extends SimpleRuleSet {
         if (mapFrontendToBackendFields(before, after)) {
             List<Worker> workers = before.getCurrentPlayer().getWorkers();
 
-            List<Field> neighbouringFields = neighbouringFields(after, workers.get(0).getField().getPosX(), workers.get(0).getField().getPosY());
-            if (!neighbouringFields.addAll(neighbouringFields(after, workers.get(1).getField().getPosX(), workers.get(1).getField().getPosY()))) {
+            List<Field> neighbouringFields = neighbouringFields(before, workers.get(0).getField().getPosX(), workers.get(0).getField().getPosY());
+            if (!neighbouringFields.addAll(neighbouringFields(before, workers.get(1).getField().getPosX(), workers.get(1).getField().getPosY()))) {
                 return false;
             }
 

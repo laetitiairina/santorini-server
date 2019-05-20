@@ -14,8 +14,7 @@ import java.util.List;
 @Component
 @Transactional
 public class MinotaurRuleSet extends SimpleRuleSet {
-
-
+    
     //Worker is not anymore Stuck when a opponent worker is on a neighboring field
     @Override
     public Boolean isWorkerStuck(Game game, Worker worker) {
@@ -43,10 +42,12 @@ public class MinotaurRuleSet extends SimpleRuleSet {
         }
         return true;
     }
+
+
     @Override
     protected Boolean isValidMove(boolean isSecondMove, Field fieldBefore, Field fieldAfter) {
         // origin field had a worker
-        if ((fieldBefore.getWorker() != null) || isSecondMove
+        if (((fieldBefore.getWorker() != null) || isSecondMove)
                 //destination field has not your own worker and this opponent worker is not being pushed off the edge
                 && (fieldAfter.getWorker() == null || (!fieldAfter.getWorker().getPlayer().getIsCurrentPlayer() &&
                 (!(fieldAfter.getPosX() == 0 && fieldBefore.getPosX() == 1) && !(fieldAfter.getPosX() == 4 && fieldBefore.getPosX() == 3)

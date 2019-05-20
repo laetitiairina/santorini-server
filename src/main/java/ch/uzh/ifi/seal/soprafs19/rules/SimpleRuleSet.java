@@ -26,6 +26,7 @@ public class SimpleRuleSet implements IRuleSet {
     protected Field fieldBeforeBackEnd = null;
     protected Field fieldAfterBackEnd = null;
 
+    // frontend coordinates
     protected int xBefore = -1, yBefore = -1, xAfter = -1, yAfter = -1;
 
     // build
