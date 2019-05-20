@@ -127,10 +127,10 @@ public class MinotaurRuleSetTest extends SimpleRuleSetTest {
         Field field2 = game.getBoard().getFields().get(7);
         Worker worker = field.getWorker();
         Worker worker2 = field.getWorker();
-        game.getBoard().getFields().get(7).setWorker(worker);
-        worker.setField(game.getBoard().getFields().get(7));
-        game.getBoard().getFields().get(6).setWorker(worker2);
-        worker2.setField(game.getBoard().getFields().get(6));
+        game.getBoard().getFields().get(6).setWorker(worker);
+        worker.setField(game.getBoard().getFields().get(6));
+        game.getBoard().getFields().get(5).setWorker(worker2);
+        worker2.setField(game.getBoard().getFields().get(5));
         field.setWorker(null);
         field2.setWorker(null);
 
@@ -145,11 +145,11 @@ public class MinotaurRuleSetTest extends SimpleRuleSetTest {
         List<Field> fields = new ArrayList<>();
 
         // new field
-        fields.add(board.getFields().get(7));
+        fields.add(board.getFields().get(5));
         fields.get(0).setWorker(ownWorker);
 
         // old field
-        fields.add(board.getFields().get(8));
+        fields.add(board.getFields().get(6));
         fields.get(1).setWorker(null);
 
         board.setFields(fields);

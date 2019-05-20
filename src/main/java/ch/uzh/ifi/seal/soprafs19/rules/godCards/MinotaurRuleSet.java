@@ -49,8 +49,8 @@ public class MinotaurRuleSet extends SimpleRuleSet {
         if ((fieldBefore.getWorker() != null) || isSecondMove
                 //destination field has not your own worker and this opponent worker is not being pushed off the edge
                 && (fieldAfter.getWorker() == null || (!fieldAfter.getWorker().getPlayer().getIsCurrentPlayer() &&
-                (!(fieldAfter.getPosX() == 0 && fieldBefore.getPosX() == 1) || !(fieldAfter.getPosX() == 4 && fieldBefore.getPosX() == 3)
-                    || !(fieldAfter.getPosY() == 0 && fieldBefore.getPosY() == 1) || !(fieldAfter.getPosY() == 4 && fieldBefore.getPosY() == 3))))
+                (!(fieldAfter.getPosX() == 0 && fieldBefore.getPosX() == 1) && !(fieldAfter.getPosX() == 4 && fieldBefore.getPosX() == 3)
+                    && !(fieldAfter.getPosY() == 0 && fieldBefore.getPosY() == 1) && !(fieldAfter.getPosY() == 4 && fieldBefore.getPosY() == 3))))
                 // destination field has no dome
                 && (!fieldAfterBackEnd.getHasDome())) {
             //check if blocks in after field is maximum 1 higher
