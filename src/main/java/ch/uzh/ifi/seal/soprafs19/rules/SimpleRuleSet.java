@@ -231,7 +231,7 @@ public class SimpleRuleSet implements IRuleSet {
 
     protected Boolean isValidMove(boolean isSecondMove, Field fieldBefore, Field fieldAfter) {
         // origin field had a worker or it's the second move of a worker
-        if ((fieldBefore.getWorker() != null) || isSecondMove
+        if (((fieldBefore.getWorker() != null) || isSecondMove)
                 // destination field is unoccupied
                 && (fieldAfter.getWorker() == null)
                 // destination field has no dome
