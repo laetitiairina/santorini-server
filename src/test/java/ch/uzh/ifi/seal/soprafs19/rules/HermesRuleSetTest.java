@@ -104,7 +104,7 @@ public class HermesRuleSetTest extends SimpleRuleSetTest {
         fields.get(0).setWorker(null);
 
         // new field 1
-        fields.add(board.getFields().get(16));
+        fields.add(board.getFields().get(9));
         fields.get(1).setWorker(worker1);
 
         // old field 2
@@ -131,6 +131,50 @@ public class HermesRuleSetTest extends SimpleRuleSetTest {
 
         Assert.assertTrue(gameService.updateGame(game, updatedGame));
 
+    }
+
+    @Test
+    public void moveOnlyOneWorkerOneLevelUp() {
+        // create game with chosen position
+        Game updatedGame = SerializationUtils.clone(game);
+        Board board = updatedGame.getBoard();
+
+        Worker worker1 = board.getFields().get(4).getWorker();
+        Worker worker2 = board.getFields().get(18).getWorker();
+
+        // move a worker by one field in any direction
+        List<Field> fields = new ArrayList<>();
+
+        // old field 1
+        fields.add(board.getFields().get(4));
+        fields.get(0).setWorker(null);
+
+        // new field 1
+        fields.add(board.getFields().get(9));
+        fields.get(1).setWorker(worker1);
+
+        // old field 2
+        fields.add(board.getFields().get(18));
+        fields.get(2).setWorker(worker2);
+
+        //new field 2
+        fields.add(board.getFields().get(18));
+        fields.get(3).setWorker(worker2);
+
+        board.setFields(fields);
+
+        //set some blocks
+        game.getBoard().getFields().get(9).setBlocks(1);
+
+
+
+        // update position of Workers
+        boolean isSuccessful = ruleSet.checkMovePhase(game, updatedGame);
+
+        // Asserts
+        Assert.assertTrue(isSuccessful);
+
+        Assert.assertTrue(gameService.updateGame(game, updatedGame));
     }
 
 

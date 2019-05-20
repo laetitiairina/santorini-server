@@ -56,15 +56,18 @@ public class HermesRuleSet extends SimpleRuleSet {
     @Override
     protected Boolean isValidMove(boolean isSecondMove, Field fieldBefore, Field fieldAfter) {
 
+        //if worker did not move is valid
+        if (fieldBefore.equals(fieldAfter)) {return true;}
+
         // origin field had a worker or it's the second move of a worker
-        if ((fieldBefore.getWorker() != null) || isSecondMove
+        else if ((fieldBefore.getWorker() != null) || isSecondMove
                 // destination field is unoccupied
                 && ((fieldAfter.getWorker() == null && !fieldBefore.equals(fieldAfter)) ||
                 (fieldBefore.equals(fieldAfter)))
                 // destination field has no dome
                 && (!fieldAfter.getHasDome())) {
             //check if blocks in after field is maximum 1 higher if worker only moves one field
-            if (isNeighbouringField(gameBefore, fieldAfter)) {
+            if (isNeighbouringField(gameBefore, fieldBefore, fieldAfter)) {
                 return (fieldAfter.getBlocks() <= fieldBefore.getBlocks() + 1);
             }
             else return hasValidPath(fieldBefore, fieldAfter) && fieldAfter.getBlocks() == fieldBefore.getBlocks();
@@ -72,8 +75,8 @@ public class HermesRuleSet extends SimpleRuleSet {
         return false;
     }
 
-    private Boolean isNeighbouringField(Game game, Field fieldAfter) {
-        return neighbouringFields(game, fieldAfter.getPosX(), fieldAfter.getPosY()).stream().anyMatch(field -> field.equals(fieldAfter));
+    private Boolean isNeighbouringField(Game game, Field fieldBefore, Field fieldAfter) {
+        return neighbouringFields(game, fieldBefore.getPosX(), fieldBefore.getPosY()).stream().anyMatch(field -> field.equals(fieldAfter));
     }
 
     private Boolean hasValidPath(Field origin, Field target) {
@@ -105,7 +108,7 @@ public class HermesRuleSet extends SimpleRuleSet {
 
             // check if can build
             Boolean canBuild = frontendFieldToBackendField.keySet().stream().allMatch(f -> {
-                return  neighbouringFields.stream().anyMatch(n -> n.getPosX() == f.getPosX() && n.getPosY() == f.getPosY());
+                return  neighbouringFields.stream().anyMatch(n -> n.equals(f));
             });
             return canBuild && isValidBuild();
         }
