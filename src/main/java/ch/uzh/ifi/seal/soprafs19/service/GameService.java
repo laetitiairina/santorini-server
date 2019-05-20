@@ -213,8 +213,7 @@ public class GameService {
             currentGame.setCards(updatedGame.getCards());
 
             // other player is now current player
-            nextTurn(currentGame);
-            return currentGame;
+            return nextTurn(currentGame);
         }
         return null;
     }
@@ -235,28 +234,52 @@ public class GameService {
             List<SimpleGodCard> currentCards = currentGame.getCards();
 
             // get players
-            List<Player> currentPlayers = currentGame.getPlayers();
-            long id = updatedGame.getPlayers().get(0).getId();
-            Player currentPlayer = playerRepository.findById(id);
+            //List<Player> currentPlayers = currentGame.getPlayers();
+            //long id = updatedGame.getPlayers().get(0).getId();
+
+            // Try not to use playerRepository in GameService
+            //Player currentPlayer = playerRepository.findById(id);
+
+            Player currentPlayer = null;
+            Player opponentPlayer = null;
+            // Get current player
+            for (Player player : currentGame.getPlayers()) {
+                if (player.getId().equals(updatedGame.getPlayers().get(0).getId())) {
+                    currentPlayer = player;
+                } else {
+                    opponentPlayer = player;
+                }
+            }
 
             // check if the chosenCard is one of the 2 currentCards
             // and the currentPlayer is one of the two currentPlayers and the Challenger
-            if (currentCards.contains(chosenCard) && currentPlayers.contains(currentPlayer) && currentPlayer.getIsCurrentPlayer()) {
-                currentCards.remove(chosenCard);
-                currentPlayers.remove(currentPlayer);
+            if (currentCards.contains(chosenCard) && currentPlayer != null && opponentPlayer != null  && currentPlayer.getIsCurrentPlayer()) {
+
+                // Never remove things from the currentGame entity (even if added later again)
+                //currentCards.remove(chosenCard);
+                //currentPlayers.remove(currentPlayer);
 
                 // now currentPlayers only contains the opponent
                 // and currentCards only contains the other card
-                currentPlayers.get(0).setCard(currentCards.get(0));
-                currentPlayer.setCard(chosenCard);
+                //currentPlayers.get(0).setCard(currentCards.get(0));
+                //currentPlayer.setCard(chosenCard);
 
                 // add again
-                currentPlayers.add(currentPlayer);
-                currentCards.add(chosenCard);
+                //currentPlayers.add(currentPlayer);
+                //currentCards.add(chosenCard);
 
-                // other player is now current player
-                nextTurn(currentGame);
-                return currentGame;
+                for (SimpleGodCard card : currentGame.getCards()) {
+                    if (card == chosenCard) {
+                        currentPlayer.setCard(card);
+                    } else {
+                        opponentPlayer.setCard(card);
+                    }
+                }
+
+                if (currentPlayer.getCard() != null && opponentPlayer.getCard() != null) {
+                    // other player is now current player
+                    return nextTurn(currentGame);
+                }
             }
         }
         return null;
@@ -269,25 +292,24 @@ public class GameService {
      * @return
      */
     public Game setStartPlayer(Game currentGame, Game updatedGame) {
-        Player currentPlayer = updatedGame.getPlayers().get(0);
-        List<Player> players = currentGame.getPlayers();
+        Player currentGamePlayer = null;
+        Player currentUpdatePlayer = updatedGame.getPlayers().get(0);
+        //List<Player> players = currentGame.getPlayers();
 
-        boolean isPlayer = false;
         for (Player player : currentGame.getPlayers()) {
-            if (player.getId().equals(currentPlayer.getId())) {
-                isPlayer = true;
+            if (player.getId().equals(currentUpdatePlayer.getId())) {
+                currentGamePlayer = player;
             }
         }
-        if (!isPlayer) {
-            return null;
-        }
 
-        if (currentPlayer.getIsCurrentPlayer()) {
-            long id = currentPlayer.getId();
-            currentPlayer = playerRepository.findById(id);
+        if (currentUpdatePlayer.getIsCurrentPlayer() && currentGamePlayer != null) {
+            //long id = currentUpdatePlayer.getId();
 
-            for (Player player : players) {
-                if (player.getId().equals(currentPlayer.getId())) {
+            // Try not to use playerRepository in GameService
+            //currentPlayer = playerRepository.findById(id);
+
+            for (Player player : currentGame.getPlayers()) {
+                if (player.getId().equals(currentGamePlayer.getId())) {
                     player.setIsCurrentPlayer(true);
                 } else {
                     player.setIsCurrentPlayer(false);
@@ -366,11 +388,9 @@ public class GameService {
                 && fields.size() == 2 && !fields.get(0).getId().equals(fields.get(1).getId())) {
             fields.get(0).setWorker(workers.get(0));
             fields.get(1).setWorker(workers.get(1));
-            nextTurn(currentGame);
-            return currentGame;
-        } else {
-            return null;
+            return nextTurn(currentGame);
         }
+        return null;
     }
 
     /**
@@ -514,8 +534,7 @@ public class GameService {
                 }
             }
 
-            nextTurn(currentGame);
-        return currentGame;
+        return nextTurn(currentGame);
     }
 
     /**
@@ -549,17 +568,43 @@ public class GameService {
      * switches who's the current Player
      * @param game
      */
-    public void nextTurn(Game game) {
+    public Game nextTurn(Game game) {
+
         for (Player player : game.getPlayers()) {
             // reverse value
             player.setIsCurrentPlayer(!player.getIsCurrentPlayer());
         }
+
+        // Check if somehow the current player was set to both players or none, if so, return null -> bad request
+        if (game.getPlayers().get(0).getIsCurrentPlayer() == game.getPlayers().get(1).getIsCurrentPlayer()) {
+            return null;
+        }
+
+        // Gets saved later
         // save
+        //gameRepository.save(game);
+
+        // Return updated game
+        return game;
+    }
+
+    public void abortGameWithWinner(Game game, Player lostPlayer) {
+        // Let game end, inform front-end of abort, and set winner
+        for (Player player : game.getPlayers()) {
+            if (player.getId().equals(lostPlayer.getId())) {
+                player.setIsCurrentPlayer(false);
+            } else {
+                player.setIsCurrentPlayer(true);
+            }
+            player.setIsActive(false);
+        }
+        game.setMessage("Other player left the game!");
+        game.setStatus(GameStatus.END);
         gameRepository.save(game);
     }
 
     public void abortGame(Game game) {
-        // let game end inform front-end of abort
+        // Let game end, inform front-end of abort
         for (Player player : game.getPlayers()) {
             player.setIsCurrentPlayer(false);
             player.setIsActive(false);
