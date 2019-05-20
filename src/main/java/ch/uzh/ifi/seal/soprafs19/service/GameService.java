@@ -588,8 +588,23 @@ public class GameService {
         return game;
     }
 
+    public void abortGameWithWinner(Game game, Player lostPlayer) {
+        // Let game end, inform front-end of abort, and set winner
+        for (Player player : game.getPlayers()) {
+            if (player.getId().equals(lostPlayer.getId())) {
+                player.setIsCurrentPlayer(false);
+            } else {
+                player.setIsCurrentPlayer(true);
+            }
+            player.setIsActive(false);
+        }
+        game.setMessage("Other player left the game!");
+        game.setStatus(GameStatus.END);
+        gameRepository.save(game);
+    }
+
     public void abortGame(Game game) {
-        // let game end inform front-end of abort
+        // Let game end, inform front-end of abort
         for (Player player : game.getPlayers()) {
             player.setIsCurrentPlayer(false);
             player.setIsActive(false);

@@ -799,6 +799,23 @@ public class GameServiceTest {
     }
 
     @Test
+    public void abortGameWithWinner() {
+        // setup
+        Game simpleGame = helperClass.setup(false);
+
+        // abort game
+        gameService.abortGameWithWinner(simpleGame,simpleGame.getPlayers().get(0));
+
+        // Asserts
+        Assert.assertEquals(GameStatus.END, simpleGame.getStatus());
+        Assert.assertFalse(simpleGame.getPlayers().get(0).getIsCurrentPlayer());
+        Assert.assertTrue(simpleGame.getPlayers().get(1).getIsCurrentPlayer());
+        for (Player player : simpleGame.getPlayers()) {
+            Assert.assertFalse(player.getIsActive());
+        }
+    }
+
+    @Test
     public void rematch() {
         // get to move
         Game godGame = helperClass.statusMove(true);
