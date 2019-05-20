@@ -76,6 +76,9 @@ public class GameService {
      */
     public boolean updateGame(Game currentGame, Game updatedGame) {
 
+        /* TODO: Current game entity gets modified in the rematch() function,
+        *   if there was a bad request, these modifications stay which they shouldn't
+        */
         // if they want to rematch
         if (currentGame.getStatus() == GameStatus.END && rematch(currentGame, updatedGame)) {
             return true;
@@ -174,8 +177,15 @@ public class GameService {
             // saves updates to database
             gameRepository.save(successfullyUpdatedGame);
 
+            // Good request
             return true;
         } else {
+            // !!!!!!!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!!!!!!!!!
+            /* TODO: Current game entity might have been modified at this point,
+            *   make sure ALL these modifications are reverted, i.e. current game is reset to its previous state
+            */
+
+            // Bad request
             return false;
         }
     }
