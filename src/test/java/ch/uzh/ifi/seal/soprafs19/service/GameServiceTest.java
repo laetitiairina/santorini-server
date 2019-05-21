@@ -804,7 +804,7 @@ public class GameServiceTest {
         Game simpleGame = helperClass.setup(false);
 
         // abort game
-        gameService.abortGameWithWinner(simpleGame,simpleGame.getPlayers().get(0));
+        gameService.abortGameWithWinner(simpleGame,simpleGame.getPlayers().get(0),"test abort!");
 
         // Asserts
         Assert.assertEquals(GameStatus.END, simpleGame.getStatus());

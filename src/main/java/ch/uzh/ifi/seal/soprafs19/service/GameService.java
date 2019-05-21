@@ -174,6 +174,11 @@ public class GameService {
                 incrementGameStatus(successfullyUpdatedGame, true);
             }
 
+            // Set players last move time to current time (for CheckPolling)
+            for (Player p : successfullyUpdatedGame.getPlayers()) {
+                p.didMove();
+            }
+
             // saves updates to database
             gameRepository.save(successfullyUpdatedGame);
 
@@ -598,7 +603,7 @@ public class GameService {
         return game;
     }
 
-    public void abortGameWithWinner(Game game, Player lostPlayer) {
+    public void abortGameWithWinner(Game game, Player lostPlayer, String message) {
         // Let game end, inform front-end of abort, and set winner
         for (Player player : game.getPlayers()) {
             if (player.getId().equals(lostPlayer.getId())) {
@@ -608,7 +613,7 @@ public class GameService {
             }
             player.setIsActive(false);
         }
-        game.setMessage("Other player left the game!");
+        game.setMessage(message);
         game.setStatus(GameStatus.END);
         gameRepository.save(game);
     }

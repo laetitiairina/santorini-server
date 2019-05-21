@@ -29,6 +29,9 @@ public class Player implements Serializable {
     private Boolean isGodMode;
 
     @Column(nullable = false)
+    private Long lastMoveMillis;
+
+    @Column(nullable = false)
     private Long lastPollMillis;
 
     @Column(nullable = false)
@@ -147,6 +150,17 @@ public class Player implements Serializable {
         this.isActive = isActive;
     }
 
+    // Leave this commented out, used for calculating remaining move time frontend
+    //@JsonIgnore
+    public Long getLastMoveMillis() {
+        return lastMoveMillis;
+    }
+
+    //@JsonIgnore
+    public void setLastMoveMillis(Long lastMoveMillis) {
+        this.lastMoveMillis = lastMoveMillis;
+    }
+
     @JsonIgnore
     public Long getLastPollMillis() {
         return lastPollMillis;
@@ -166,6 +180,7 @@ public class Player implements Serializable {
         workers.add(new Worker(this));
         workers.add(new Worker(this));
 
+        this.lastMoveMillis = System.currentTimeMillis();
         this.lastPollMillis = System.currentTimeMillis();
         this.isActive = true;
     }
@@ -178,6 +193,14 @@ public class Player implements Serializable {
         }
         Player player = (Player) o;
         return this.getId().equals(player.getId());
+    }
+
+    public void didMove() {
+        setLastMoveMillis(System.currentTimeMillis());
+    }
+
+    public Long lastMove() {
+        return System.currentTimeMillis() - getLastMoveMillis();
     }
 
     public void didPoll() {
