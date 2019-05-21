@@ -64,6 +64,7 @@ public class UserService {
         if (user != null) {
             if (user.getPassword().equals(password)) {
                 user.setStatus(UserStatus.ONLINE);
+                userRepository.save(user);
                 return user;
             }
         }
