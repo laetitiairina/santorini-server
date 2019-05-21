@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.persistence.*;
 
@@ -21,13 +22,13 @@ public class User implements Serializable {
 	@GeneratedValue
 	private Long id;
 	
-	@Column(nullable = false, unique = true) 
+	@Column(nullable = false, unique = true)
 	private String username;
 
 	@Column(nullable = false)
 	private String password;
 	
-	@Column(nullable = false, unique = true) 
+	@Column(nullable = false, unique = true)
 	private String token;
 
 	@Column
@@ -35,7 +36,7 @@ public class User implements Serializable {
 	private Date creationDate;
 
 	@Column
-	private Date birthdayDate;
+	private String birthdayDate;
 
 	@Column(nullable = false)
 	private UserStatus status;
@@ -60,12 +61,12 @@ public class User implements Serializable {
 		this.username = username;
 	}
 
-	@JsonIgnore
+	//@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
 
-	@JsonIgnore
+	//@JsonIgnore
 	public void setPassword(String password) {
 		this.password = password;
 	}
@@ -86,11 +87,11 @@ public class User implements Serializable {
 		this.creationDate = creationDate;
 	}
 
-	public Date getBirthdayDate() {
+	public String getBirthdayDate() {
 		return birthdayDate;
 	}
 
-	public void setBirthdayDate(Date birthdayDate) {
+	public void setBirthdayDate(String birthdayDate) {
 		this.birthdayDate = birthdayDate;
 	}
 
@@ -118,7 +119,16 @@ public class User implements Serializable {
 		this.losses = losses;
 	}
 
-	//public User() {}
+	/*
+	public User() {}
+
+	public User(String username, String password) {
+		this.username = username;
+		this.password = password;
+		this.token = UUID.randomUUID().toString();
+		this.status = UserStatus.OFFLINE;
+	}
+	*/
 
 	@Override
 	public boolean equals(Object o) {
