@@ -31,11 +31,13 @@ public class PlayerService {
     @Autowired
     private MatchMaker matchMaker;
 
+    /*
     //@Autowired
-    /*public PlayerService(PlayerRepository playerRepository, MatchMaker matchMaker) {
+    public PlayerService(PlayerRepository playerRepository, MatchMaker matchMaker) {
         this.playerRepository = playerRepository;
         this.matchMaker = matchMaker;
-    }*/
+    }
+    */
 
     /*
     public Iterable<Player> getPlayers() {

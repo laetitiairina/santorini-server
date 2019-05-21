@@ -20,8 +20,8 @@ public class UserService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
+    @Autowired
     private final UserRepository userRepository;
-
 
     @Autowired
     public UserService(UserRepository userRepository) {

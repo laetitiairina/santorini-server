@@ -61,6 +61,7 @@ public class User implements Serializable {
 		this.username = username;
 	}
 
+	// TODO: Check why test fail when JsonIgnore
 	//@JsonIgnore
 	public String getPassword() {
 		return password;
@@ -129,6 +130,14 @@ public class User implements Serializable {
 		this.status = UserStatus.OFFLINE;
 	}
 	*/
+
+	public void didWin(Boolean won) {
+		if (won) {
+			setWins(getWins()+1);
+		} else {
+			setLosses(getLosses()+1);
+		}
+	}
 
 	@Override
 	public boolean equals(Object o) {
