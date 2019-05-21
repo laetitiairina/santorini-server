@@ -59,25 +59,25 @@ public class HermesRuleSetTest extends SimpleRuleSetTest {
         fields.get(0).setWorker(null);
 
         // new field 1
-        fields.add(board.getFields().get(16));
+        fields.add(board.getFields().get(0));
         fields.get(1).setWorker(worker1);
 
         // old field 2
         fields.add(board.getFields().get(18));
-        fields.get(2).setWorker(worker2);
 
         //new field 2
         fields.add(board.getFields().get(18));
-        fields.get(3).setWorker(worker2);
 
         board.setFields(fields);
 
         //set some blocks
-        game.getBoard().getFields().get(0).setBlocks(1);
-        game.getBoard().getFields().get(1).setBlocks(1);
-        game.getBoard().getFields().get(2).setBlocks(2);
-        game.getBoard().getFields().get(24).setBlocks(2);
-        game.getBoard().getFields().get(13).setBlocks(1);
+        game.getBoard().getFields().get(14).setBlocks(1);
+        game.getBoard().getFields().get(3).setBlocks(1);
+        game.getBoard().getFields().get(8).setBlocks(2);
+        game.getBoard().getFields().get(12).setBlocks(2);
+        game.getBoard().getFields().get(11).setBlocks(1);
+        game.getBoard().getFields().get(16).setBlocks(1);
+        game.getBoard().getFields().get(20).setBlocks(1);
 
 
         // update position of Workers

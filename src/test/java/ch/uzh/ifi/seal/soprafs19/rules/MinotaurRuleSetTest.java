@@ -120,7 +120,7 @@ public class MinotaurRuleSetTest extends SimpleRuleSetTest {
     }
 
     @Test
-    public void pushOpponentWorkerOverEdgeFails() {
+    public void findPathSuccessfully() {
 
         // adjust setup
         Field field = game.getBoard().getFields().get(4);

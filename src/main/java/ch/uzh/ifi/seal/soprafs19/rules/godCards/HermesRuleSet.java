@@ -10,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -17,6 +18,10 @@ import java.util.List;
 public class HermesRuleSet extends SimpleRuleSet {
 
     private Game gameBefore;
+
+    private List<Field> blockedFields;
+    private List<Field> possibleFields;
+    private Field tempOrigin;
 
     @Override
     public Boolean checkMovePhase(Game before, Game after) {
@@ -37,9 +42,15 @@ public class HermesRuleSet extends SimpleRuleSet {
             frontendFieldToBackendField.get(frontEndFields.get(2)).getWorker().equals(frontEndFields.get(3).getWorker()))) {
             return false;
         }
+        tempOrigin = frontendFieldToBackendField.get(frontEndFields.get(0));
+        blockedFields = new ArrayList<>();
+        possibleFields = new ArrayList<>();
         if (!isValidMove(false, frontendFieldToBackendField.get(frontEndFields.get(0)), frontendFieldToBackendField.get(frontEndFields.get(1)))){
             return false;
         }
+        tempOrigin = frontendFieldToBackendField.get(frontEndFields.get(2));
+        blockedFields.clear();
+        possibleFields.clear();
         if (!isValidMove(false, frontendFieldToBackendField.get(frontEndFields.get(2)), frontendFieldToBackendField.get(frontEndFields.get(3)))) {
             return false;
         }
@@ -70,7 +81,7 @@ public class HermesRuleSet extends SimpleRuleSet {
             if (isNeighbouringField(gameBefore, fieldBefore, fieldAfter)) {
                 return (fieldAfter.getBlocks() <= fieldBefore.getBlocks() + 1);
             }
-            else return hasValidPath(fieldBefore, fieldAfter) && fieldAfter.getBlocks() == fieldBefore.getBlocks();
+            else return hasValidPath(fieldBefore, fieldAfter);
         }
         return false;
     }
@@ -81,6 +92,31 @@ public class HermesRuleSet extends SimpleRuleSet {
 
     private Boolean hasValidPath(Field origin, Field target) {
         // TODO replace this with dynamic programming solution because of stack overflow error
+        int height = origin.getBlocks();
+        List<Field> temp;
+        List<Field> tempPossible = new ArrayList<>();
+
+        temp = neighbouringFields(gameBefore, origin.getPosX(), origin.getPosY()).stream().filter(x -> !blockedFields.contains(x) && !x.getId().equals(tempOrigin.getId())).collect(Collectors.toList());
+
+        for (Field field : temp) {
+            Boolean possible = fieldIsPossible(field, height);
+            if (possible) {
+                if(field.getId().equals(target.getId())) {
+                    return true;
+                }
+                else {
+                    tempPossible.add(field);
+                }
+            }
+        }
+
+        tempOrigin = origin;
+
+        for (Field field : tempPossible) {
+            hasValidPath(field, target);
+        }
+
+
         /*int blockLevel = origin.getBlocks();
         for (Field neighbour : neighbouringFields(gameBefore, origin.getPosX(), origin.getPosY())) {
             if (neighbour.getBlocks() == blockLevel) {
@@ -94,6 +130,17 @@ public class HermesRuleSet extends SimpleRuleSet {
         }
         return false;*/
         return true;
+    }
+
+    private Boolean fieldIsPossible(Field field, int height) {
+        if(field.getBlocks() != height || field.getWorker() != null) {
+            blockedFields.add(field);
+            return false;
+        }
+        else {
+            possibleFields.add(field);
+            return true;
+        }
     }
 
     @Override
