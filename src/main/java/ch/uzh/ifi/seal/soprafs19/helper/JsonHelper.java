@@ -49,6 +49,9 @@ public class JsonHelper {
         // Transform filtered node to player object and return it
         //return objectMapper.treeToValue(filteredObjNode,Player.class);
 
+        // Add current system time field
+        ((ObjectNode) filteredObjNode).put("system_time",System.currentTimeMillis());
+
         return filteredObjNode;
     }
 }

@@ -76,6 +76,9 @@ public class GameService {
      */
     public boolean updateGame(Game currentGame, Game updatedGame) {
 
+        /* TODO: Current game entity gets modified in the rematch() function,
+        *   if there was a bad request, these modifications stay which they shouldn't
+        */
         // if they want to rematch
         if (currentGame.getStatus() == GameStatus.END && rematch(currentGame, updatedGame)) {
             return true;
@@ -171,11 +174,23 @@ public class GameService {
                 incrementGameStatus(successfullyUpdatedGame, true);
             }
 
+            // Set players last move time to current time (for CheckPolling)
+            for (Player p : successfullyUpdatedGame.getPlayers()) {
+                p.didMove();
+            }
+
             // saves updates to database
             gameRepository.save(successfullyUpdatedGame);
 
+            // Good request
             return true;
         } else {
+            // !!!!!!!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!!!!!!!!!
+            /* TODO: Current game entity might have been modified at this point,
+            *   make sure ALL these modifications are reverted, i.e. current game is reset to its previous state
+            */
+
+            // Bad request
             return false;
         }
     }
@@ -588,7 +603,7 @@ public class GameService {
         return game;
     }
 
-    public void abortGameWithWinner(Game game, Player lostPlayer) {
+    public void abortGameWithWinner(Game game, Player lostPlayer, String message) {
         // Let game end, inform front-end of abort, and set winner
         for (Player player : game.getPlayers()) {
             if (player.getId().equals(lostPlayer.getId())) {
@@ -598,7 +613,7 @@ public class GameService {
             }
             player.setIsActive(false);
         }
-        game.setMessage("Other player left the game!");
+        game.setMessage(message);
         game.setStatus(GameStatus.END);
         gameRepository.save(game);
     }

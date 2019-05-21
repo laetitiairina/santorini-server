@@ -24,8 +24,11 @@ public class CheckPolling implements Runnable {
     // 1 seconds
     private int QUEUE_POLL_TIME_MAX = 1000;
 
-    // 10 seconds
+    // 30 seconds
     private int GAME_POLL_TIME_MAX = 30000;
+
+    // 120 seconds
+    private int GAME_TURN_TIME_MAX = 120000;
 
     @Scheduled(fixedRate = 1000)
     @Async("taskExecutor")
@@ -45,7 +48,14 @@ public class CheckPolling implements Runnable {
                     // Abort game if player hasn't polled in x seconds
                     System.out.println("Game aborted");
                     //gameService.abortGame(player.getGame());
-                    gameService.abortGameWithWinner(player.getGame(),player);
+                    gameService.abortGameWithWinner(player.getGame(),player,"left the game!");
+                }
+
+                if (player.getIsCurrentPlayer() && player.lastMove() > GAME_TURN_TIME_MAX) {
+                    // Abort game if player takes too long
+                    System.out.println("Game aborted");
+                    //gameService.abortGame(player.getGame());
+                    gameService.abortGameWithWinner(player.getGame(),player,"took too long!");
                 }
             }
         }
