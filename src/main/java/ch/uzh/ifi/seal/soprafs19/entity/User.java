@@ -1,11 +1,13 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.persistence.*;
 
@@ -20,22 +22,28 @@ public class User implements Serializable {
 	@GeneratedValue
 	private Long id;
 	
-	@Column(nullable = false, unique = true) 
+	@Column(nullable = false, unique = true)
 	private String username;
 
 	@Column(nullable = false)
 	private String password;
 	
-	@Column(nullable = false, unique = true) 
+	@Column(nullable = false, unique = true)
 	private String token;
 
+	@Column
 	@CreatedDate
 	private Date creationDate;
 
-	private Date birthdayDate;
+	@Column
+	private String birthdayDate;
 
 	@Column(nullable = false)
 	private UserStatus status;
+
+	private Integer wins = 0;
+
+	private Integer losses = 0;
 
 	public Long getId() {
 		return id;
@@ -53,10 +61,13 @@ public class User implements Serializable {
 		this.username = username;
 	}
 
+	// TODO: Check why test fail when JsonIgnore
+	//@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
 
+	//@JsonIgnore
 	public void setPassword(String password) {
 		this.password = password;
 	}
@@ -77,11 +88,11 @@ public class User implements Serializable {
 		this.creationDate = creationDate;
 	}
 
-	public Date getBirthdayDate() {
+	public String getBirthdayDate() {
 		return birthdayDate;
 	}
 
-	public void setBirthdayDate(Date birthdayDate) {
+	public void setBirthdayDate(String birthdayDate) {
 		this.birthdayDate = birthdayDate;
 	}
 
@@ -91,6 +102,41 @@ public class User implements Serializable {
 
 	public void setStatus(UserStatus status) {
 		this.status = status;
+	}
+
+	public Integer getWins() {
+		return wins;
+	}
+
+	public void setWins(Integer wins) {
+		this.wins = wins;
+	}
+
+	public Integer getLosses() {
+		return losses;
+	}
+
+	public void setLosses(Integer losses) {
+		this.losses = losses;
+	}
+
+	/*
+	public User() {}
+
+	public User(String username, String password) {
+		this.username = username;
+		this.password = password;
+		this.token = UUID.randomUUID().toString();
+		this.status = UserStatus.OFFLINE;
+	}
+	*/
+
+	public void didWin(Boolean won) {
+		if (won) {
+			setWins(getWins()+1);
+		} else {
+			setLosses(getLosses()+1);
+		}
 	}
 
 	@Override

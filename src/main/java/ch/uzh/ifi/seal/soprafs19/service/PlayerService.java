@@ -1,5 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.service;
 
+import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import ch.uzh.ifi.seal.soprafs19.entity.User;
 import ch.uzh.ifi.seal.soprafs19.helper.MatchMaker;
@@ -30,11 +31,13 @@ public class PlayerService {
     @Autowired
     private MatchMaker matchMaker;
 
+    /*
     //@Autowired
-    /*public PlayerService(PlayerRepository playerRepository, MatchMaker matchMaker) {
+    public PlayerService(PlayerRepository playerRepository, MatchMaker matchMaker) {
         this.playerRepository = playerRepository;
         this.matchMaker = matchMaker;
-    }*/
+    }
+    */
 
     /*
     public Iterable<Player> getPlayers() {
@@ -64,23 +67,31 @@ public class PlayerService {
      * @param newPlayer
      * @return
      */
-    public Player createPlayer(Player newPlayer, Boolean matchmaking) {
+    public Player createPlayer(Player newPlayer, String token, Boolean matchmaking) {
+
+        // Player token has to be unique, can't be a copy of user token (see CheckPolling)
+        newPlayer.setToken(UUID.randomUUID().toString());
 
         // Check if a userId was given
-        // TODO: !!!!!ATTENTION!!!!! Player token has to be unique, can't be a copy of user token (see CheckPolling)
-        if (newPlayer.getUserId() == null) {
-            newPlayer.setToken(UUID.randomUUID().toString());
-        } else {
+        if (newPlayer.getUserId() != null) {
             Optional<User> user = userRepository.findById(newPlayer.getUserId());
 
-            // Check if userId of player is valid and token is correct
-            // TODO: NOT IMPORTANT: Clean up and return pretty error messages
+            // TODO: LOW PRIORITY: Clean up and return pretty error messages
+            // Check if userId of player is valid
             if (user.isEmpty()) {
                 return null;
             }
-            if (!user.get().getToken().equals(newPlayer.getToken())) {
+            // Check if token was given
+            if (token == null) {
                 return null;
             }
+            // Check if token matches user token and user is online
+            if (!user.get().getToken().equals(token) || !user.get().getStatus().equals(UserStatus.ONLINE)) {
+                return null;
+            }
+
+            // Set username of player
+            newPlayer.setUsername(user.get().getUsername());
         }
 
         playerRepository.save(newPlayer);

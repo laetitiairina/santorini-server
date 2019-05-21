@@ -6,6 +6,7 @@ import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.*;
 import ch.uzh.ifi.seal.soprafs19.repository.GameRepository;
 import ch.uzh.ifi.seal.soprafs19.repository.PlayerRepository;
+import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.rules.IRuleSet;
 import ch.uzh.ifi.seal.soprafs19.rules.RuleFactory;
 import org.slf4j.Logger;
@@ -29,18 +30,26 @@ public class GameService {
 
     private final Logger log = LoggerFactory.getLogger(GameService.class);
 
+    @Autowired
     private GameRepository gameRepository;
 
+    @Autowired
     private PlayerRepository playerRepository;
 
-    private RuleFactory ruleFactory;
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
+    private RuleFactory ruleFactory;
+
+    /*
+    //@Autowired
     public GameService(GameRepository gameRepository, PlayerRepository playerRepository, RuleFactory ruleFactory) {
         this.gameRepository = gameRepository;
         this.playerRepository = playerRepository;
         this.ruleFactory = ruleFactory;
     }
+    */
 
     /*
     public Iterable<Game> getGames() {
@@ -164,8 +173,10 @@ public class GameService {
                 for (Player p : successfullyUpdatedGame.getPlayers()) {
                     if (p.getId().equals(winner.getId())) {
                         p.setIsCurrentPlayer(true);
+                        updateUserWinsLosses(p,true);
                     } else {
                         p.setIsCurrentPlayer(false);
+                        updateUserWinsLosses(p,false);
                     }
                     // Set players to inactive (for CheckPolling)
                     p.setIsActive(false);
@@ -608,8 +619,10 @@ public class GameService {
         for (Player player : game.getPlayers()) {
             if (player.getId().equals(lostPlayer.getId())) {
                 player.setIsCurrentPlayer(false);
+                updateUserWinsLosses(player,false);
             } else {
                 player.setIsCurrentPlayer(true);
+                updateUserWinsLosses(player,true);
             }
             player.setIsActive(false);
         }
@@ -654,6 +667,21 @@ public class GameService {
         if (player != null) {
             player.didPoll();
             playerRepository.save(player);
+        }
+    }
+
+    /**
+     * Update wins and losses of user if player has user id
+     * @param player
+     * @param won
+     */
+    public void updateUserWinsLosses(Player player, Boolean won) {
+        if (player.getUserId() != null) {
+            Optional<User> user = userRepository.findById(player.getUserId());
+            if (!user.isEmpty()) {
+                user.get().didWin(won);
+                userRepository.save(user.get());
+            }
         }
     }
 

@@ -54,6 +54,9 @@ public class Player implements Serializable {
     @Column(nullable = false)
     private List<Worker> workers;
 
+    @Column()
+    private String username;
+
     // default value is false
     private boolean isCurrentPlayer = false;
 
@@ -124,6 +127,14 @@ public class Player implements Serializable {
             return game.getId();
         }
         return null;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public List<Worker> getWorkers() {

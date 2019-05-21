@@ -66,12 +66,12 @@ public class GetGameTest {
         Player player1 = new Player();
         player1.setIsGodMode(false);
 
-        testPlayer1 = playerService.createPlayer(player1,false);
+        testPlayer1 = playerService.createPlayer(player1,null,false);
 
         Player player2 = new Player();
         player2.setIsGodMode(false);
 
-        testPlayer2 = playerService.createPlayer(player2,false);
+        testPlayer2 = playerService.createPlayer(player2,null,false);
 
         List<Player> players = new ArrayList<>();
         players.add(testPlayer1);

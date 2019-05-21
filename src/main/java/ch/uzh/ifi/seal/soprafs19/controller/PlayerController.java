@@ -39,10 +39,10 @@ public class PlayerController {
     */
 
     @PostMapping("/players")
-    ResponseEntity createPlayer(@RequestBody Player newPlayer) {
+    ResponseEntity createPlayer(@RequestHeader(value="Token",required=false) String token, @RequestBody Player newPlayer) {
 
         // Create player
-        Player player = service.createPlayer(newPlayer,true);
+        Player player = service.createPlayer(newPlayer,token,true);
 
         // Check if player was created successfully
         if (player == null) {
