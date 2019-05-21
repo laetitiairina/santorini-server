@@ -69,11 +69,11 @@ public class UpdateGameTest {
 
         Player player1 = new Player();
         player1.setIsGodMode(true);
-        testPlayer1 = playerService.createPlayer(player1,false);
+        testPlayer1 = playerService.createPlayer(player1,null,false);
 
         Player player2 = new Player();
         player2.setIsGodMode(true);
-        testPlayer2 = playerService.createPlayer(player2,false);
+        testPlayer2 = playerService.createPlayer(player2,null,false);
 
         List<Player> players = new ArrayList<>();
         players.add(testPlayer1);

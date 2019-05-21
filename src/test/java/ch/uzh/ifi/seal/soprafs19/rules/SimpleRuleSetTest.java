@@ -504,7 +504,7 @@ public class SimpleRuleSetTest {
     public Player newPlayer(Boolean isGodMode) {
         Player player = new Player();
         player.setIsGodMode(isGodMode);
-        return playerService.createPlayer(player,true);
+        return playerService.createPlayer(player,null,true);
     }
 
     /**

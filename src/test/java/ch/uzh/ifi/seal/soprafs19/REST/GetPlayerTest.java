@@ -57,7 +57,7 @@ public class GetPlayerTest {
         Player player = new Player();
         player.setIsGodMode(false);
 
-        testPlayer = playerService.createPlayer(player,false);
+        testPlayer = playerService.createPlayer(player,null,false);
     }
 
     @Test
