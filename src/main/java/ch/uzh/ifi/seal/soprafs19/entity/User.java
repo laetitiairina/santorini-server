@@ -1,6 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.entity;
 
 import ch.uzh.ifi.seal.soprafs19.constant.UserStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -29,13 +30,19 @@ public class User implements Serializable {
 	@Column(nullable = false, unique = true) 
 	private String token;
 
+	@Column
 	@CreatedDate
 	private Date creationDate;
 
+	@Column
 	private Date birthdayDate;
 
 	@Column(nullable = false)
 	private UserStatus status;
+
+	private Integer wins = 0;
+
+	private Integer losses = 0;
 
 	public Long getId() {
 		return id;
@@ -53,10 +60,12 @@ public class User implements Serializable {
 		this.username = username;
 	}
 
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
 
+	@JsonIgnore
 	public void setPassword(String password) {
 		this.password = password;
 	}
@@ -92,6 +101,24 @@ public class User implements Serializable {
 	public void setStatus(UserStatus status) {
 		this.status = status;
 	}
+
+	public Integer getWins() {
+		return wins;
+	}
+
+	public void setWins(Integer wins) {
+		this.wins = wins;
+	}
+
+	public Integer getLosses() {
+		return losses;
+	}
+
+	public void setLosses(Integer losses) {
+		this.losses = losses;
+	}
+
+	//public User() {}
 
 	@Override
 	public boolean equals(Object o) {
