@@ -20,8 +20,7 @@ public class HermesRuleSet extends SimpleRuleSet {
     private Game gameBefore;
 
     private List<Field> blockedFields;
-    private List<Field> possibleFields;
-    private Field tempOrigin;
+    private List<Field> path;
 
     @Override
     public Boolean checkMovePhase(Game before, Game after) {
@@ -42,15 +41,15 @@ public class HermesRuleSet extends SimpleRuleSet {
             frontendFieldToBackendField.get(frontEndFields.get(2)).getWorker().equals(frontEndFields.get(3).getWorker()))) {
             return false;
         }
-        tempOrigin = frontendFieldToBackendField.get(frontEndFields.get(0));
         blockedFields = new ArrayList<>();
-        possibleFields = new ArrayList<>();
+        path = new ArrayList<>();
+        path.add(frontendFieldToBackendField.get(frontEndFields.get(0)));
         if (!isValidMove(false, frontendFieldToBackendField.get(frontEndFields.get(0)), frontendFieldToBackendField.get(frontEndFields.get(1)))){
             return false;
         }
-        tempOrigin = frontendFieldToBackendField.get(frontEndFields.get(2));
         blockedFields.clear();
-        possibleFields.clear();
+        path.clear();
+        path.add(frontendFieldToBackendField.get(frontEndFields.get(2)));
         if (!isValidMove(false, frontendFieldToBackendField.get(frontEndFields.get(2)), frontendFieldToBackendField.get(frontEndFields.get(3)))) {
             return false;
         }
@@ -96,7 +95,7 @@ public class HermesRuleSet extends SimpleRuleSet {
         List<Field> temp;
         List<Field> tempPossible = new ArrayList<>();
 
-        temp = neighbouringFields(gameBefore, origin.getPosX(), origin.getPosY()).stream().filter(x -> !blockedFields.contains(x) && !x.getId().equals(tempOrigin.getId())).collect(Collectors.toList());
+        temp = neighbouringFields(gameBefore, origin.getPosX(), origin.getPosY()).stream().filter(x -> !blockedFields.contains(x) && !x.equals(path.get(path.size() - 1))).collect(Collectors.toList());
 
         for (Field field : temp) {
             Boolean possible = fieldIsPossible(field, height);
@@ -110,26 +109,19 @@ public class HermesRuleSet extends SimpleRuleSet {
             }
         }
 
-        tempOrigin = origin;
+        if (tempPossible.isEmpty()) {
+            blockedFields.add(origin);
+        }
+        else path.add(origin);
+
 
         for (Field field : tempPossible) {
-            hasValidPath(field, target);
+            return hasValidPath(field, target);
         }
-
-
-        /*int blockLevel = origin.getBlocks();
-        for (Field neighbour : neighbouringFields(gameBefore, origin.getPosX(), origin.getPosY())) {
-            if (neighbour.getBlocks() == blockLevel) {
-                if (neighbour.equals(target)){
-                    return true;
-                }
-                else {
-                    return hasValidPath(neighbour, target);
-                }
-            }
+        if (path.size() > 0 ) {
+            path.remove(path.size() -1);
         }
-        return false;*/
-        return true;
+        return false;
     }
 
     private Boolean fieldIsPossible(Field field, int height) {
@@ -138,7 +130,6 @@ public class HermesRuleSet extends SimpleRuleSet {
             return false;
         }
         else {
-            possibleFields.add(field);
             return true;
         }
     }
