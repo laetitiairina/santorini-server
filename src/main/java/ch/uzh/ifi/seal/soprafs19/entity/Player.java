@@ -16,6 +16,16 @@ public class Player implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public Player() {
+        this.workers = new ArrayList<>();
+        workers.add(new Worker(this));
+        workers.add(new Worker(this));
+
+        this.lastMoveMillis = System.currentTimeMillis();
+        this.lastPollMillis = System.currentTimeMillis();
+        this.isActive = true;
+    }
+
     @Id
     @GeneratedValue
     @Column(name = "player_id")
@@ -185,15 +195,7 @@ public class Player implements Serializable {
 
     public void setWantsRematch(boolean wantsRematch) { this.wantsRematch = wantsRematch; }
 
-	public Player() {
-        this.workers = new ArrayList<>();
-        workers.add(new Worker(this));
-        workers.add(new Worker(this));
 
-        this.lastMoveMillis = System.currentTimeMillis();
-        this.lastPollMillis = System.currentTimeMillis();
-        this.isActive = true;
-    }
 
     @Override
     public boolean equals(Object o) {
