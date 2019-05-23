@@ -462,7 +462,7 @@ public class GameService {
                 }
             }
             catch (NullPointerException e){
-                log.error("fieldToUpdate not found on backend");
+                log.error("fieldToUpdate not found on backend", e);
                 return null;
             }
         }
