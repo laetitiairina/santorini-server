@@ -79,4 +79,66 @@ public class DemeterRuleSetTest extends SimpleRuleSetTest {
         // Asserts
         Assert.assertTrue(isSuccessful);
     }
+
+    @Test
+    public void buildOneFieldsSuccessfully() {
+
+        // set up and move worker
+        move(game, game.getBoard().getFields().get(4), game.getBoard().getFields().get(9));
+        //move(4, 3);
+        Assert.assertTrue(game.getPlayers().get(0).getWorkers().get(0).getIsCurrentWorker());
+
+        // create game with chosen position
+        Game updatedGame = SerializationUtils.clone(game);
+        Board board = updatedGame.getBoard();
+
+        // build a block
+        List<Field> fields = new ArrayList<>();
+
+        fields.add(board.getFields().get(8));
+        fields.get(0).setBlocks(1);
+
+        board.setFields(fields);
+
+        Assert.assertEquals(1, board.getFields().size());
+
+        // update position of Workers
+        boolean isSuccessful = ruleSet.checkBuildPhase(game, updatedGame);
+
+        // Asserts
+        Assert.assertTrue(isSuccessful);
+    }
+
+    @Test
+    public void buildOnTwoFieldsWithWrongWorkerFails() {
+
+        // set up and move worker
+        move(game, game.getBoard().getFields().get(4), game.getBoard().getFields().get(9));
+        //move(4, 3);
+        Assert.assertTrue(game.getPlayers().get(0).getWorkers().get(0).getIsCurrentWorker());
+
+        // create game with chosen position
+        Game updatedGame = SerializationUtils.clone(game);
+        Board board = updatedGame.getBoard();
+
+        // build a block
+        List<Field> fields = new ArrayList<>();
+
+        fields.add(board.getFields().get(17));
+        fields.add(board.getFields().get(22));
+        fields.get(0).setBlocks(1);
+        fields.get(1).setBlocks(1);
+
+        board.setFields(fields);
+
+        Assert.assertEquals(2, board.getFields().size());
+
+        // update position of Workers
+        boolean isSuccessful = ruleSet.checkBuildPhase(game, updatedGame);
+
+        // Asserts
+        Assert.assertFalse(isSuccessful);
+    }
+
+
 }

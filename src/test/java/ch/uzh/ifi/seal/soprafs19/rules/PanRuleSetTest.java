@@ -3,10 +3,7 @@ package ch.uzh.ifi.seal.soprafs19.rules;
 import ch.uzh.ifi.seal.soprafs19.Application;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
 import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
-import ch.uzh.ifi.seal.soprafs19.entity.Board;
-import ch.uzh.ifi.seal.soprafs19.entity.Field;
-import ch.uzh.ifi.seal.soprafs19.entity.Game;
-import ch.uzh.ifi.seal.soprafs19.entity.Worker;
+import ch.uzh.ifi.seal.soprafs19.entity.*;
 import ch.uzh.ifi.seal.soprafs19.rules.godCards.PanRuleSet;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import org.apache.commons.lang3.SerializationUtils;
@@ -33,33 +30,31 @@ public class PanRuleSetTest extends SimpleRuleSetTest {
     @Autowired
     private GameService gameService;
 
-    /*@Test
+    @Test
     public void winByJumpingDownTwoLevels() {
-        // TODO fix test
         game.getBoard().getFields().get(4).setBlocks(2);
 
-        gameService.saveGame(game);
+        Player currentPlayer = game.getCurrentPlayer();
 
         Game updatedGame = SerializationUtils.clone(game);
         Board board = updatedGame.getBoard();
 
         Worker worker = board.getFields().get(4).getWorker();
-        worker.setIsCurrentWorker(true);
-        board.getFields().get(4).setWorker(null);
-        board.getFields().get(9).setWorker(worker);
 
         List<Field> fields = new ArrayList<>();
 
         fields.add(board.getFields().get(4));
         fields.add(board.getFields().get(9));
+        fields.get(0).setWorker(null);
+        fields.get(1).setWorker(worker);
 
         board.setFields(fields);
 
-        gameService.updateGame(game, updatedGame);
+        Assert.assertTrue(gameService.updateGame(game, updatedGame));
 
-        Assert.assertTrue(game.getStatus() == GameStatus.END);
+        Assert.assertTrue(ruleSet.checkWinCondition(game) == currentPlayer);
 
-    }*/
+    }
 
     @Override
     public void initGodGame(SimpleGodCard cardOne, SimpleGodCard cardTwo) {
