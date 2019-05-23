@@ -99,7 +99,6 @@ public class MatchMaker {
             // Set game of matched players
             for (Player player : matchedPlayers) {
                 // Game of players gets set in Game constructor now
-                //player.setGame(game);
                 playerService.updatePlayer(player);
             }
         }

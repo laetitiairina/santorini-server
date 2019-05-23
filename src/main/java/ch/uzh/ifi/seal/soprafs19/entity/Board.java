@@ -73,7 +73,8 @@ public class Board implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		if (o == this) return true;
+		if (o == this)
+			return true;
 		if (!(o instanceof Board)) {
 			return false;
 		}

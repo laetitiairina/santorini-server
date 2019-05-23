@@ -119,7 +119,6 @@ public class Game implements Serializable {
             matchedPlayers.get(0).setIsCurrentPlayer(true);
         } else {
 			this.status = GameStatus.COLOR1;
-            // TODO: Add logic for simple game mode (birthday, etc..)
 			matchedPlayers.get(0).setIsCurrentPlayer(true);
         }
 
@@ -135,7 +134,8 @@ public class Game implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		if (o == this) return true;
+		if (o == this)
+			return true;
 		if (!(o instanceof Game)) {
 			return false;
 		}

@@ -1,7 +1,6 @@
 package ch.uzh.ifi.seal.soprafs19.controller;
 
 import ch.uzh.ifi.seal.soprafs19.entity.User;
-import ch.uzh.ifi.seal.soprafs19.repository.UserRepository;
 import ch.uzh.ifi.seal.soprafs19.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,11 +16,7 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    /*
-    UserController(UserService service) {
-        this.service = service;
-    }
-    */
+    private String unauthenticatedRequest = "Unauthenticated request!";
 
     @GetMapping("/users")
     Iterable<User> all() {
@@ -62,7 +57,7 @@ public class UserController {
 
         // Check if user who sent request is authenticated
         if (!service.checkUserAuthentication(token)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthenticated request!");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(unauthenticatedRequest);
         }
 
         // Logout user
@@ -79,7 +74,7 @@ public class UserController {
 
         // Check if user who sent request is authenticated
         if (!service.checkUserAuthentication(token)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthenticated request!");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(unauthenticatedRequest);
         }
 
         // Get user by id
@@ -99,7 +94,7 @@ public class UserController {
 
         // Check if user who sent request is authenticated
         if (!service.checkUserAuthentication(token)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthenticated request!");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(unauthenticatedRequest);
         }
 
         // Get user by id
@@ -112,7 +107,7 @@ public class UserController {
 
         // Check if user who sent request is same user who is going to be updated
         if (!user.get().getToken().equals(token)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthenticated request!");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(unauthenticatedRequest);
         }
 
         // Update user data
