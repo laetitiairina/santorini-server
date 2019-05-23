@@ -32,8 +32,8 @@ public class MatchMaker {
     private GameService gameService;
 
     public MatchMaker() {
-        this.simpleQueue = new ArrayList<Player>();
-        this.godQueue = new ArrayList<Player>();
+        this.simpleQueue = new ArrayList<>();
+        this.godQueue = new ArrayList<>();
     }
 
     /**
@@ -81,7 +81,7 @@ public class MatchMaker {
      */
     private void scanQueue(List<Player> queue, Integer numberOfPlayers, Integer numberOfRows) {
 
-        List<Player> matchedPlayers = new ArrayList<Player>();
+        List<Player> matchedPlayers = new ArrayList<>();
 
         // Check if players can be matched
         if (queue.size() >= numberOfPlayers) {
