@@ -47,13 +47,13 @@ public class PrometheusRuleSetTest extends SimpleRuleSetTest {
 
         Worker worker = board.getFields().get(4).getWorker();
 
-        // new field
-        fields.add(board.getFields().get(9));
-        fields.get(1).setWorker(worker);
-
         // old field
         fields.add(board.getFields().get(4));
-        fields.get(2).setWorker(null);
+        fields.get(1).setWorker(null);
+
+        // new field
+        fields.add(board.getFields().get(9));
+        fields.get(2).setWorker(worker);
 
         board.setFields(fields);
 
@@ -72,13 +72,13 @@ public class PrometheusRuleSetTest extends SimpleRuleSetTest {
 
         Worker worker = board.getFields().get(4).getWorker();
 
-        // new field
-        fields.add(board.getFields().get(3));
-        fields.get(1).setWorker(worker);
-
         // old field
         fields.add(board.getFields().get(4));
-        fields.get(2).setWorker(null);
+        fields.get(1).setWorker(null);
+
+        // new field
+        fields.add(board.getFields().get(3));
+        fields.get(2).setWorker(worker);
 
         board.setFields(fields);
 
@@ -99,13 +99,13 @@ public class PrometheusRuleSetTest extends SimpleRuleSetTest {
 
         Worker worker = board.getFields().get(4).getWorker();
 
-        // new field
-        fields.add(board.getFields().get(9));
-        fields.get(1).setWorker(worker);
-
         // old field
         fields.add(board.getFields().get(4));
-        fields.get(2).setWorker(null);
+        fields.get(1).setWorker(null);
+
+        // new field
+        fields.add(board.getFields().get(9));
+        fields.get(2).setWorker(worker);
 
         board.setFields(fields);
 
