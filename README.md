@@ -1,4 +1,4 @@
-# SoPra RESTful Service Template FS19
+# SoPra - FS19 - Group 10 - Server
 
 ## Spring Boot
 
