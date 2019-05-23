@@ -72,8 +72,7 @@ public class HermesRuleSet extends SimpleRuleSet {
         // origin field had a worker or it's the second move of a worker
         else if (((fieldBefore.getWorker() != null) || isSecondMove)
                 // destination field is unoccupied
-                && ((fieldAfter.getWorker() == null && !fieldBefore.equals(fieldAfter)) ||
-                (fieldBefore.equals(fieldAfter)))
+                && (fieldAfter.getWorker() == null)
                 // destination field has no dome
                 && (!fieldAfter.getHasDome())) {
             //check if blocks in after field is maximum 1 higher if worker only moves one field
@@ -94,7 +93,7 @@ public class HermesRuleSet extends SimpleRuleSet {
         List<Field> temp;
         List<Field> tempPossible = new ArrayList<>();
 
-        temp = neighbouringFields(gameBefore, origin.getPosX(), origin.getPosY()).stream().filter(x -> !blockedFields.contains(x) && !x.equals(path.get(path.size() - 1))).collect(Collectors.toList());
+        temp = neighbouringFields(gameBefore, origin.getPosX(), origin.getPosY()).stream().filter(x -> !blockedFields.contains(x) && !path.contains(x)).collect(Collectors.toList());
 
         for (Field field : temp) {
             Boolean possible = fieldIsPossible(field, height);
@@ -108,16 +107,25 @@ public class HermesRuleSet extends SimpleRuleSet {
             }
         }
 
+        // ? if no more possible path from this node
         if (tempPossible.isEmpty()) {
             blockedFields.add(origin);
         }
-        else path.add(origin);
+        if (!path.get(path.size()-1).equals(origin)){
+            path.add(origin);
+        }
 
+        Boolean isValid = false;
 
         for (Field field : tempPossible) {
-            return hasValidPath(field, target);
+            isValid = hasValidPath(field, target);
+            if (isValid) {
+                break;
+            }
         }
-        if (path.size() > 0 ) {
+        if (isValid == true) return true;
+
+        if (path.size() > 0) {
             path.remove(path.size() -1);
         }
         return false;
