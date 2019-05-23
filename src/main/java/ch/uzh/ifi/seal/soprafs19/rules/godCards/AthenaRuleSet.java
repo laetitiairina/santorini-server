@@ -18,6 +18,7 @@ public class AthenaRuleSet extends SimpleRuleSet {
         if (before.getBlockDifference() > 0) {
             checkMovePhase(before, after);
             if (before.getCurrentPlayer().getCard() == SimpleGodCard.HERMES){
+                mapFrontendToBackendFields(before, after);
                 isValidMove = (frontendFieldToBackendField.get(after.getBoard().getFields().get(1)).getBlocks() - frontendFieldToBackendField.get(after.getBoard().getFields().get(0)).getBlocks() <= 0) &&
                         (frontendFieldToBackendField.get(after.getBoard().getFields().get(3)).getBlocks() - frontendFieldToBackendField.get(after.getBoard().getFields().get(2)).getBlocks() <=0);
             }
