@@ -10,9 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,18 +22,6 @@ public class PlayerController {
     @Autowired
     private JsonHelper helper;
 
-    /*
-    PlayerController(PlayerService service) {
-        this.service = service;
-    }
-    */
-
-    /*
-    @GetMapping("/players")
-    Iterable<Player> all() {
-        return service.getPlayer();
-    }
-    */
 
     @PostMapping("/players")
     ResponseEntity createPlayer(@RequestHeader(value="Token",required=false) String token, @RequestBody Player newPlayer) {
@@ -52,7 +37,6 @@ public class PlayerController {
 
         // Transform player to json node
         JsonNode playerNode = helper.objectToJsonNode(player);
-        //JsonNode playerNode = helper.getFilteredObjectAsJsonNode(player, Arrays.asList("id"));
 
         // Manually add token since JsonIgnore is set for it
         ((ObjectNode) playerNode).put("token",player.getToken());

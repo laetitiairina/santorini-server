@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +46,6 @@ public class JsonHelper {
         }
 
         // Transform filtered node to player object and return it
-        //return objectMapper.treeToValue(filteredObjNode,Player.class);
 
         // Add current system time field
         ((ObjectNode) filteredObjNode).put("system_time",System.currentTimeMillis());

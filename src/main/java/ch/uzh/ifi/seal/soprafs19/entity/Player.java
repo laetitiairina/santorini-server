@@ -21,7 +21,6 @@ public class Player implements Serializable {
     @Column(name = "player_id")
     private Long id;
 
-    // TODO: Implement User
     //@Column(nullable = false, unique = true)
     private Long userId;
 
@@ -198,7 +197,8 @@ public class Player implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this) return true;
+        if (o == this)
+            return true;
         if (!(o instanceof Player)) {
             return false;
         }
