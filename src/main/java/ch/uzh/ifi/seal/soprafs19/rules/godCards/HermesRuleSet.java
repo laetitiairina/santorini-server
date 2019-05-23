@@ -70,7 +70,7 @@ public class HermesRuleSet extends SimpleRuleSet {
         if (fieldBefore.equals(fieldAfter)) {return true;}
 
         // origin field had a worker or it's the second move of a worker
-        else if ((fieldBefore.getWorker() != null) || isSecondMove
+        else if (((fieldBefore.getWorker() != null) || isSecondMove)
                 // destination field is unoccupied
                 && ((fieldAfter.getWorker() == null && !fieldBefore.equals(fieldAfter)) ||
                 (fieldBefore.equals(fieldAfter)))
@@ -90,7 +90,6 @@ public class HermesRuleSet extends SimpleRuleSet {
     }
 
     private Boolean hasValidPath(Field origin, Field target) {
-        // TODO replace this with dynamic programming solution because of stack overflow error
         int height = origin.getBlocks();
         List<Field> temp;
         List<Field> tempPossible = new ArrayList<>();
@@ -125,7 +124,7 @@ public class HermesRuleSet extends SimpleRuleSet {
     }
 
     private Boolean fieldIsPossible(Field field, int height) {
-        if(field.getBlocks() != height || field.getWorker() != null) {
+        if(field.getBlocks() != height || field.getWorker() != null || field.getHasDome() == true) {
             blockedFields.add(field);
             return false;
         }

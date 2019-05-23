@@ -138,12 +138,15 @@ public class MinotaurRuleSetTest extends SimpleRuleSetTest {
         Game updatedGame = SerializationUtils.clone(game);
         Board board = updatedGame.getBoard();
 
+        Worker ownWorker = board.getFields().get(8).getWorker();
+        Worker opponentWorker = board.getFields().get(7).getWorker();
+
         // move a worker by one field in any direction
         List<Field> fields = new ArrayList<>();
 
         // new field
         fields.add(board.getFields().get(5));
-        fields.get(0).setWorker(worker);
+        fields.get(0).setWorker(ownWorker);
 
         // old field
         fields.add(board.getFields().get(6));
@@ -154,6 +157,49 @@ public class MinotaurRuleSetTest extends SimpleRuleSetTest {
         Assert.assertEquals(2, board.getFields().size());
 
         Assert.assertFalse(ruleSet.checkMovePhase(game, updatedGame));
+
+        Assert.assertFalse(gameService.updateGame(game, updatedGame));
+
+    }
+
+    @Test
+    public void pushOpponentWorkerIntoOtherWorkerFails() {
+
+        // adjust setup
+        Field field = game.getBoard().getFields().get(4);
+        Field field2 = game.getBoard().getFields().get(23);
+        Worker worker = field.getWorker();
+        Worker worker2 = field2.getWorker();
+        game.getBoard().getFields().get(8).setWorker(worker);
+        //worker.setField(game.getBoard().getFields().get(6));
+        game.getBoard().getFields().get(6).setWorker(worker2);
+        //worker2.setField(game.getBoard().getFields().get(5));
+        field.setWorker(null);
+        field2.setWorker(null);
+
+        // create game with chosen position
+        Game updatedGame = SerializationUtils.clone(game);
+        Board board = updatedGame.getBoard();
+
+        Worker ownWorker = board.getFields().get(8).getWorker();
+        Worker opponentWorker = board.getFields().get(7).getWorker();
+
+        // move a worker by one field in any direction
+        List<Field> fields = new ArrayList<>();
+
+        // new field
+        fields.add(board.getFields().get(7));
+        fields.get(0).setWorker(ownWorker);
+
+        // old field
+        fields.add(board.getFields().get(8));
+        fields.get(1).setWorker(null);
+
+        board.setFields(fields);
+
+        Assert.assertEquals(2, board.getFields().size());
+
+        Assert.assertTrue(ruleSet.checkMovePhase(game, updatedGame));
 
         Assert.assertFalse(gameService.updateGame(game, updatedGame));
 

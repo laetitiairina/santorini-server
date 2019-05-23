@@ -102,17 +102,17 @@ public class GameService {
         currentGame.setMessage(null);
         saveGame(currentGame);
 
+        // only checks the first 3 states, if isGodMode is true
+        if (currentGame.getIsGodMode()) {
+            successfullyUpdatedGame = setGodModeInit(currentGame, updatedGame);
+        }
+
         // get rules
         for (Player player : currentGame.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
                 currentPlayerRules = ruleFactory.getRuleSet(player);
             }
             else opponentPlayerRules = ruleFactory.getRuleSet(player);
-        }
-
-        // only checks the first 3 states, if isGodMode is true
-        if (currentGame.getIsGodMode()) {
-            successfullyUpdatedGame = setGodModeInit(currentGame, updatedGame);
         }
 
         // check the remaining states
@@ -489,7 +489,6 @@ public class GameService {
                         //push opponent worker one field, only with Minotaur card
                         else if(fieldAfter.getWorker() != null && currentGame.getCurrentPlayer().getCard() == SimpleGodCard.MINOTAUR){
                             Worker opponentWorker = fieldAfter.getWorker();
-                            fieldBefore.setWorker(null);
                             int deltaX = 0;
                             int deltaY = 0;
                             //move left
@@ -507,7 +506,10 @@ public class GameService {
                             if (opponentWorker.getField().getPosY() > worker.getField().getPosY()) {
                                 deltaY = 1;
                             }
-                            moveWorker(currentGame, opponentWorker, deltaX, deltaY);
+                            if(!moveWorker(currentGame, opponentWorker, deltaX, deltaY)){
+                                return null;
+                            }
+                            else fieldBefore.setWorker(null);
                         }
                         // field was empty
                         else if(fieldAfter.getWorker() == null) {
@@ -525,10 +527,11 @@ public class GameService {
         return currentGame;
     }
 
+    //helper for minotaur
     public boolean moveWorker(Game currentGame, Worker worker, int deltaX, int deltaY) {
         Field targetField = currentGame.getBoard().getFieldByCoordinates(worker.getField().getPosX() + deltaX, worker.getField().getPosY() + deltaY);
-        if (targetField != null) {
-            worker.setField(targetField);
+        if (targetField != null && targetField.getWorker() == null && targetField.getHasDome() == false) {
+            //worker.setField(targetField);
             targetField.setWorker(worker);
             return true;
         }
