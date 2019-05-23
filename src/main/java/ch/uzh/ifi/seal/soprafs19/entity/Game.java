@@ -126,6 +126,7 @@ public class Game implements Serializable {
 		// Set game of matched players
 		for (Player player : matchedPlayers) {
 			player.setGame(this);
+			player.didMove();
 		}
 
 		// Delete board and save fields in game entity directly?
