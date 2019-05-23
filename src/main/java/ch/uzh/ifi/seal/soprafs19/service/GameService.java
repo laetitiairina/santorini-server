@@ -150,6 +150,7 @@ public class GameService {
                     }
                     catch (NullPointerException e) {
                         log.error("OpponentPlayerRules not available", e);
+                        return false;
                     }
                 }
                 break;
