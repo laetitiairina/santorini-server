@@ -5,7 +5,6 @@ import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
 import ch.uzh.ifi.seal.soprafs19.entity.*;
 import ch.uzh.ifi.seal.soprafs19.rules.godCards.AthenaRuleSet;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
-import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
 import org.apache.commons.lang3.SerializationUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,9 +26,6 @@ public class AthenaRuleSetTest extends SimpleRuleSetTest {
 
     @Autowired
     private GameService gameService;
-
-    @Autowired
-    private PlayerService playerService;
 
     @Override
     public void setup() {
@@ -129,5 +125,56 @@ public class AthenaRuleSetTest extends SimpleRuleSetTest {
 
         // Asserts
         Assert.assertFalse(isSuccessful);
+    }
+
+    @Test
+    public void checkWinConditionWithMoveUp() {
+        // adjust setup
+        Field field = game.getBoard().getFields().get(18);
+        Field field2 = game.getBoard().getFields().get(7);
+        Worker worker = field.getWorker();
+        Worker worker2 = field2.getWorker();
+        game.getBoard().getFields().get(13).setWorker(worker);
+        //worker.setField(game.getBoard().getFields().get(6));
+        game.getBoard().getFields().get(22).setWorker(worker2);
+        //worker2.setField(game.getBoard().getFields().get(5));
+        field.setWorker(null);
+        field2.setWorker(null);
+
+        //setup blocks
+        game.getBoard().getFields().get(24).setBlocks(2);
+        game.getBoard().getFields().get(19).setBlocks(2);
+        game.getBoard().getFields().get(18).setBlocks(1);
+        game.getBoard().getFields().get(17).setBlocks(2);
+        game.getBoard().getFields().get(16).setBlocks(2);
+        game.getBoard().getFields().get(21).setBlocks(1);
+
+        // create game with chosen position
+        Game updatedGame = SerializationUtils.clone(game);
+        Board board = updatedGame.getBoard();
+
+        Worker ownWorker = board.getFields().get(13).getWorker();
+
+        // move a worker by one field in any direction
+        List<Field> fields = new ArrayList<>();
+
+        // new field
+        fields.add(board.getFields().get(18));
+        fields.get(0).setWorker(ownWorker);
+
+        // old field
+        fields.add(board.getFields().get(13));
+        fields.get(1).setWorker(null);
+
+        board.setFields(fields);
+
+        Assert.assertEquals(2, board.getFields().size());
+
+        Assert.assertTrue(ruleSet.checkMovePhase(game, updatedGame));
+
+        Assert.assertTrue(gameService.updateGame(game, updatedGame));
+
+        Assert.assertTrue(ruleSet.checkWinCondition(game).equals(field.getWorker().getPlayer()));
+
     }
 }

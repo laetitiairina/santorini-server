@@ -1,10 +1,8 @@
 package ch.uzh.ifi.seal.soprafs19.rules;
 
 import ch.uzh.ifi.seal.soprafs19.Application;
-import ch.uzh.ifi.seal.soprafs19.entity.Board;
-import ch.uzh.ifi.seal.soprafs19.entity.Field;
-import ch.uzh.ifi.seal.soprafs19.entity.Game;
-import ch.uzh.ifi.seal.soprafs19.entity.Worker;
+import ch.uzh.ifi.seal.soprafs19.constant.SimpleGodCard;
+import ch.uzh.ifi.seal.soprafs19.entity.*;
 import ch.uzh.ifi.seal.soprafs19.rules.godCards.PrometheusRuleSet;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
@@ -110,5 +108,17 @@ public class PrometheusRuleSetTest extends SimpleRuleSetTest {
         board.setFields(fields);
 
         Assert.assertFalse(ruleSet.checkMovePhase(game, updatedGame));
+    }
+
+    @Override
+    public void setup() {
+        // creating players and adding to queue for matchmaking
+        Player player1 = newPlayer(true);
+        Player player2 = newPlayer(true);
+
+        // get the game
+        game = player1.getGame();
+
+        initGodGame(SimpleGodCard.PROMETHEUS, SimpleGodCard.ARTEMIS);
     }
 }
