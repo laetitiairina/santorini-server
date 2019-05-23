@@ -47,26 +47,26 @@ public class RuleFactory {
 
     public IRuleSet getRuleSet(Player player) {
         if (player.getCard() != null) {
-            switch (player.getCard().toString()) {
-                case ("APOLLO"):
+            switch (player.getCard()) {
+                case APOLLO:
                     return apolloRuleSet;
-                case("ARTEMIS"):
+                case ARTEMIS:
                     return artemisRuleSet;
-                case("ATHENA"):
+                case ATHENA:
                     return athenaRuleSet;
-                case("ATLAS"):
+                case ATLAS:
                     return atlasRuleSet;
-                case("DEMETER"):
+                case DEMETER:
                     return demeterRuleSet;
-                case("HEPHAESTUS"):
+                case HEPHAESTUS:
                     return hephaestusRuleSet;
-                case("HERMES"):
+                case HERMES:
                     return hermesRuleSet;
-                case("MINOTAUR"):
+                case MINOTAUR:
                     return minotaurRuleSet;
-                case("PAN"):
+                case PAN:
                     return panRuleSet;
-                case("PROMETHEUS"):
+                case PROMETHEUS:
                     return prometheusRuleSet;
             }
         }
