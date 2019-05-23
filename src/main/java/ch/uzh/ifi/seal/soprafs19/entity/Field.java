@@ -8,6 +8,16 @@ public class Field implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public Field () {}
+
+	public Field(Board board, Integer posX, Integer posY) {
+		this.board = board;
+		this.blocks = 0;
+		this.hasDome = false;
+		this.posX = posX;
+		this.posY = posY;
+	}
+
 	@Id
 	@GeneratedValue
 	@Column(name = "field_id")
@@ -83,16 +93,6 @@ public class Field implements Serializable {
 	}
 
 	public void setPosY(Integer posY) {
-		this.posY = posY;
-	}
-
-	public Field () {}
-
-	public Field(Board board, Integer posX, Integer posY) {
-		this.board = board;
-		this.blocks = 0;
-		this.hasDome = false;
-		this.posX = posX;
 		this.posY = posY;
 	}
 

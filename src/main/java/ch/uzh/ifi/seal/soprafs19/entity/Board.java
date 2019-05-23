@@ -13,6 +13,21 @@ public class Board implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public Board() {}
+
+	public Board(Game game, Integer numberOfRows) {
+
+		this.game = game;
+
+		this.fields = new ArrayList<>();
+
+		for (int i = 0; i < numberOfRows; i++) {
+			for (int j = 0; j < numberOfRows; j++)
+				this.fields.add(new Field(this,i, j));
+		}
+
+	}
+
 	@Id
 	@GeneratedValue
 	@Column(name = "board_id")
@@ -47,21 +62,6 @@ public class Board implements Serializable {
 
     @JsonIgnore
 	public void setGame(Game game) {this.game = game;}
-
-	public Board() {}
-
-	public Board(Game game, Integer numberOfRows) {
-
-		this.game = game;
-
-		this.fields = new ArrayList<>();
-
-		for (int i = 0; i < numberOfRows; i++) {
-			for (int j = 0; j < numberOfRows; j++)
-			this.fields.add(new Field(this,i, j));
-		}
-
-	}
 
 	public Field getFieldByCoordinates(int x, int y) {
 		List<Field> coordinateFields = fields.stream().filter(field -> field.getPosX() == x && field.getPosY() == y).collect(Collectors.toList());
