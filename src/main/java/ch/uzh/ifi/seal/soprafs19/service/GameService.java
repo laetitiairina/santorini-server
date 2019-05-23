@@ -102,17 +102,17 @@ public class GameService {
         currentGame.setMessage(null);
         saveGame(currentGame);
 
-        // only checks the first 3 states, if isGodMode is true
-        if (currentGame.getIsGodMode()) {
-            successfullyUpdatedGame = setGodModeInit(currentGame, updatedGame);
-        }
-
         // get rules
         for (Player player : currentGame.getPlayers()) {
             if (player.getIsCurrentPlayer()) {
                 currentPlayerRules = ruleFactory.getRuleSet(player);
             }
             else opponentPlayerRules = ruleFactory.getRuleSet(player);
+        }
+
+        // only checks the first 3 states, if isGodMode is true
+        if (currentGame.getIsGodMode()) {
+            successfullyUpdatedGame = setGodModeInit(currentGame, updatedGame);
         }
 
         // check the remaining states

@@ -66,7 +66,7 @@ public class RuleFactory {
                     return minotaurRuleSet;
                 case("PAN"):
                     return panRuleSet;
-                case("PROMETHEUR"):
+                case("PROMETHEUS"):
                     return prometheusRuleSet;
             }
         }

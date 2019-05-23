@@ -62,7 +62,7 @@ public class PrometheusRuleSetTest extends SimpleRuleSetTest {
     }
 
     @Test
-    public void buildAndMoveUpFails() {
+    public void buildAndMoveUpOnSameFieldFails() {
         List<Field> fields = new ArrayList<>();
         Game updatedGame = SerializationUtils.clone(game);
         Board board = updatedGame.getBoard();
@@ -74,6 +74,33 @@ public class PrometheusRuleSetTest extends SimpleRuleSetTest {
 
         // new field
         fields.add(board.getFields().get(3));
+        fields.get(1).setWorker(worker);
+
+        // old field
+        fields.add(board.getFields().get(4));
+        fields.get(2).setWorker(null);
+
+        board.setFields(fields);
+
+        Assert.assertFalse(ruleSet.checkMovePhase(game, updatedGame));
+    }
+
+    @Test
+    public void buildAndMoveUpOnOtherFieldFails() {
+        List<Field> fields = new ArrayList<>();
+        // adjust setup
+        game.getBoard().getFields().get(9).setBlocks(1);
+
+        Game updatedGame = SerializationUtils.clone(game);
+        Board board = updatedGame.getBoard();
+
+        fields.add(board.getFields().get(3));
+        fields.get(0).setBlocks(1);
+
+        Worker worker = board.getFields().get(4).getWorker();
+
+        // new field
+        fields.add(board.getFields().get(9));
         fields.get(1).setWorker(worker);
 
         // old field

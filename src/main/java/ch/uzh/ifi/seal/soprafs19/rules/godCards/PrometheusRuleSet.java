@@ -21,23 +21,31 @@ public class PrometheusRuleSet extends SimpleRuleSet {
             return super.checkMovePhase(before, after);
         }
         else if(after.getBoard().getFields().size() == 3) {
-            neighbouringFields(before, after.getBoard().getFields().get(0).getPosX(), after.getBoard().getFields().get(0).getPosY()).forEach(field -> {
+            mapFrontendToBackendFields(before, after);
+            List<Field> updatedFields = after.getBoard().getFields();
+            List<Field> dummyUpdatedFields = new ArrayList<>();
+            neighbouringFields(before, frontendFieldToBackendField.get(after.getBoard().getFields().get(0)).getPosX(), frontendFieldToBackendField.get(after.getBoard().getFields().get(0)).getPosY()).forEach(field -> {
                 if (field.getWorker() != null && field.getWorker().getPlayer() == before.getCurrentPlayer()){
-                    before.getBoard().getFieldByCoordinates(field.getPosX(), field.getPosY()).getWorker().setIsCurrentWorker(true);
+                    field.getWorker().setIsCurrentWorker(true);
                 }
             });
-            Game cloneAfter = SerializationUtils.clone(after);
-            List<Field> fields = new ArrayList<>();
-            fields.add(after.getBoard().getFields().get(0));
-            cloneAfter.getBoard().setFields(fields);
-            if (!checkBuildPhase(before, cloneAfter)) {
+            dummyUpdatedFields.add(updatedFields.get(0));
+            after.getBoard().setFields(dummyUpdatedFields);
+            if (!checkBuildPhase(before, after)) {
                 before.getCurrentPlayer().getWorkers().forEach(worker -> worker.setIsCurrentWorker(false));
                 return false;
             }
-            before.getCurrentPlayer().getWorkers().forEach(worker -> worker.setIsCurrentWorker(false));
-            return isValidMove(false, after.getBoard().getFields().get(1), after.getBoard().getFields().get(2)) &&
-                    after.getBoard().getFields().get(1).getBlocks() == after.getBoard().getFields().get(2).getBlocks();
 
+            before.getCurrentPlayer().getWorkers().forEach(worker -> worker.setIsCurrentWorker(false));
+            dummyUpdatedFields.clear();
+            dummyUpdatedFields.add(updatedFields.get(1));
+            dummyUpdatedFields.add(updatedFields.get(2));
+            after.getBoard().setFields(dummyUpdatedFields);
+            Boolean isValidMovePhase = super.checkMovePhase(before, after) &&
+                    updatedFields.get(1).getBlocks() == updatedFields.get(2).getBlocks();
+            //restore after game state
+            after.getBoard().setFields(updatedFields);
+            return isValidMovePhase;
         }
         return false;
     }
