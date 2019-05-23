@@ -53,11 +53,11 @@ public class HermesRuleSet extends SimpleRuleSet {
         if (!isValidMove(false, frontendFieldToBackendField.get(frontEndFields.get(2)), frontendFieldToBackendField.get(frontEndFields.get(3)))) {
             return false;
         }
-        // if one worker moves up only one can move
-        if(frontEndFields.get(1).getBlocks() - frontEndFields.get(0).getBlocks() == 1 && !frontEndFields.get(2).equals(frontEndFields.get(3))) {
+        // if one worker moves up or down only one can move
+        if(Math.abs(frontEndFields.get(1).getBlocks() - frontEndFields.get(0).getBlocks()) == 1 && !frontEndFields.get(2).equals(frontEndFields.get(3))) {
             return false;
         }
-        if (frontEndFields.get(3).getBlocks() - frontEndFields.get(2).getBlocks() == 1 && !frontEndFields.get(0).equals(frontEndFields.get(1))){
+        if (Math.abs(frontEndFields.get(3).getBlocks() - frontEndFields.get(2).getBlocks()) == 1 && !frontEndFields.get(0).equals(frontEndFields.get(1))){
             return false;
         }
         return true;
@@ -107,7 +107,7 @@ public class HermesRuleSet extends SimpleRuleSet {
             }
         }
 
-        // ? if no more possible path from this node
+        // if no more possible path from this node
         if (tempPossible.isEmpty()) {
             blockedFields.add(origin);
         }
