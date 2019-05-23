@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
-import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,27 +127,30 @@ public class GameService {
                 // TODO: include isBadRequest handling, add check logic (low priority)
                 // check if it's a valid move
                 if (currentPlayerRules.checkMovePhase(currentGame, updatedGame)) {
-                    if (opponentPlayerRules.checkMovePhaseOpponent(currentGame, updatedGame)) {
-                        // special logic for hermes input
-                        if (currentGame.getCurrentPlayer().getCard() == SimpleGodCard.HERMES) {
-                            List<Field> inputFields = updatedGame.getBoard().getFields();
-                            updatedGame.getBoard().setFields(inputFields.subList(0, 2));
-                            successfullyUpdatedGame = move(currentGame, updatedGame);
-                            updatedGame.getBoard().setFields(inputFields.subList(2, 4));
-                            successfullyUpdatedGame = successfullyUpdatedGame == null ? null : move(successfullyUpdatedGame, updatedGame);
-                            if (successfullyUpdatedGame != null) {
-                                currentGame.getCurrentPlayer().getWorkers().forEach(worker -> worker.setIsCurrentWorker(false));
+                    try {
+                        if (opponentPlayerRules.checkMovePhaseOpponent(currentGame, updatedGame)) {
+                            // special logic for hermes input
+                            if (currentGame.getCurrentPlayer().getCard() == SimpleGodCard.HERMES) {
+                                List<Field> inputFields = updatedGame.getBoard().getFields();
+                                updatedGame.getBoard().setFields(inputFields.subList(0, 2));
+                                successfullyUpdatedGame = move(currentGame, updatedGame);
+                                updatedGame.getBoard().setFields(inputFields.subList(2, 4));
+                                successfullyUpdatedGame = successfullyUpdatedGame == null ? null : move(successfullyUpdatedGame, updatedGame);
+                                if (successfullyUpdatedGame != null) {
+                                    currentGame.getCurrentPlayer().getWorkers().forEach(worker -> worker.setIsCurrentWorker(false));
+                                }
+                            } else {
+                                successfullyUpdatedGame = move(currentGame, updatedGame);
                             }
                         }
                         else {
-                            successfullyUpdatedGame = move(currentGame, updatedGame);
+                            currentGame.setMessage("Move invalid because of opponents god power. Try again!");
+                            saveGame(currentGame);
                         }
                     }
-                    else {
-                        currentGame.setMessage("Move invalid because of opponents god power. Try again!");
-                        saveGame(currentGame);
+                    catch (NullPointerException e) {
+                        log.error("OpponentPlayerRules not available", e);
                     }
-
                 }
                 break;
             case BUILD:
@@ -446,11 +447,11 @@ public class GameService {
 
         for (Field field : updatedGame.getBoard().getFields()) {
 
-            // find field that needs to be updated
-            Field fieldToUpdate = getFieldToUpdate(currentGame, field);
-
             // update the worker value of the field and remember current Worker
             try {
+
+                // find field that needs to be updated
+                Field fieldToUpdate = getFieldToUpdate(currentGame, field);
 
                 if (field.getWorker() != null) {
                     currentWorker = field.getWorker();
