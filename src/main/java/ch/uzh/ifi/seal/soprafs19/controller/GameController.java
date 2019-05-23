@@ -105,6 +105,10 @@ public class GameController {
     @PutMapping("/games/{id}/fastforward")
     ResponseEntity fastforwardGame(@RequestHeader("Token") String token, @PathVariable Long id, @RequestBody Game updatedGame) {
 
+        // Disable fast-forwarding
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("[DEBUG] Fast-forwarding is disabled!");
+
+        /*
         // Get game by id
         Optional<Game> currentGame = service.getGameById(id);
 
@@ -113,7 +117,9 @@ public class GameController {
             // Send response 404
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game was not found!");
         }
+        */
 
+        // Leave this commented out
         /*
         // Check if requested id is same as updatedGame id
         if (!currentGame.get().getId().equals(updatedGame.getId())) {
@@ -122,6 +128,7 @@ public class GameController {
         }
         */
 
+        /*
         // Check if request came from the current player in the current game
         if (!service.checkPlayerAuthentication(currentGame.get(), token)) {
             // Send response 403
@@ -135,6 +142,7 @@ public class GameController {
             // Send response 400
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad request!");
         }
+        */
     }
 
 }
