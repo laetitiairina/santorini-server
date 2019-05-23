@@ -16,7 +16,6 @@ public class UserController {
     @Autowired
     private UserService service;
 
-    private String unauthenticatedRequest = "Unauthenticated request!";
 
     @GetMapping("/users")
     Iterable<User> all() {
@@ -57,7 +56,7 @@ public class UserController {
 
         // Check if user who sent request is authenticated
         if (!service.checkUserAuthentication(token)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(unauthenticatedRequest);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthenticated request!");
         }
 
         // Logout user
@@ -74,7 +73,7 @@ public class UserController {
 
         // Check if user who sent request is authenticated
         if (!service.checkUserAuthentication(token)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(unauthenticatedRequest);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthenticated request!");
         }
 
         // Get user by id
@@ -94,7 +93,7 @@ public class UserController {
 
         // Check if user who sent request is authenticated
         if (!service.checkUserAuthentication(token)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(unauthenticatedRequest);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthenticated request!");
         }
 
         // Get user by id
@@ -107,7 +106,7 @@ public class UserController {
 
         // Check if user who sent request is same user who is going to be updated
         if (!user.get().getToken().equals(token)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(unauthenticatedRequest);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthenticated request!");
         }
 
         // Update user data
