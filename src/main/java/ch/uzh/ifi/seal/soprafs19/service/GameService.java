@@ -40,20 +40,7 @@ public class GameService {
     @Autowired
     private RuleFactory ruleFactory;
 
-    /*
-    //@Autowired
-    public GameService(GameRepository gameRepository, PlayerRepository playerRepository, RuleFactory ruleFactory) {
-        this.gameRepository = gameRepository;
-        this.playerRepository = playerRepository;
-        this.ruleFactory = ruleFactory;
-    }
-    */
 
-    /*
-    public Iterable<Game> getGames() {
-        return this.gameRepository.findAll();
-    }
-    */
 
     /**
      * Get game by id
@@ -83,9 +70,7 @@ public class GameService {
      */
     public boolean updateGame(Game currentGame, Game updatedGame) {
 
-        /* TODO: Current game entity gets modified in the rematch() function,
-        *   if there was a bad request, these modifications stay which they shouldn't
-        */
+
         // if they want to rematch
         if (currentGame.getStatus() == GameStatus.END && rematch(currentGame, updatedGame)) {
             return true;
@@ -124,7 +109,6 @@ public class GameService {
                 successfullyUpdatedGame = setPosition(currentGame, updatedGame);
                 break;
             case MOVE:
-                // TODO: include isBadRequest handling, add check logic (low priority)
                 // check if it's a valid move
                 if (currentPlayerRules.checkMovePhase(currentGame, updatedGame)) {
                     try {
@@ -155,7 +139,6 @@ public class GameService {
                 }
                 break;
             case BUILD:
-                // TODO: include isBadRequest handling, add check logic (low priority)
                 // check if it's a valid build
                 if (currentPlayerRules.checkBuildPhase(currentGame, updatedGame)) {
                 successfullyUpdatedGame = build(currentGame, updatedGame);
@@ -199,9 +182,7 @@ public class GameService {
             return true;
         } else {
             // !!!!!!!!!!!!!!!!!! IMPORTANT !!!!!!!!!!!!!!!!!!!!!
-            /* TODO: Current game entity might have been modified at this point,
-            *   make sure ALL these modifications are reverted, i.e. current game is reset to its previous state
-            */
+
 
             // Bad request
             return false;
@@ -261,12 +242,7 @@ public class GameService {
             SimpleGodCard chosenCard = updatedGame.getPlayers().get(0).getCard();
             List<SimpleGodCard> currentCards = currentGame.getCards();
 
-            // get players
-            //List<Player> currentPlayers = currentGame.getPlayers();
-            //long id = updatedGame.getPlayers().get(0).getId();
 
-            // Try not to use playerRepository in GameService
-            //Player currentPlayer = playerRepository.findById(id);
 
             Player currentPlayer = null;
             Player opponentPlayer = null;
@@ -283,18 +259,7 @@ public class GameService {
             // and the currentPlayer is one of the two currentPlayers and the Challenger
             if (currentCards.contains(chosenCard) && currentPlayer != null && opponentPlayer != null  && currentPlayer.getIsCurrentPlayer()) {
 
-                // Never remove things from the currentGame entity (even if added later again)
-                //currentCards.remove(chosenCard);
-                //currentPlayers.remove(currentPlayer);
 
-                // now currentPlayers only contains the opponent
-                // and currentCards only contains the other card
-                //currentPlayers.get(0).setCard(currentCards.get(0));
-                //currentPlayer.setCard(chosenCard);
-
-                // add again
-                //currentPlayers.add(currentPlayer);
-                //currentCards.add(chosenCard);
 
                 for (SimpleGodCard card : currentGame.getCards()) {
                     if (card == chosenCard) {
@@ -322,7 +287,6 @@ public class GameService {
     public Game setStartPlayer(Game currentGame, Game updatedGame) {
         Player currentGamePlayer = null;
         Player currentUpdatePlayer = updatedGame.getPlayers().get(0);
-        //List<Player> players = currentGame.getPlayers();
 
         for (Player player : currentGame.getPlayers()) {
             if (player.getId().equals(currentUpdatePlayer.getId())) {
@@ -331,10 +295,8 @@ public class GameService {
         }
 
         if (currentUpdatePlayer.getIsCurrentPlayer() && currentGamePlayer != null) {
-            //long id = currentUpdatePlayer.getId();
 
             // Try not to use playerRepository in GameService
-            //currentPlayer = playerRepository.findById(id);
 
             for (Player player : currentGame.getPlayers()) {
                 if (player.getId().equals(currentGamePlayer.getId())) {
@@ -533,7 +495,6 @@ public class GameService {
     public boolean moveWorker(Game currentGame, Worker worker, int deltaX, int deltaY) {
         Field targetField = currentGame.getBoard().getFieldByCoordinates(worker.getField().getPosX() + deltaX, worker.getField().getPosY() + deltaY);
         if (targetField != null && targetField.getWorker() == null && targetField.getHasDome() == false) {
-            //worker.setField(targetField);
             targetField.setWorker(worker);
             return true;
         }
@@ -611,9 +572,7 @@ public class GameService {
             return null;
         }
 
-        // Gets saved later
-        // save
-        //gameRepository.save(game);
+
 
         // Return updated game
         return game;

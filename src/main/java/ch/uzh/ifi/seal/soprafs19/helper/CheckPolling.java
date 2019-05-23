@@ -3,7 +3,6 @@ package ch.uzh.ifi.seal.soprafs19.helper;
 import ch.uzh.ifi.seal.soprafs19.service.GameService;
 import ch.uzh.ifi.seal.soprafs19.service.PlayerService;
 import ch.uzh.ifi.seal.soprafs19.constant.GameStatus;
-import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.entity.Player;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;

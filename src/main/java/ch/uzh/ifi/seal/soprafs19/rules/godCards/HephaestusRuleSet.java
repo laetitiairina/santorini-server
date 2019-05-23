@@ -1,13 +1,11 @@
 package ch.uzh.ifi.seal.soprafs19.rules.godCards;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Field;
-import ch.uzh.ifi.seal.soprafs19.entity.Game;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Component

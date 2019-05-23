@@ -1,9 +1,7 @@
 package ch.uzh.ifi.seal.soprafs19.rules.godCards;
 
 import ch.uzh.ifi.seal.soprafs19.entity.Game;
-import ch.uzh.ifi.seal.soprafs19.entity.Worker;
 import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
-import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ch.uzh.ifi.seal.soprafs19.entity.Field;
@@ -53,7 +51,8 @@ public class PrometheusRuleSet extends SimpleRuleSet {
             //check if worker who built is moving
 
 
-            if (frontToBack.get(updatedFields.get(1)).getWorker().getIsCurrentWorker() == false) return false;
+            if (frontToBack.get(updatedFields.get(1)).getWorker().getIsCurrentWorker() == false)
+                return false;
 
             before.getCurrentPlayer().getWorkers().forEach(worker -> worker.setIsCurrentWorker(false));
             dummyUpdatedFields.clear();

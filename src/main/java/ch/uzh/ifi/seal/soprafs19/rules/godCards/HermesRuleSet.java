@@ -6,7 +6,6 @@ import ch.uzh.ifi.seal.soprafs19.rules.SimpleRuleSet;
 import ch.uzh.ifi.seal.soprafs19.entity.Field; 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +66,8 @@ public class HermesRuleSet extends SimpleRuleSet {
     protected Boolean isValidMove(boolean isSecondMove, Field fieldBefore, Field fieldAfter) {
 
         //if worker did not move is valid
-        if (fieldBefore.equals(fieldAfter)) {return true;}
+        if (fieldBefore.equals(fieldAfter))
+        {return true;}
 
         // origin field had a worker or it's the second move of a worker
         else if (((fieldBefore.getWorker() != null) || isSecondMove)
@@ -123,7 +123,8 @@ public class HermesRuleSet extends SimpleRuleSet {
                 break;
             }
         }
-        if (isValid == true) return true;
+        if (isValid == true)
+            return true;
 
         if (path.size() > 0) {
             path.remove(path.size() -1);
