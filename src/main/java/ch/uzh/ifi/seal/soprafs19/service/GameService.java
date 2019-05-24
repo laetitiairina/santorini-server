@@ -322,6 +322,7 @@ public class GameService {
     public Game setStartPlayer(Game currentGame, Game updatedGame) {
         Player currentGamePlayer = null;
         Player currentUpdatePlayer = updatedGame.getPlayers().get(0);
+        //List<Player> players = currentGame.getPlayers();
 
         for (Player player : currentGame.getPlayers()) {
             if (player.getId().equals(currentUpdatePlayer.getId())) {
@@ -532,6 +533,7 @@ public class GameService {
     public boolean moveWorker(Game currentGame, Worker worker, int deltaX, int deltaY) {
         Field targetField = currentGame.getBoard().getFieldByCoordinates(worker.getField().getPosX() + deltaX, worker.getField().getPosY() + deltaY);
         if (targetField != null && targetField.getWorker() == null && targetField.getHasDome() == false) {
+            //worker.setField(targetField);
             targetField.setWorker(worker);
             return true;
         }
