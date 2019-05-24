@@ -22,6 +22,18 @@ public class PlayerController {
     @Autowired
     private JsonHelper helper;
 
+    /*
+    PlayerController(PlayerService service) {
+        this.service = service;
+    }
+    */
+
+    /*
+    @GetMapping("/players")
+    Iterable<Player> all() {
+        return service.getPlayer();
+    }
+    */
 
     @PostMapping("/players")
     ResponseEntity createPlayer(@RequestHeader(value="Token",required=false) String token, @RequestBody Player newPlayer) {
@@ -37,6 +49,7 @@ public class PlayerController {
 
         // Transform player to json node
         JsonNode playerNode = helper.objectToJsonNode(player);
+        //JsonNode playerNode = helper.getFilteredObjectAsJsonNode(player, Arrays.asList("id"));
 
         // Manually add token since JsonIgnore is set for it
         ((ObjectNode) playerNode).put("token",player.getToken());

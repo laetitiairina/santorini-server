@@ -46,12 +46,14 @@ public class CheckPolling implements Runnable {
                 if (player.lastPoll() > GAME_POLL_TIME_MAX) {
                     // Abort game if player hasn't polled in x seconds
                     System.out.println("Game aborted");
+                    //gameService.abortGame(player.getGame());
                     gameService.abortGameWithWinner(player.getGame(),player,"left the game!");
                 }
 
                 if (player.getIsCurrentPlayer() && player.lastMove() > GAME_TURN_TIME_MAX) {
                     // Abort game if player takes too long
                     System.out.println("Game aborted");
+                    //gameService.abortGame(player.getGame());
                     gameService.abortGameWithWinner(player.getGame(),player,"took too long!");
                 }
             }
