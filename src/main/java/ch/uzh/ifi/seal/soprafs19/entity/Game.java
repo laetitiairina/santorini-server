@@ -26,6 +26,7 @@ public class Game implements Serializable {
 			matchedPlayers.get(0).setIsCurrentPlayer(true);
 		} else {
 			this.status = GameStatus.COLOR1;
+            // TODO: Add logic for simple game mode (birthday, etc..)
 			matchedPlayers.get(0).setIsCurrentPlayer(true);
 		}
 

@@ -60,6 +60,7 @@ public class User implements Serializable {
 		this.username = username;
 	}
 
+	// TODO: Check why test fail when JsonIgnore
 	//@JsonIgnore
 	public String getPassword() {
 		return password;
@@ -118,7 +119,16 @@ public class User implements Serializable {
 		this.losses = losses;
 	}
 
+	/*
+	public User() {}
 
+	public User(String username, String password) {
+		this.username = username;
+		this.password = password;
+		this.token = UUID.randomUUID().toString();
+		this.status = UserStatus.OFFLINE;
+	}
+	*/
 
 	public void didWin(Boolean won) {
 		if (won) {
