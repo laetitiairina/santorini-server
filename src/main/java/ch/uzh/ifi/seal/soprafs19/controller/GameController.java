@@ -20,6 +20,26 @@ public class GameController {
     @Autowired
     private JsonHelper helper;
 
+    /*
+    GameController(GameService gameService, JsonHelper helper) {
+        this.service = gameService;
+        this.helper = helper;
+    }
+    */
+
+    /*
+    @GetMapping("/games")
+    Iterable<Game> all() {
+        return service.getGames();
+    }
+    */
+
+    /*
+    @PostMapping("/games")
+    Game createGame(@RequestBody Game newGame) {
+        return this.service.createUser(newGame);
+    }
+    */
 
     @GetMapping("/games/{id}")
     ResponseEntity getGame(@RequestHeader("Token") String token, @PathVariable("id") Long id, @RequestParam(required = false) List<String> fields) {
